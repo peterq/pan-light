@@ -1,0 +1,133 @@
+diff --git a/src/cmd/go/internal/work/exec.go b/src/cmd/go/internal/work/exec.go
+index 158f5f3b17..53f7c38a09 100644
+--- a/src/cmd/go/internal/work/exec.go
++++ b/src/cmd/go/internal/work/exec.go
+@@ -2822,7 +2822,11 @@ func passLongArgsInResponseFiles(cmd *exec.Cmd) (cleanup func()) {
+ 	cleanup = func() { os.Remove(tf.Name()) }
+ 	var buf bytes.Buffer
+ 	for _, arg := range cmd.Args[1:] {
+-		fmt.Fprintf(&buf, "%s\n", arg)
++		if strings.Contains(arg, "\\") {
++			fmt.Fprintf(&buf, "%s\n", strings.Replace(arg, "\\", "\\\\", -1))
++		} else {
++			fmt.Fprintf(&buf, "%s\n", arg)
++		}
+ 	}
+ 	if _, err := tf.Write(buf.Bytes()); err != nil {
+ 		tf.Close()
+@@ -2848,7 +2852,7 @@ func useResponseFile(path string, argLen int) bool {
+ 	// TODO: do we need more commands? asm? cgo? For now, no.
+ 	prog := strings.TrimSuffix(filepath.Base(path), ".exe")
+ 	switch prog {
+-	case "compile", "link":
++	case "compile", "link", "gcc", "g++":
+ 	default:
+ 		return false
+ 	}
+diff --git a/src/cmd/link/internal/ld/lib.go b/src/cmd/link/internal/ld/lib.go
+index 2284c347dc..c94ce4bef2 100644
+--- a/src/cmd/link/internal/ld/lib.go
++++ b/src/cmd/link/internal/ld/lib.go
+@@ -50,6 +50,7 @@ import (
+ 	"io"
+ 	"io/ioutil"
+ 	"log"
++	"math/rand"
+ 	"os"
+ 	"os/exec"
+ 	"path/filepath"
+@@ -1337,7 +1338,10 @@ func (ctxt *Link) hostlink() {
+ 		ctxt.Logf("\n")
+ 	}
+ 
+-	if out, err := exec.Command(argv[0], argv[1:]...).CombinedOutput(); err != nil {
++	cmd := exec.Command(argv[0], argv[1:]...)
++	cleanup := passLongArgsInResponseFiles(cmd)
++	defer cleanup()
++	if out, err := cmd.CombinedOutput(); err != nil {
+ 		Exitf("running %s failed: %v\n%s", argv[0], err, out)
+ 	} else if len(out) > 0 {
+ 		// always print external output even if the command is successful, so that we don't
+@@ -2366,3 +2370,82 @@ func dfs(lib *sym.Library, mark map[*sym.Library]markKind, order *[]*sym.Library
+ 	mark[lib] = visited
+ 	*order = append(*order, lib)
+ }
++
++// passLongArgsInResponseFiles modifies cmd on Windows such that, for
++// certain programs, long arguments are passed in "response files", a
++// file on disk with the arguments, with one arg per line. An actual
++// argument starting with '@' means that the rest of the argument is
++// a filename of arguments to expand.
++//
++// See Issue 18468.
++func passLongArgsInResponseFiles(cmd *exec.Cmd) (cleanup func()) {
++	cleanup = func() {} // no cleanup by default
++
++	var argLen int
++	for _, arg := range cmd.Args {
++		argLen += len(arg)
++	}
++
++	// If we're not approaching 32KB of args, just pass args normally.
++	// (use 30KB instead to be conservative; not sure how accounting is done)
++	if !useResponseFile(cmd.Path, argLen) {
++		return
++	}
++
++	tf, err := ioutil.TempFile("", "args")
++	if err != nil {
++		log.Fatalf("error writing long arguments to response file: %v", err)
++	}
++	cleanup = func() { os.Remove(tf.Name()) }
++	var buf bytes.Buffer
++	for _, arg := range cmd.Args[1:] {
++		if strings.Contains(arg, "\\") {
++			fmt.Fprintf(&buf, "%s\n", strings.Replace(arg, "\\", "\\\\", -1))
++		} else {
++			fmt.Fprintf(&buf, "%s\n", arg)
++		}
++	}
++	if _, err := tf.Write(buf.Bytes()); err != nil {
++		tf.Close()
++		cleanup()
++		log.Fatalf("error writing long arguments to response file: %v", err)
++	}
++	if err := tf.Close(); err != nil {
++		cleanup()
++		log.Fatalf("error writing long arguments to response file: %v", err)
++	}
++	cmd.Args = []string{cmd.Args[0], "@" + tf.Name()}
++	return cleanup
++}
++
++func useResponseFile(path string, argLen int) bool {
++	// Unless we're on Windows, don't use response files.
++	if runtime.GOOS != "windows" {
++		return false
++	}
++
++	// Unless the program uses objabi.Flagparse, which understands
++	// response files, don't use response files.
++	// TODO: do we need more commands? asm? cgo? For now, no.
++	prog := strings.TrimSuffix(filepath.Base(path), ".exe")
++	switch prog {
++	case "gcc", "g++":
++	default:
++		return false
++	}
++
++	// Windows has a limit of 32 KB arguments. To be conservative and not
++	// worry about whether that includes spaces or not, just use 30 KB.
++	if argLen > (30 << 10) {
++		return true
++	}
++
++	// On the Go build system, use response files about 10% of the
++	// time, just to exercise this codepath.
++	isBuilder := os.Getenv("GO_BUILDER_NAME") != ""
++	if isBuilder && rand.Intn(10) == 0 {
++		return true
++	}
++
++	return false
++}

@@ -1,0 +1,48 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "designerror/windows-7"
+  config.vm.synced_folder ENV['GOPATH'], "/media/sf_GOPATH0", SharedFoldersEnableSymlinksCreate: false
+  config.ssh.keep_alive = true
+
+  config.vm.provider "virtualbox" do |v|
+    v.linked_clone = true
+    v.memory = 8192
+    v.customize ["modifyvm", :id, "--vram", "256"]
+    v.cpus = 1
+    v.customize ["modifyvm", :id, "--accelerate3d", "on"]
+  end
+
+  config.vm.define "windows" do |m|
+    config.vm.provision "shell", inline: "(New-Object Net.WebClient).DownloadFile('https://skanthak.homepage.t-online.de/download/curl-7.61.1.cab', 'c:/tmp/curl.cab')"
+    config.vm.provision "shell", path: "../pre.bat", env: {"OS" => "windows", "DESKTOP" => "true"}
+  end
+
+  config.vm.define "android" do |m|
+    config.vm.provision "shell", inline: "(New-Object Net.WebClient).DownloadFile('https://skanthak.homepage.t-online.de/download/curl-7.61.1.cab', 'c:/tmp/curl.cab')"
+    config.vm.provision "shell", path: "../pre.bat", env: {"OS" => "windows", "ANDROID" => "true"}
+  end
+
+  config.vm.define "windows_32_shared" do |m|
+     config.vm.provision "shell", inline: "(New-Object Net.WebClient).DownloadFile('https://skanthak.homepage.t-online.de/download/curl-7.61.1.cab', 'c:/tmp/curl.cab')"
+     config.vm.provision "shell", path: "../pre.bat", env: {"OS" => "windows", "QT_MSYS2" => "true", "QT_MSYS2_STATIC" => "false", "QT_MSYS2_ARCH" => "386"}
+  end
+
+  config.vm.define "windows_32_static" do |m|
+     config.vm.provision "shell", inline: "(New-Object Net.WebClient).DownloadFile('https://skanthak.homepage.t-online.de/download/curl-7.61.1.cab', 'c:/tmp/curl.cab')"
+     config.vm.provision "shell", path: "../pre.bat", env: {"OS" => "windows", "QT_MSYS2" => "true", "QT_MSYS2_STATIC" => "true", "QT_MSYS2_ARCH" => "386"}
+  end
+
+  config.vm.define "windows_64_shared" do |m|
+     config.vm.provision "shell", inline: "(New-Object Net.WebClient).DownloadFile('https://skanthak.homepage.t-online.de/download/curl-7.61.1.cab', 'c:/tmp/curl.cab')"
+     config.vm.provision "shell", path: "../pre.bat", env: {"OS" => "windows", "QT_MSYS2" => "true", "QT_MSYS2_STATIC" => "false", "QT_MSYS2_ARCH" => "amd64"}
+  end
+
+  config.vm.define "windows_64_static" do |m|
+     config.vm.provision "shell", inline: "(New-Object Net.WebClient).DownloadFile('https://skanthak.homepage.t-online.de/download/curl-7.61.1.cab', 'c:/tmp/curl.cab')"
+     config.vm.provision "shell", path: "../pre.bat", env: {"OS" => "windows", "QT_MSYS2" => "true", "QT_MSYS2_STATIC" => "true", "QT_MSYS2_ARCH" => "amd64"}
+  end
+
+  #TODO: desktop + webkit
+  #TODO: android + openssl
+  #TODO: sailfish
+
+end

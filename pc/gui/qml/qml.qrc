@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>comps/bridge.qml</file>
+        <file>js/util.js</file>
+        <file>js/promise.js</file>
+        <file>js/global.js</file>
+        <file>comps/timer.qml</file>
+    </qresource>
+</RCC>

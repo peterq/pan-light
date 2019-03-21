@@ -1,0 +1,6 @@
+*.pro.user
+.idea
+pc/vendor
+moc*
+*.autosave
+rcc*

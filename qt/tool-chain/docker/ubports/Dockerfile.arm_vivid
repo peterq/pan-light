@@ -1,0 +1,27 @@
+FROM clickable/ubuntu-sdk:15.04-armhf
+LABEL maintainer therecipe
+
+ENV USER user
+ENV HOME /home/$USER
+ENV GOPATH $HOME/work
+ENV PATH /usr/local/go/bin:$PATH
+ENV QT_DOCKER true
+ENV QT_PKG_CONFIG true
+ENV QT_UBPORTS true
+ENV QT_UBPORTS_ARCH arm
+ENV QT_UBPORTS_VERSION vivid
+
+RUN rm -rf /usr/local/go || true
+COPY --from=therecipe/qt:linux /usr/local/go /usr/local/go
+COPY --from=therecipe/qt:linux $GOPATH/bin $GOPATH/bin
+COPY --from=therecipe/qt:linux $GOPATH/src/github.com/peterq/pan-light/qt $GOPATH/src/github.com/peterq/pan-light/qt
+
+RUN apt-get -qq update && apt-get --no-install-recommends -qq -y install qt*5-doc-html && apt-get -qq clean
+
+RUN ln -s /usr/lib/x86_64-linux-gnu/qt5/bin/rcc /usr/lib/arm-linux-gnueabihf/qt5/bin/
+RUN ln -s /usr/lib/x86_64-linux-gnu/qt5/bin/moc /usr/lib/arm-linux-gnueabihf/qt5/bin/
+
+RUN $GOPATH/bin/qtsetup prep
+RUN $GOPATH/bin/qtsetup check ubports
+RUN $GOPATH/bin/qtsetup generate ubports
+RUN $GOPATH/bin/qtsetup install ubports

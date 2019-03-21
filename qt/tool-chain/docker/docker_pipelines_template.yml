@@ -1,0 +1,193 @@
+jobs:
+- template: docker_job_template.yml
+  parameters:
+    file: android/Dockerfile
+    tag: android
+    dep: linux
+- template: docker_job_template.yml
+  parameters:
+    file: js/Dockerfile
+    tag: js
+    dep:
+    #        - js_base
+    - linux
+#  -
+#    template: docker_job_template.yml
+#    parameters:
+#      file: js/Dockerfile.base
+#      tag: js_base
+- template: docker_job_template.yml
+  parameters:
+    file: js/Dockerfile.wasm
+    tag: wasm
+    dep:
+    #        - js_base
+    - linux
+- template: docker_job_template.yml
+  parameters:
+    file: linux/Dockerfile
+    tag: linux
+- template: docker_job_template.yml
+  parameters:
+    file: linux/Dockerfile.56
+    tag: linux_56
+- template: docker_job_template.yml
+  parameters:
+    file: linux/Dockerfile.59
+    tag: linux_59
+- template: docker_job_template.yml
+  parameters:
+    file: linux/Dockerfile.arch
+    tag: linux_arch
+- template: docker_job_template.yml
+  parameters:
+    file: linux/Dockerfile.ubuntu_16_04
+    tag: linux_ubuntu_16_04
+- template: docker_job_template.yml
+  parameters:
+    file: linux/Dockerfile.ubuntu_18_04
+    tag: linux_ubuntu_18_04
+- template: docker_job_template.yml
+  parameters:
+    file: sailfish/Dockerfile
+    tag: sailfish
+- template: docker_job_template.yml
+  parameters:
+    file: ubports/Dockerfile.64_vivid
+    tag: ubports_64_vivid
+    dep: linux
+- template: docker_job_template.yml
+  parameters:
+    file: ubports/Dockerfile.64_xenial
+    tag: ubports_64_xenial
+    dep: linux
+- template: docker_job_template.yml
+  parameters:
+    file: ubports/Dockerfile.arm_vivid
+    tag: ubports_arm_vivid
+    dep: linux
+- template: docker_job_template.yml
+  parameters:
+    file: ubports/Dockerfile.arm_xenial
+    tag: ubports_arm_xenial
+    dep: linux
+- template: docker_job_template.yml
+  parameters:
+    file: windows_32_shared/Dockerfile
+    tag: windows_32_shared
+    dep:
+    #        - windows_32_shared_base
+    - linux
+#  -
+#    template: docker_job_template.yml
+#    parameters:
+#      file: windows_32_shared/Dockerfile.base
+#      tag: windows_32_shared_base
+- template: docker_job_template.yml
+  parameters:
+    file: windows_32_static/Dockerfile
+    tag: windows_32_static
+    dep:
+    #        - windows_32_static_base
+    - linux
+#  -
+#    template: docker_job_template.yml
+#    parameters:
+#      file: windows_32_static/Dockerfile.base
+#      tag: windows_32_static_base
+- template: docker_job_template.yml
+  parameters:
+    file: windows_64_shared/Dockerfile
+    tag: windows_64_shared
+    dep:
+    #        - windows_64_shared_base
+    - linux
+#  -
+#    template: docker_job_template.yml
+#    parameters:
+#      file: windows_64_shared/Dockerfile.base
+#      tag: windows_64_shared_base
+- template: docker_job_template.yml
+  parameters:
+    file: windows_64_static/Dockerfile
+    tag: windows_64_static
+    dep:
+    #        - windows_64_static_base
+    - linux
+#  -
+#    template: docker_job_template.yml
+#    parameters:
+#      file: windows_64_static/Dockerfile.base
+#      tag: windows_64_static_base
+#  -
+#    template: docker_job_template.yml
+#    parameters:
+#      file: windows_legacy/Dockerfile.32_shared
+#      tag: windows_32_shared_legacy
+#      dep: linux
+#  -
+#    template: docker_job_template.yml
+#    parameters:
+#      file: windows_legacy/Dockerfile.32_static
+#      tag: windows_32_static_legacy
+#      dep: linux
+#  -
+#    template: docker_job_template.yml
+#    parameters:
+#      file: windows_legacy/Dockerfile.64_shared
+#      tag: windows_64_shared_legacy
+#      dep: linux
+#  -
+#    template: docker_job_template.yml
+#    parameters:
+#      file: windows_legacy/Dockerfile.64_static
+#      tag: windows_64_static_legacy
+#      dep: linux
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile
+    tag: windows_64_shared_wine
+    dep: wine_base
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile.32_shared
+    tag: windows_32_shared_msys2
+    dep: wine_base
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile.32_static
+    tag: windows_32_static_msys2
+    dep: wine_base
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile.56
+    tag: windows_32_shared_56
+    dep: wine_base
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile.56_xp
+    tag: windows_32_shared_xp
+    dep: wine_base_xp
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile.59
+    tag: windows_32_shared_59
+    dep: wine_base
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile.64_shared
+    tag: windows_64_shared_msys2
+    dep: wine_base
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile.64_static
+    tag: windows_64_static_msys2
+    dep: wine_base
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile.base
+    tag: wine_base
+- template: docker_job_template.yml
+  parameters:
+    file: wine/Dockerfile.base_xp
+    tag: wine_base_xp

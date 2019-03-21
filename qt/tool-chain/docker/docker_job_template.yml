@@ -1,0 +1,9 @@
+jobs:
+- job: '${{ parameters.tag }}'
+  timeoutInMinutes: 0
+  pool:
+    vmImage: ubuntu-16.04
+  dependsOn: '${{ parameters.dep }}'
+  steps:
+  - script: 'docker build -f tool-chain/docker/${{ parameters.file }} -t therecipe/qt:${{ parameters.tag }} .'
+  - script: 'docker login -u therecipe -p $(DOCKER_PASSWORD) && docker push therecipe/qt:${{ parameters.tag }} && docker logout'
