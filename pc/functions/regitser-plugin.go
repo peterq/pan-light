@@ -18,7 +18,7 @@ func asyncMap(r map[string]asyncHandler) {
 	asyncRoutes = append(asyncRoutes, r)
 }
 
-func RegiterAsync(regitser func(routes map[string]func(map[string]interface{},
+func RegisterAsync(regitser func(routes map[string]func(map[string]interface{},
 	func(interface{}), func(interface{}), func(interface{}), chan interface{}))) {
 
 	for _, r := range asyncRoutes {
@@ -32,7 +32,7 @@ func RegiterAsync(regitser func(routes map[string]func(map[string]interface{},
 	}
 }
 
-func RegiterSync(register func(routes map[string]func(map[string]interface{}) interface{})) {
+func RegisterSync(register func(routes map[string]func(map[string]interface{}) interface{})) {
 
 	for _, r := range syncRoutes {
 

@@ -25,10 +25,10 @@ func main() {
 		panic(err)
 	}
 
-	functions.RegiterAsync(AsyncRouteRegitser.(func(routes map[string]func(map[string]interface{},
+	functions.RegisterAsync(AsyncRouteRegitser.(func(routes map[string]func(map[string]interface{},
 		func(interface{}), func(interface{}), func(interface{}), chan interface{}))))
 
-	functions.RegiterSync(SyncRouteRegitser.(func(routes map[string]func(map[string]interface{}) interface{})))
+	functions.RegisterSync(SyncRouteRegitser.(func(routes map[string]func(map[string]interface{}) interface{})))
 
 	StartGui.(func(rccFile, mainQml string))("./gui/qml/qml.rcc", "qrc:/main.qml")
 }
