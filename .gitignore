@@ -4,3 +4,5 @@ pc/vendor
 moc*
 *.autosave
 rcc*
+qml.rcc
+gui-plugin.so

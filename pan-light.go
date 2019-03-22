@@ -22,6 +22,7 @@ func main() {
 
 		println("命令:\n")
 		for _, m := range []struct{ name, desc string }{
+			{"pc dev", "启动pc客户端, 开发模式, 用plugin加速编译, 不支持windows"},
 			{"pc start", "启动pc客户端"},
 			{"pc moc", "生成moc"},
 		} {
@@ -52,9 +53,27 @@ func pcCmd() {
 		pcStart()
 	case "moc":
 		pcMoc()
+	case "dev":
+		pcDev()
 	default:
 		flag.Usage()
 	}
+}
+
+func pcDev() {
+	var rebuildPlugin bool
+	flag.BoolVar(&rebuildPlugin, "rebuild", false, "重新编译plugin插件")
+	flag.Parse()
+	pluginPath := "./pc/gui/gui-plugin.so"
+	_, err := os.Stat(pluginPath)
+	if os.IsNotExist(err) || rebuildPlugin {
+		log.Println("编译gui插件...")
+		runCmd("./pc/gui", "go", "build", "-tags=plugin", "--buildmode=plugin", "-o", "gui-plugin.so", "gui-plugin.go")
+	}
+	log.Println("打包qml...")
+	cmd(qtBin("rcc"), "-binary", "pc/gui/qml/qml.qrc", "-o", "pc/gui/qml/qml.rcc").Run()
+	log.Println("启动客户端...")
+	runCmd("./pc", "go", "run", "-tags=plugin", "pan-light-pc-dev.go")
 }
 
 func qtBin(name string) string {
@@ -125,4 +144,10 @@ func cmd(name string, arg ...string) *exec.Cmd {
 	cmd.Stdin = os.Stdin
 
 	return cmd
+}
+
+func runCmd(path, name string, arg ...string) {
+	c := cmd(name, arg...)
+	c.Dir, _ = filepath.Abs(path)
+	c.Run()
 }

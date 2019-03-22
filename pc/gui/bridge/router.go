@@ -71,6 +71,9 @@ func callGoAsync(data *qt_rpc.Gson) {
 				})
 				finish()
 			}, func(i interface{}) {
+				if e, ok := i.(error); ok {
+					i = e.Error()
+				}
 				NotifyQml("call.ret", map[string]interface{}{
 					"type":   "reject",
 					"callId": p["callId"],

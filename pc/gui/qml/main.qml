@@ -22,12 +22,16 @@ Window {
 
     Component.onCompleted: {
         // 初始化js工具
-        Util.callGoAsync('wait', {
+        Util.callGoAsync("wait", {
                              "time": 3
                          }).then(function (s) {
-                             text.text = s + Util.callGoSync('time')
+                             text.text = s + Util.callGoSync("time")
                          }, null, function (s) {
                              text.text = s
-                         })
+                         });
+        var ret = Util.callGoSync("add", {a: 3, b: 8})
+        console.log(ret)
+        Util.callGoAsync("ip.info")
+            .then(function(r) {console.log(r)}, function(e) {console.log(e)})
     }
 }
