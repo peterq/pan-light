@@ -52,7 +52,7 @@ func doInit() {
 	// 初始化一个用户存储
 	ChangeUserStorage()
 	if debug {
-		Global.UserStorageMap[Global.UserStorageId] = last.UserStorageMap[last.UserStorageId]
+		//Global.UserStorageMap[Global.UserStorageId] = last.UserStorageMap[last.UserStorageId]
 	}
 	//log.Println(string(util.First(json.Marshal(Global)).([]byte)))
 }

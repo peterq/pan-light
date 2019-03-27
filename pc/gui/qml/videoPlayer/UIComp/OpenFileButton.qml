@@ -18,6 +18,7 @@ Button {
     }
 
     DataSaver {
+        $key: 'video.open-file'
         property alias lastFolder: fileDialog.lastFolder
     }
 

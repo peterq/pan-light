@@ -145,6 +145,17 @@ var callGoSync
     }
 })()
 
+function storageGet(key, $default) {
+    var ret = callGoSync('storage.get', { k: key })
+    if (ret === '')
+        return $default
+    return JSON.parse(ret)
+}
+
+function storageSet(key, value) {
+    return callGoSync('storage.set', { k: key, v: JSON.stringify(value || '') })
+}
+
 function notifyPromise(promise, data){
     function getCallId(promise) {
         if (promise.callId)

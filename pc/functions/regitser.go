@@ -4,7 +4,7 @@ package functions
 
 import "github.com/peterq/pan-light/pc/gui/bridge"
 
-type syncHandler func(map[string]interface{}) interface{}
+type syncHandler func(p map[string]interface{}) (result interface{})
 
 type asyncHandler func(map[string]interface{},
 	func(interface{}), func(interface{}), func(interface{}), chan interface{})

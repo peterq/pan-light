@@ -9,8 +9,8 @@ function init(r) {
     root = r
 }
 
-// 播放器
-var player = null
+// DataSaver 使用过的key
+var dataSaverKeys = {}
 
 // internal server(go) url
 var internalServerUrl = ""
