@@ -20,7 +20,7 @@ func StartGui(rccFile, mainQml string) {
 
 	// 加载qml
 	core.QResource_RegisterResource(rccFile, "/")
-	
+
 	app := gui.NewQGuiApplication(len(os.Args), os.Args)
 
 	engine := qml.NewQQmlApplicationEngine(nil)
@@ -28,11 +28,11 @@ func StartGui(rccFile, mainQml string) {
 	app.Exec()
 }
 
-func SyncRouteRegitser(routes map[string]func(map[string]interface{}) interface{}) {
-	bridge.SyncRouteRegitser(routes)
+func SyncRouteRegister(routes map[string]func(map[string]interface{}) interface{}) {
+	bridge.SyncRouteRegister(routes)
 }
 
-func AsyncRouteRegitser(routes map[string]func(map[string]interface{},
+func AsyncRouteRegister(routes map[string]func(map[string]interface{},
 	func(interface{}), func(interface{}), func(interface{}), chan interface{})) {
-	bridge.AsyncRouteRegitser(routes)
+	bridge.AsyncRouteRegister(routes)
 }

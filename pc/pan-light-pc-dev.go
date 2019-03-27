@@ -3,11 +3,18 @@
 package main
 
 import (
+	"github.com/peterq/pan-light/pc/dep"
 	"github.com/peterq/pan-light/pc/functions"
+	"log"
 	"plugin"
 )
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	defer func() {
+		dep.DoClose()
+	}()
+	dep.DoInit()
 	p, err := plugin.Open("./gui/gui-plugin.so")
 	if err != nil {
 		panic(err)
@@ -16,19 +23,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	SyncRouteRegitser, err := p.Lookup("SyncRouteRegitser")
+	SyncRouteRegister, err := p.Lookup("SyncRouteRegitser")
 	if err != nil {
 		panic(err)
 	}
-	AsyncRouteRegitser, err := p.Lookup("AsyncRouteRegitser")
+	AsyncRouteRegister, err := p.Lookup("AsyncRouteRegitser")
 	if err != nil {
 		panic(err)
 	}
 
-	functions.RegisterAsync(AsyncRouteRegitser.(func(routes map[string]func(map[string]interface{},
+	functions.RegisterAsync(AsyncRouteRegister.(func(routes map[string]func(map[string]interface{},
 		func(interface{}), func(interface{}), func(interface{}), chan interface{}))))
 
-	functions.RegisterSync(SyncRouteRegitser.(func(routes map[string]func(map[string]interface{}) interface{})))
+	functions.RegisterSync(SyncRouteRegister.(func(routes map[string]func(map[string]interface{}) interface{})))
 
 	StartGui.(func(rccFile, mainQml string))("./gui/qml/qml.rcc", "qrc:/main.qml")
 }

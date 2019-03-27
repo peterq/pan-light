@@ -1,37 +1,67 @@
-import QtQuick 2.1
-import QtQuick.Window 2.0
+import QtQuick 2.9
+import QtQuick.Window 2.2
 import "js/util.js" as Util
-
+import "js/global.js" as G
+import "./layout"
+import "./login"
+import "./videoPlayer"
 Window {
+    id: mainWindow
     visible: true
-    width: 360
-    height: 360
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: {
-            Qt.quit()
-        }
+    width: 1000
+    height: 680
+    minimumHeight: 600
+    minimumWidth: 900
+    title: "hello peterq2"
+    // 用来触发窗口重汇
+    Rectangle {
+       id: re
+       width: 0
+       height: 0
+       z: -1
     }
-
-    Text {
-        id: text
-        text: "hello pan-light"
-        anchors.centerIn: parent
-    }
-
+    MPlayer{}
+    Layout{}
+    Login{}
     Component.onCompleted: {
+
         // 初始化js工具
-        Util.callGoAsync("wait", {
-                             "time": 3
-                         }).then(function (s) {
-                             text.text = s + Util.callGoSync("time")
-                         }, null, function (s) {
-                             text.text = s
-                         });
-        var ret = Util.callGoSync("add", {a: 3, b: 8})
-        console.log(ret)
-        Util.callGoAsync("ip.info")
-            .then(function(r) {console.log(r)}, function(e) {console.log(e)})
+        G.init(mainWindow)
+        // Util.openDesktopWidget()
+        G.setTimeout(function(){
+            mainWindow.hide()
+        })
+        return;
+        function getSign() {
+            Util.callGoAsync('pan.init')
+                .then(function(data){
+                    console.log('api init success')
+                    Util.event.fire('init.api.ok', data)
+                })
+                .catch(function(e){
+                    console.log('get sign error', e)
+                    Util.event.fire('init.not-login')
+                    Util.event.once('login.success', function(){
+                        console.log('get sign again')
+                        getSign()
+                    })
+                })
+        }
+        getSign()
+    }
+    onWidthChanged: {
+        Util.setTimeout(function () {
+          re.width = mainWindow.width
+        }, 1)
+    }
+    onHeightChanged: {
+        Util.setTimeout(function () {
+          re.height = mainWindow.height
+        }, 1)
+    }
+    onVisibleChanged: {
+        Util.setTimeout(function () {
+//          mainWindow.visible = true
+        }, 1e3)
     }
 }

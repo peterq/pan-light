@@ -25,7 +25,7 @@ var CallGoAsync = func(gson *Gson) {
 }
 
 var NotifyQml = func(event string, data *Gson) {
-	log.Println("qml msg handler not initialized")
+	log.Println("qml msg handler not initialized", event, *data)
 }
 
 func init() {

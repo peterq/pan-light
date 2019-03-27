@@ -1,10 +1,70 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>comps/bridge.qml</file>
+        <file>layout/Header.qml</file>
         <file>js/util.js</file>
+        <file>comps/dialog.qml</file>
         <file>js/promise.js</file>
         <file>js/global.js</file>
         <file>comps/timer.qml</file>
+        <file>layout/Layout.qml</file>
+        <file>comps/desktop-widget.qml</file>
+        <file>comps/desktop-widget_copy.qml</file>
+        <file>comps/bridge.qml</file>
+        <file>assets/images/pan-light-1.png</file>
+        <file>pan/pan.qml</file>
+        <file>explore/explore.qml</file>
+        <file>transfer/transfer.qml</file>
+        <file>login/Login.qml</file>
+        <file>comps/IconFont.qml</file>
+        <file>assets/images/icons/wx.svg</file>
+        <file>login/Wx.qml</file>
+        <file>assets/images/icons/loading.svg</file>
+        <file>login/FixedWindow.qml</file>
+        <file>comps/Alert.qml</file>
+        <file>assets/images/icons/error.svg</file>
+        <file>pan/LeftPanel.qml</file>
+        <file>pan/PathNav.qml</file>
+        <file>js/app.js</file>
+        <file>pan/FileList.qml</file>
+        <file>js/appState.qml</file>
+        <file>comps/rightClickMenu.qml</file>
+        <file>assets/images/icons/return.svg</file>
+        <file>assets/images/icons/enter.svg</file>
+        <file>assets/images/icons/enter-enable.svg</file>
+        <file>assets/images/icons/return-enable.svg</file>
+        <file>assets/images/icons/home.svg</file>
+        <file>videoPlayer/Player.qml</file>
+        <file>videoPlayer/ButtonImage.qml</file>
+        <file>assets/images/icons/baidu.svg</file>
+        <file>login/Baidu.qml</file>
+        <file>login/QQ.qml</file>
+        <file>assets/images/icons/qq.svg</file>
+        <file>videoPlayer/MPlayer.qml</file>
+        <file>videoPlayer/ControlArea.qml</file>
+        <file>videoPlayer/UIComp/ButtonPlay.qml</file>
+        <file>videoPlayer/icons/fullscreen.svg</file>
+        <file>videoPlayer/icons/pause.svg</file>
+        <file>videoPlayer/icons/play.svg</file>
+        <file>videoPlayer/UIComp/VolumeButton.qml</file>
+        <file>videoPlayer/UIComp/VolumeSlider.qml</file>
+        <file>videoPlayer/icons/volume-down.svg</file>
+        <file>videoPlayer/icons/volume-mute.svg</file>
+        <file>videoPlayer/icons/volume-up.svg</file>
+        <file>videoPlayer/UIComp/TimeText.qml</file>
+        <file>videoPlayer/UIComp/TimeSlider.qml</file>
+        <file>videoPlayer/UIComp/PlayIcon.qml</file>
+        <file>videoPlayer/Tips.qml</file>
+        <file>videoPlayer/UIComp/AniIcon.qml</file>
+        <file>videoPlayer/UIComp/ForwardBackward.qml</file>
+        <file>videoPlayer/icons/backward.svg</file>
+        <file>videoPlayer/icons/forward.svg</file>
+        <file>videoPlayer/UIComp/VolumeIcon.qml</file>
+        <file>videoPlayer/UIComp/ActionTips.qml</file>
+        <file>videoPlayer/UIComp/FullScreenButton.qml</file>
+        <file>videoPlayer/icons/open-file.svg</file>
+        <file>videoPlayer/UIComp/OpenFileButton.qml</file>
+        <file>comps/DataSaver.qml</file>
+        <file>videoPlayer/UIComp/DataSaver.qml</file>
     </qresource>
 </RCC>

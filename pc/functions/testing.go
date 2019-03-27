@@ -1,9 +1,15 @@
 package functions
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
+
+var UiContext = context.WithValue(context.Background(), "start_time", time.Now())
+
+type gson map[string]interface{}
 
 func init() {
 	syncMap(testingSyncRoutes)

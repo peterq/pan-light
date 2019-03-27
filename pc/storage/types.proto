@@ -1,0 +1,52 @@
+syntax = "proto3";
+package storage;
+
+message state {
+    bool electronReady = 1;
+    string electronPath = 2;
+    map<string, downloadState> downloadList = 3;
+    map<string, userStorage> userStorageMap = 4;
+    string userStorageId = 5;
+    string token = 6;
+    message setting {
+        int64 downloadSegSize = 1;
+        int64 downloadCoroutine = 2;
+    }
+    setting settings = 7;
+    repeated cookies panCookie = 8;
+}
+
+message downloadState {
+    string fid = 1;
+    string filename = 2;
+    string tempName = 3;
+    string localPath = 4;
+    int64 size = 5;
+    repeated downloadSeg seg = 6;
+    bool downloading = 7;
+    bool finished = 8;
+    string link = 9;
+    string userAgent = 10;
+    bool stopping = 11;
+    int64 finishedSize = 12;
+}
+
+message downloadSeg {
+    int64 start = 1;
+    int64 len = 2;
+    bool finish = 3;
+    bool distributed = 4;
+}
+
+
+message userStorage {
+    map<string, string> DataBucket = 1;
+}
+
+
+message cookies {
+    string key = 1;
+    string value = 2;
+    string domain = 3;
+    int64 expires = 4;
+}

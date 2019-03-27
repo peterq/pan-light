@@ -14,7 +14,7 @@ func syncMap(r map[string]syncHandler) {
 	for p, h := range r {
 		r1[p] = h
 	}
-	bridge.SyncRouteRegitser(r1)
+	bridge.SyncRouteRegister(r1)
 }
 
 func asyncMap(r map[string]asyncHandler) {
@@ -23,5 +23,5 @@ func asyncMap(r map[string]asyncHandler) {
 	for p, h := range r {
 		r1[p] = h
 	}
-	bridge.AsyncRouteRegitser(r1)
+	bridge.AsyncRouteRegister(r1)
 }

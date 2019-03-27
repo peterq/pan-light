@@ -1,4 +1,4 @@
-// 实现了一个待progress回调的Promise
+// 实现了一个带progress回调的Promise
 .pragma library
 
 .import "global.js" as G
@@ -125,7 +125,7 @@ var Promise = (function () {
                 }
                 var ret
                 try {
-                    ret = cb(newValue);
+                    ret = cb(newValue);                
                 } catch (e) {
                     reject(deferred.promise, e);
                     return;

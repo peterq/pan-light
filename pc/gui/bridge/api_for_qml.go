@@ -34,13 +34,13 @@ var callAsyncMap = map[string]func(map[string]interface{},
 	},
 }
 
-func SyncRouteRegitser(routes map[string]func(map[string]interface{}) interface{}) {
+func SyncRouteRegister(routes map[string]func(map[string]interface{}) interface{}) {
 	for path, handler := range routes {
 		callSyncMap[path] = handler
 	}
 }
 
-func AsyncRouteRegitser(routes map[string]func(map[string]interface{},
+func AsyncRouteRegister(routes map[string]func(map[string]interface{},
 	func(interface{}), func(interface{}), func(interface{}), chan interface{})) {
 	for path, handler := range routes {
 		callAsyncMap[path] = handler
