@@ -20,7 +20,6 @@ Window {
        height: 0
        z: -1
     }
-    MPlayer{}
     Layout{}
     Login{}
     Component.onCompleted: {
@@ -28,10 +27,6 @@ Window {
         // 初始化js工具
         G.init(mainWindow)
         // Util.openDesktopWidget()
-        G.setTimeout(function(){
-            mainWindow.hide()
-        })
-        return;
         function getSign() {
             Util.callGoAsync('pan.init')
                 .then(function(data){
@@ -58,10 +53,5 @@ Window {
         Util.setTimeout(function () {
           re.height = mainWindow.height
         }, 1)
-    }
-    onVisibleChanged: {
-        Util.setTimeout(function () {
-//          mainWindow.visible = true
-        }, 1e3)
     }
 }

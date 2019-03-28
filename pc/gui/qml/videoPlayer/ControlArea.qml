@@ -3,14 +3,13 @@ import QtGraphicalEffects 1.0
 import "./UIComp"
 import "../js/app.js" as App
 
-
 Item {
     id: controls
     anchors.bottom: parent.bottom
     width: parent.width
     height: 60
     property var player: App.appState.player
-    visible: player.showControls
+    opacity: player.showControls ? 1 : 0
 
     function mouseInControls() {
         function walkItem(item) {
@@ -165,6 +164,18 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: fullScreenButton.left
         }
+        RotateButton {
+            id: rotateButton
+            icon.height: parent.height / 1.8
+            icon.width: parent.height / 1.8
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: openFileButton.left
+        }
+        PlayRateButton {
+            id: playRateButton
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: rotateButton.left
+        }
     }
 
     TimeSlider {
@@ -173,5 +184,19 @@ Item {
         height: parent.height * 0.3
         anchors.bottom: btns.top
         anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    Behavior on opacity {
+        PropertyAnimation {
+            duration: 1000
+        }
+    }
+    states: State {
+        name: "hide"
+        when: opacity === 0
+        PropertyChanges {
+            target: controls
+            visible: false
+        }
     }
 }

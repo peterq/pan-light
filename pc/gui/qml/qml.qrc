@@ -34,8 +34,6 @@
         <file>assets/images/icons/enter-enable.svg</file>
         <file>assets/images/icons/return-enable.svg</file>
         <file>assets/images/icons/home.svg</file>
-        <file>videoPlayer/Player.qml</file>
-        <file>videoPlayer/ButtonImage.qml</file>
         <file>assets/images/icons/baidu.svg</file>
         <file>login/Baidu.qml</file>
         <file>login/QQ.qml</file>
@@ -66,5 +64,10 @@
         <file>videoPlayer/UIComp/OpenFileButton.qml</file>
         <file>comps/DataSaver.qml</file>
         <file>videoPlayer/UIComp/DataSaver.qml</file>
+        <file>videoPlayer/UIComp/VideoTitle.qml</file>
+        <file>videoPlayer/UIComp/RotateButton.qml</file>
+        <file>videoPlayer/icons/rotate.svg</file>
+        <file>videoPlayer/UIComp/PlayRateButton.qml</file>
+        <file>comps/MyModal.qml</file>
     </qresource>
 </RCC>

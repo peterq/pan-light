@@ -16,7 +16,7 @@ ApplicationWindow {
     height: 650
     minimumHeight: 325
     minimumWidth: 512
-    visible: true
+    visible: false
     title: 'pan-light video player'
 
     DataSaver {
@@ -36,16 +36,32 @@ ApplicationWindow {
     property alias position: mediaPlayer.position
     property bool showControls: false
     property bool canHideControls: true
-    property string videoTitle: ''
-
+    property string videoTitle: 'pan-light video player'
+    property int videoRotation: 0
+    property real playbackRate: mediaPlayer.playbackRate
     signal controlsWillHide(var hideEvent)
     signal customerEvent(var event, var data)
 
     function playVideo(title, source) {
+        visible = true
+        requestActivate()
         videoTitle = title
+        videoRotation = 0
         mediaPlayer.stop()
         mediaPlayer.source = source
         mediaPlayer.play()
+    }
+
+    function rotateVideo() {
+        var pos = mediaPlayer.position
+        videoRotation = (videoRotation + 90) % 360
+        G.setTimeout(function(){
+            seekAbs(pos)
+        }, 500)
+    }
+
+    function setRate(rate) {
+        mediaPlayer.playbackRate = rate
     }
 
     function play() {
@@ -109,8 +125,7 @@ ApplicationWindow {
     }
     MediaPlayer {
         id: mediaPlayer
-        autoPlay: true
-        source: "file:///media/peterq/files/share/video/盗梦空间.Inception.2010.中英字幕.BDrip.AAC.720p.x264-人人影视.mp4"
+        source: ''
         onError: {
             console.log('-----------', error, errorString)
         }
@@ -122,8 +137,17 @@ ApplicationWindow {
         }
     }
     VideoOutput {
-        anchors.fill: parent
+        id: vo
+        x: (player.width - width) / 2
+        y: (player.height - height) / 2
+        width: (player.videoRotation / 90) % 2 ? parent.height : parent.width
+        height: (player.videoRotation / 90) % 2 ? parent.width : parent.height
         source: mediaPlayer
+        transform: Rotation {
+            origin.x: vo.width / 2
+            origin.y: vo.height / 2
+            angle: player.videoRotation
+        }
     }
     Tips {}
     MouseArea {

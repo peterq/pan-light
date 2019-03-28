@@ -33,7 +33,7 @@ var panApiAsyncRoutes = map[string]asyncHandler{
 	},
 
 	"pan.link": func(p map[string]interface{}, resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{}) {
-		link, err := pan_api.Link(fmt.Sprint(int(p["fid"].(float64))), p["useVip"].(bool))
+		link, err := pan_api.Link(fmt.Sprint(int(p["fid"].(float64))))
 		if err != nil {
 			reject(err.Error())
 		} else {

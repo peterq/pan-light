@@ -212,24 +212,41 @@ function isVideo(f){
     return ext.indexOf(e) >= 0
 }
 
+var videoAgentLink = (function(){
+    var server
+    return function(meta) {
+        if (!server) {
+            server =  callGoSync('env.internal_server_url')
+            console.log('internal url', JSON.stringify(server))
+        }
+        return server + '/videoAgent?fid=' + meta.fs_id
+    }
+})()
+
+function getFileLink(meta) {
+    return callGoAsync('pan.link', {fid: meta.fs_id})
+}
+
+function getFileLinkVip(meta) {
+    return callGoAsync('pan.link.vip', {fid: meta.fs_id})
+}
+
 var playVideo = (function(){
-    var comp = loadComponent(function(){},'../videoPlayer/Player.qml')
+    var comp = loadComponent(function(){},'../videoPlayer/MPlayer.qml')
     var ins
-    console.log('-------------video comp', comp)
     return function(meta, useVip){
         if (!ins || !ins.playVideo) {
             ins = comp.createObject(G.root)
         }
-        ins.requestActivate()
-        ins.playVideo(meta, useVip)
-    }
-})()
+        (useVip ?
+             getFileLinkVip(meta) :
+             getFileLink(meta))
+        .then(function(link){
+            var agentLink = videoAgentLink(meta, useVip)
+            console.log('play link', agentLink, link)
+            ins.playVideo(meta.server_filename, agentLink)
+        })
 
-var videoAgentLink = (function(){
-    var server = callGoSync('env.internal_server_url')
-    console.log('internal url', JSON.stringify(server))
-    return function(meta) {
-        return server + '/videoAgent?fid=' + meta.fs_id
     }
 })()
 

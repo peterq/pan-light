@@ -118,11 +118,7 @@ func ListDir(path string) (list interface{}, err error) {
 }
 
 // 链接解析
-func Link(fid string, useVip bool) (link string, err error) {
-
-	if useVip {
-		return linkByVip()
-	}
+func Link(fid string) (link string, err error) {
 
 	if c, ok := linkCacheMap[fid]; !ok {
 		linkCacheMap[fid] = fidLinks{}
