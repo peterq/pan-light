@@ -5,6 +5,7 @@ import QtQuick.Controls.Styles 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
+import './UIComp'
 import "../js/util.js" as Util
 import "../js/global.js" as G
 import "../js/app.js" as App
@@ -17,6 +18,15 @@ ApplicationWindow {
     minimumWidth: 512
     visible: true
     title: 'pan-light video player'
+
+    DataSaver {
+        $key: 'video.player'
+        property alias volume: mediaPlayer.volume
+        property alias x: player.x
+        property alias y: player.y
+        property alias width: player.width
+        property alias height: player.height
+    }
 
     property bool playing: false
 
