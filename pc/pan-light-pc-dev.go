@@ -23,11 +23,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	SyncRouteRegister, err := p.Lookup("SyncRouteRegitser")
+	SyncRouteRegister, err := p.Lookup("SyncRouteRegister")
 	if err != nil {
 		panic(err)
 	}
-	AsyncRouteRegister, err := p.Lookup("AsyncRouteRegitser")
+	AsyncRouteRegister, err := p.Lookup("AsyncRouteRegister")
 	if err != nil {
 		panic(err)
 	}
