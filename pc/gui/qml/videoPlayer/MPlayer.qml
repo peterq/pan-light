@@ -135,7 +135,7 @@ ApplicationWindow {
         onError: {
             console.log('-----------', error, errorString)
             // 同时2个弹窗有bug, 直接卡死, 改造成队列模式
-            errShowPromise = errShowPromise.queue(function () {
+            errShowPromise = errShowPromise.finally(function () {
                 return Util.alert({
                                       "parent": player,
                                       "title": '播放器错误',

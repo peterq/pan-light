@@ -218,15 +218,6 @@ var Promise = (function () {
 
     Promise.prototype['finally'] = finallyConstructor;
 
-    Promise.prototype.queue = function(next) {
-        var lastPromise = this
-        return new Promise(function(resolve, reject, progress) {
-            lastPromise.finally(function() {
-                next().then(resolve, reject, progress)
-            })
-        })
-    }
-
     Promise.all = function (arr) {
         return new Promise(function (resolve, reject) {
             if (!arr || typeof arr.length === 'undefined')
