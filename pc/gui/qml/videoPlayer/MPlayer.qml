@@ -5,7 +5,7 @@ import QtQuick.Controls.Styles 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
-import './UIComp'
+import "./UIComp"
 import "../js/util.js" as Util
 import "../js/global.js" as G
 import "../js/app.js" as App
@@ -40,7 +40,8 @@ ApplicationWindow {
     property int videoRotation: 0
     property real playbackRate: mediaPlayer.playbackRate
     property alias bufferProgress: mediaPlayer.bufferProgress
-    property bool isLoading: [MediaPlayer.Loading, MediaPlayer.Stalled].indexOf(mediaPlayer.status) > -1
+    property bool isLoading: [MediaPlayer.Loading, MediaPlayer.Stalled].indexOf(
+        mediaPlayer.status) > -1
     signal controlsWillHide(var hideEvent)
     signal customerEvent(var event, var data)
 
@@ -57,7 +58,7 @@ ApplicationWindow {
     function rotateVideo() {
         var pos = mediaPlayer.position
         videoRotation = (videoRotation + 90) % 360
-        G.setTimeout(function(){
+        G.setTimeout(function () {
             seekAbs(pos)
         }, 500)
     }
@@ -106,7 +107,9 @@ ApplicationWindow {
         player.showControls = true
         G.setTimeout(function () {
             if (hideControlsCheck === rand) {
-                var evt = { hide: true }
+                var evt = {
+                    "hide": true
+                }
                 player.controlsWillHide(evt)
                 if (evt.hide)
                     player.showControls = false
@@ -132,14 +135,12 @@ ApplicationWindow {
         onError: {
             console.log('-----------', error, errorString)
             // 同时2个弹窗有bug, 直接卡死, 改造成队列模式
-            var lastPromise = errShowPromise
-            errShowPromise = new Util.Promise(function(resolve) {
-                lastPromise.finally(function () {
-                    Util.alert({parent: player, title: '播放器错误', msg: errorString})
-                        .finally(function(){
-                            resolve()
-                        })
-                })
+            errShowPromise = errShowPromise.queue(function () {
+                return Util.alert({
+                                      "parent": player,
+                                      "title": '播放器错误',
+                                      "msg": errorString
+                                  })
             })
         }
         onPaused: {
@@ -162,7 +163,8 @@ ApplicationWindow {
             angle: player.videoRotation
         }
     }
-    Tips {}
+    Tips {
+    }
     MouseArea {
         id: controlControlsArea
         anchors.fill: parent
@@ -178,5 +180,6 @@ ApplicationWindow {
         }
         cursorShape: player.showControls ? Qt.ArrowCursor : Qt.BlankCursor
     }
-    ControlArea {}
+    ControlArea {
+    }
 }
