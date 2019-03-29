@@ -39,6 +39,8 @@ ApplicationWindow {
     property string videoTitle: 'pan-light video player'
     property int videoRotation: 0
     property real playbackRate: mediaPlayer.playbackRate
+    property alias bufferProgress: mediaPlayer.bufferProgress
+    property bool isLoading: [MediaPlayer.Loading, MediaPlayer.Stalled].indexOf(mediaPlayer.status) > -1
     signal controlsWillHide(var hideEvent)
     signal customerEvent(var event, var data)
 
@@ -125,9 +127,20 @@ ApplicationWindow {
     }
     MediaPlayer {
         id: mediaPlayer
+        property var errShowPromise: Util.Promise.resolve()
         source: ''
         onError: {
             console.log('-----------', error, errorString)
+            // 同时2个弹窗有bug, 直接卡死, 改造成队列模式
+            var lastPromise = errShowPromise
+            errShowPromise = new Util.Promise(function(resolve) {
+                lastPromise.finally(function () {
+                    Util.alert({parent: player, title: '播放器错误', msg: errorString})
+                        .finally(function(){
+                            resolve()
+                        })
+                })
+            })
         }
         onPaused: {
             player.playing = false

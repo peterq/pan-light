@@ -51,4 +51,8 @@ Item {
             }
         }
     }
+
+    LoadingTips {
+        anchors.centerIn: parent
+    }
 }
