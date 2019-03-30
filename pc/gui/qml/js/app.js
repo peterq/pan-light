@@ -17,14 +17,18 @@ Util.event.once('init.api.ok', function(loginSession) {
 
 // 历史记录后退
 function backPath() {
-    var p = enterPath(appState.accessDirHistory[appState.accessDirHistoryIndex], true)
+    var dir = appState.accessDirHistory[appState.accessDirHistoryIndex - 1]
+    if (!dir) return Util.Promise.reject('cant go back')
+    var p = enterPath(dir, true)
     appState.accessDirHistoryIndex--
     return p
 }
 
 // 历史记录前进
 function forwardPath() {
-    var p = enterPath(appState.accessDirHistory[appState.accessDirHistoryIndex], true)
+    var dir = appState.accessDirHistory[appState.accessDirHistoryIndex + 1]
+    if (!dir) return Util.Promise.reject('cant go forward')
+    var p = enterPath(dir, true)
     appState.accessDirHistoryIndex++
     return p
 }

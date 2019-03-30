@@ -55,6 +55,7 @@ Rectangle {
                 }
                 Loader {
                     id: iconLoader
+                    focus: true
                 }
                 Component.onCompleted: {
                     // 监听进入path, 延时500ms显示加载动画

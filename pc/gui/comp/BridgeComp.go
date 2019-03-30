@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/peterq/pan-light/pc/gui/qt-rpc"
 	"github.com/peterq/pan-light/qt/bindings/core"
+	"github.com/peterq/pan-light/qt/bindings/gui"
 	"github.com/peterq/pan-light/qt/bindings/quick"
 	"github.com/peterq/pan-light/qt/bindings/widgets"
 	"log"
@@ -26,6 +27,8 @@ type BridgeComp struct {
 	_ func(data string) string                                         `slot:"callSync,auto"`
 	_ func(data string)                                                `signal:"callAsync,auto"`
 	_ func(data string)                                                `signal:"goMessage"`
+	_ func() *core.QPoint                                              `slot:"cursorPos,auto"`
+	_ func(x, y int)                                                   `slot:"setCursorPos,auto"`
 	//...
 }
 
@@ -66,4 +69,14 @@ func (t *BridgeComp) callAsync(data string) {
 	var gson qt_rpc.Gson
 	json.Unmarshal([]byte(data), &gson)
 	qt_rpc.CallGoAsync(&gson)
+}
+
+// 获取鼠标位置
+func (t *BridgeComp) cursorPos() *core.QPoint {
+	return gui.QCursor_Pos()
+}
+
+// 设置鼠标位置
+func (t *BridgeComp) setCursorPos(x, y int) {
+	gui.QCursor_SetPos(x, y)
 }

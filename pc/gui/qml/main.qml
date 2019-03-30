@@ -2,6 +2,7 @@ import QtQuick 2.9
 import QtQuick.Window 2.2
 import "js/util.js" as Util
 import "js/global.js" as G
+import "js/app.js" as App
 import "./layout"
 import "./login"
 import "./videoPlayer"
@@ -13,6 +14,8 @@ Window {
     minimumHeight: 600
     minimumWidth: 900
     title: "hello peterq2"
+    signal customerEvent(string event, var data)
+
     // 用来触发窗口重汇
     Rectangle {
        id: re
@@ -26,7 +29,8 @@ Window {
 
         // 初始化js工具
         G.init(mainWindow)
-        // Util.openDesktopWidget()
+        App.appState.mainWindow = mainWindow
+         Util.openDesktopWidget()
         function getSign() {
             Util.callGoAsync('pan.init')
                 .then(function(data){

@@ -9,6 +9,7 @@ QtObject {
     property var accessDirHistory: []
     property int accessDirHistoryIndex: -1
     property var player: null
+    property var mainWindow: null
 
     Component.onCompleted: {
         loginSession = {

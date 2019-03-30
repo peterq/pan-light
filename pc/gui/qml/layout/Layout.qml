@@ -133,6 +133,7 @@ Item {
                     }
                     Loader {
                         id: tabLoader
+                        focus: true
                         width: tabWapper.width
                         height: tabWapper.height
                         source: '../' + tabsUrl[modelData] + '/' + tabsUrl[modelData] + '.qml'

@@ -69,5 +69,7 @@
         <file>videoPlayer/icons/rotate.svg</file>
         <file>videoPlayer/UIComp/PlayRateButton.qml</file>
         <file>videoPlayer/UIComp/LoadingTips.qml</file>
+        <file>pan/FileNode.qml</file>
+        <file>comps/Modal.qml</file>
     </qresource>
 </RCC>
