@@ -68,7 +68,7 @@ func pcDev() {
 	_, err := os.Stat(pluginPath)
 	if os.IsNotExist(err) || rebuildPlugin {
 		log.Println("编译gui插件...")
-		runCmd("./pc/gui", "go", "build", "-tags=plugin", "--buildmode=plugin", "-o", "gui-plugin.so", "gui-plugin.go")
+		runCmd("./pc", "go", "build", "-tags=plugin", "--buildmode=plugin", "-o", "gui/gui-plugin.so", "gui/gui-plugin.go")
 	}
 	log.Println("打包qml...")
 	cmd(qtBin("rcc"), "-binary", "pc/gui/qml/qml.qrc", "-o", "pc/gui/qml/qml.rcc").Run()
