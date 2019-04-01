@@ -133,5 +133,7 @@
         <file>assets/images/icons/file/doc.svg</file>
         <file>assets/images/icons/file/txt.svg</file>
         <file>assets/images/icons/file/dir.svg</file>
+        <file>comps/tool-tip-window.qml</file>
+        <file>widget/ToolTip.qml</file>
     </qresource>
 </RCC>

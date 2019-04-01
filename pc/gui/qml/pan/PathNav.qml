@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.2
 import '../comps'
+import '../widget'
 import '../js/app.js' as App
 
 Item {
@@ -56,9 +57,18 @@ Item {
         }
     }
 
-    Text {
+    Label {
         anchors.left: btns.right
         anchors.verticalCenter: parent.verticalCenter
         text: '当前路径: ' + App.appState.path
+        ToolTip {
+            text: parent.text
+            show: pathMa.containsMouse
+        }
+        MouseArea {
+            id: pathMa
+            anchors.fill: parent
+            hoverEnabled: true
+        }
     }
 }

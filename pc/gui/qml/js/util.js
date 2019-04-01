@@ -250,3 +250,39 @@ var playVideo = (function(){
     }
 })()
 
+
+var tooTip = (function(){
+    var comp = loadComponent(function(){},'../comps/tool-tip-window.qml')
+    var ins
+    return function(meta, useVip){
+        if (!ins || !ins.playVideo) {
+            ins = comp.createObject(G.root)
+        }
+        return ins
+
+    }
+})()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
