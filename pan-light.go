@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -55,6 +57,8 @@ func pcCmd() {
 		pcMoc()
 	case "dev":
 		pcDev()
+	case "download-icon":
+		downloadIcon()
 	default:
 		flag.Usage()
 	}
@@ -150,4 +154,44 @@ func runCmd(path, name string, arg ...string) {
 	c := cmd(name, arg...)
 	c.Dir, _ = filepath.Abs(path)
 	c.Run()
+}
+
+type gson = map[string]interface{}
+type binary = []byte
+
+func downloadIcon() {
+	u := "https://www.iconfont.cn/api/collection/detail.json?id=2271"
+	r, e := http.Get(u)
+	panicIf(e)
+	bin, e := ioutil.ReadAll(r.Body)
+	panicIf(e)
+	var j gson
+	panicIf(json.Unmarshal(bin, &j))
+	reg := regexp.MustCompile("[a-z0-9]+$")
+	var imgs []string
+	for _, icon := range j["data"].(gson)["icons"].([]interface{}) {
+		s := icon.(gson)["show_svg"].(string)
+		name := icon.(gson)["name"].(string)
+		name = string(reg.Find(binary(name)))
+		if name == "" {
+			name = icon.(gson)["name"].(string)
+			if strings.Contains(name, "未知") {
+				name = "unknown"
+			} else {
+				continue
+			}
+		}
+		imgs = append(imgs, name)
+		e = ioutil.WriteFile("pc/gui/qml/assets/images/icons/file/"+name+".svg", binary(s), os.ModePerm)
+		panicIf(e)
+	}
+	bin, _ = json.Marshal(imgs)
+	log.Println(string(bin))
+}
+
+func panicIf(e error) {
+	if e != nil {
+		panic(e)
+	}
+
 }

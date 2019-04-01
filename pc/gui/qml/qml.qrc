@@ -71,5 +71,67 @@
         <file>videoPlayer/UIComp/LoadingTips.qml</file>
         <file>pan/FileNode.qml</file>
         <file>comps/Modal.qml</file>
+        <file>pan/FileIcon.qml</file>
+        <file>assets/images/icons/file/unknown.svg</file>
+        <file>assets/images/icons/file/tar.svg</file>
+        <file>assets/images/icons/file/iso.svg</file>
+        <file>assets/images/icons/file/cab.svg</file>
+        <file>assets/images/icons/file/7z.svg</file>
+        <file>assets/images/icons/file/rar.svg</file>
+        <file>assets/images/icons/file/zip.svg</file>
+        <file>assets/images/icons/file/cdr.svg</file>
+        <file>assets/images/icons/file/tga.svg</file>
+        <file>assets/images/icons/file/eps.svg</file>
+        <file>assets/images/icons/file/dxf.svg</file>
+        <file>assets/images/icons/file/emf.svg</file>
+        <file>assets/images/icons/file/wmf.svg</file>
+        <file>assets/images/icons/file/pcx.svg</file>
+        <file>assets/images/icons/file/svg.svg</file>
+        <file>assets/images/icons/file/psd.svg</file>
+        <file>assets/images/icons/file/png.svg</file>
+        <file>assets/images/icons/file/tif.svg</file>
+        <file>assets/images/icons/file/bmp.svg</file>
+        <file>assets/images/icons/file/gif.svg</file>
+        <file>assets/images/icons/file/jpg.svg</file>
+        <file>assets/images/icons/file/jpeg.svg</file>
+        <file>assets/images/icons/file/swf.svg</file>
+        <file>assets/images/icons/file/fla.svg</file>
+        <file>assets/images/icons/file/flv.svg</file>
+        <file>assets/images/icons/file/mkv.svg</file>
+        <file>assets/images/icons/file/vob.svg</file>
+        <file>assets/images/icons/file/dat.svg</file>
+        <file>assets/images/icons/file/avi.svg</file>
+        <file>assets/images/icons/file/mov.svg</file>
+        <file>assets/images/icons/file/m4v.svg</file>
+        <file>assets/images/icons/file/mp4.svg</file>
+        <file>assets/images/icons/file/mpeg.svg</file>
+        <file>assets/images/icons/file/mpe.svg</file>
+        <file>assets/images/icons/file/mpg.svg</file>
+        <file>assets/images/icons/file/3gp.svg</file>
+        <file>assets/images/icons/file/rmvb.svg</file>
+        <file>assets/images/icons/file/rm.svg</file>
+        <file>assets/images/icons/file/asx.svg</file>
+        <file>assets/images/icons/file/asf.svg</file>
+        <file>assets/images/icons/file/wmv.svg</file>
+        <file>assets/images/icons/file/aac.svg</file>
+        <file>assets/images/icons/file/flac.svg</file>
+        <file>assets/images/icons/file/midi.svg</file>
+        <file>assets/images/icons/file/ape.svg</file>
+        <file>assets/images/icons/file/ogg.svg</file>
+        <file>assets/images/icons/file/wav.svg</file>
+        <file>assets/images/icons/file/wma.svg</file>
+        <file>assets/images/icons/file/mp3.svg</file>
+        <file>assets/images/icons/file/xlsx.svg</file>
+        <file>assets/images/icons/file/srt.svg</file>
+        <file>assets/images/icons/file/xls.svg</file>
+        <file>assets/images/icons/file/docx.svg</file>
+        <file>assets/images/icons/file/html.svg</file>
+        <file>assets/images/icons/file/htm.svg</file>
+        <file>assets/images/icons/file/pdf.svg</file>
+        <file>assets/images/icons/file/pptx.svg</file>
+        <file>assets/images/icons/file/ppt.svg</file>
+        <file>assets/images/icons/file/doc.svg</file>
+        <file>assets/images/icons/file/txt.svg</file>
+        <file>assets/images/icons/file/dir.svg</file>
     </qresource>
 </RCC>

@@ -39,7 +39,7 @@ Rectangle {
             width: parent.width
             height: parent.height - pathNav.height
             anchors.top: pathNav.bottom
-            color: "#eee"
+            color: "#fff"
 
             Rectangle {
                 id: loading

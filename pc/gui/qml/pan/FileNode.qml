@@ -9,7 +9,7 @@ Item {
     property int idx
     property var menus: []
     property bool hover: fileItemMa.containsMouse
-    height: 40
+    height: 50
     width: root.width
 
 
@@ -32,9 +32,22 @@ Item {
         anchors.fill: parent
         color: Qt.rgba(140 / 255, 197 / 255, 1, .4)
     }
-    Text {
-        text: fileItem.prefix + fileItem.meta.server_filename
+    FileIcon {
+        id: fileIcon
+        width: parent.height
+        height: width
         anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: 10
+        type: (meta.isdir && 'dir') || fileItem.meta.server_filename.split('.').pop()
+    }
+    Text {
+        text: fileItem.meta.server_filename
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: fileIcon.right
+        anchors.leftMargin: 5
+        anchors.right: parent.right
+        anchors.rightMargin: 5
+        elide: Text.ElideRight
     }
 
     MouseArea {
