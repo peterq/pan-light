@@ -45,17 +45,18 @@ Rectangle {
                 id: loading
                 anchors.fill: parent
                 visible: false
+                color: Qt.rgba(1,1,1,.6)
                 Component {
                     id: iconComp
                     IconFont {
                         type: 'loading'
-                        width: Math.min(parent.width, parent.height) * 0.3
-                        anchors.centerIn: parent
+                        width: Math.min(loading.width, loading.height) * 0.3
                     }
                 }
                 Loader {
                     id: iconLoader
                     focus: true
+                    anchors.centerIn: parent
                 }
                 Component.onCompleted: {
                     // 监听进入path, 延时500ms显示加载动画

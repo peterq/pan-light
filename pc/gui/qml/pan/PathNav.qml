@@ -59,6 +59,7 @@ Item {
     Row {
         anchors.left: btns.right
         anchors.verticalCenter: parent.verticalCenter
+        height: parent.height
         spacing: 15
         Repeater {
             model: App.appState.pathInfo
@@ -67,6 +68,7 @@ Item {
                 text: modelData.name
                 elide: Text.ElideMiddle
                 width: Math.min(implicitWidth, 200)
+                anchors.verticalCenter: parent.verticalCenter
                 color: pathMa.containsMouse ? '#5c9fff' : 'black'
                 visible: index === 0 || App.appState.pathInfo.length < 5 || index >= App.appState.pathInfo.length - 3
                 ToolTip {

@@ -18,7 +18,7 @@ var dialog = (function(){
 
 function sleep(t) {
     return new Promise(function(resolve) {
-        setTimeout(resolve, resolve)
+        setTimeout(resolve, t)
     })
 }
 
