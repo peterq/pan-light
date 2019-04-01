@@ -56,19 +56,40 @@ Item {
             }
         }
     }
-
-    Label {
+    Row {
         anchors.left: btns.right
         anchors.verticalCenter: parent.verticalCenter
-        text: '当前路径: ' + App.appState.path
-        ToolTip {
-            text: parent.text
-            show: pathMa.containsMouse
-        }
-        MouseArea {
-            id: pathMa
-            anchors.fill: parent
-            hoverEnabled: true
+        spacing: 15
+        Repeater {
+            model: App.appState.pathInfo
+            Label {
+                id: dirname
+                text: modelData.name
+                elide: Text.ElideMiddle
+                width: Math.min(implicitWidth, 200)
+                color: pathMa.containsMouse ? '#5c9fff' : 'black'
+                visible: index === 0 || App.appState.pathInfo.length < 5 || index >= App.appState.pathInfo.length - 3
+                ToolTip {
+                    text: modelData.name
+                    show: pathMa.containsMouse
+                }
+                MouseArea {
+                    id: pathMa
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        App.enterPath(modelData.path)
+                    }
+                }
+                Label {
+                    id: sep
+                    visible: index !== App.appState.pathInfo.length - 1
+                    text: App.appState.pathInfo.length >= 5 && index === 0 ? '...' : ' > '
+                    anchors.left: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
         }
     }
 }
