@@ -60,14 +60,14 @@ Item {
         anchors.left: btns.right
         anchors.verticalCenter: parent.verticalCenter
         height: parent.height
-        spacing: 15
+        spacing: 0
         Repeater {
             model: App.appState.pathInfo
             Label {
                 id: dirname
                 text: modelData.name
                 elide: Text.ElideMiddle
-                width: Math.min(implicitWidth, 200)
+                width: Math.min(implicitWidth, 200) + sep.implicitWidth
                 anchors.verticalCenter: parent.verticalCenter
                 color: pathMa.containsMouse ? '#5c9fff' : 'black'
                 visible: index === 0 || App.appState.pathInfo.length < 5 || index >= App.appState.pathInfo.length - 3
@@ -77,7 +77,8 @@ Item {
                 }
                 MouseArea {
                     id: pathMa
-                    anchors.fill: parent
+                    width: parent.width - sep.implicitWidth
+                    height: parent.height
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
@@ -87,9 +88,10 @@ Item {
                 Label {
                     id: sep
                     visible: index !== App.appState.pathInfo.length - 1
-                    text: App.appState.pathInfo.length >= 5 && index === 0 ? '...' : ' > '
-                    anchors.left: parent.right
+                    text: App.appState.pathInfo.length >= 5 && index === 0 ? ' > ··· > ' : ' > '
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
+                    color: '#3887ff'
                 }
             }
         }
