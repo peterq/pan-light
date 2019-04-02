@@ -40,4 +40,12 @@ var panApiAsyncRoutes = map[string]asyncHandler{
 			resolve(link)
 		}
 	},
+	"pan.usage": func(p map[string]interface{}, resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{}) {
+		result, err := pan_api.Usage()
+		if err != nil {
+			reject(err.Error())
+		} else {
+			resolve(result)
+		}
+	},
 }

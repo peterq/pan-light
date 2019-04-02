@@ -23,7 +23,16 @@ Window {
        height: 0
        z: -1
     }
-    Layout{}
+    Component {
+        id: layoutComp
+        Layout {
+            width: mainWindow.width
+            height: mainWindow.height
+        }
+    }
+    Loader {
+        id: layoutLoader
+    }
     Login{}
     Component.onCompleted: {
 
@@ -35,6 +44,7 @@ Window {
             Util.callGoAsync('pan.init')
                 .then(function(data){
                     console.log('api init success')
+                    layoutLoader.sourceComponent = layoutComp
                     Util.event.fire('init.api.ok', data)
                 })
                 .catch(function(e){

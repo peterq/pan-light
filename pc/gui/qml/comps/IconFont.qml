@@ -1,16 +1,27 @@
 import QtQuick 2.0
-
+import QtGraphicalEffects 1.0
 Item {
+    id: root
     property alias type: img.type
     width: 50
     height: width
+    property var color
     Image {
         id: img
         property string type: 'error'
         anchors.fill: parent
         fillMode: Image.PreserveAspectFit
         source: '../assets/images/icons/'+ type +'.svg'
+        visible: !parent.color
     }
+
+    ColorOverlay {
+        anchors.fill: img
+        source: img
+        color: root.color || ''
+        visible: !!parent.color
+    }
+
 
     Item {
         id: name
@@ -35,6 +46,7 @@ Item {
             easing.type: Easing.InOutQuint
         }
     }
+
     Component.onCompleted: {
         if (type == 'loading') {
             transform.push(rotationAni)

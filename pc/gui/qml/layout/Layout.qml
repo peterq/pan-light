@@ -2,7 +2,6 @@ import QtQuick 2.4
 import "../js/util.js" as Util
 Item {
     id: mainLayout
-    anchors.fill: parent
     property var tabsUrl: {'我的网盘': 'pan', '传输列表': 'transfer', '探索': 'explore'}
     property var tabs: ['我的网盘', '传输列表', '探索']
     property var colors: ['blue', 'red', 'green']

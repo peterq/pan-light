@@ -27,16 +27,18 @@ var event = {}
     var map = {}
     event.fire = function(evt, data) {
         if (!map[evt]) return
+        var fns = []
         map[evt].forEach(function(fn, idx) {
             try {
                 fn(data)
-                if (fn.once) {
-                    map[evt].splice(idx, 1)
+                if (!fn.once) {
+                    fns.push(fn)
                 }
             } catch (e) {
                console.error(evt, fn, e)
             }
         })
+        map[evt] = fns
     }
 
     event.on = function(evt, fn) {

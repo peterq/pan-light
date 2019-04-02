@@ -3,6 +3,7 @@ import '../videoPlayer'
 import '../js/app.js' as App
 import '../js/util.js' as Util
 import '../comps'
+import './left-panel'
 Rectangle {
     id: root
     // 左侧信息栏

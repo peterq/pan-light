@@ -18,6 +18,7 @@ var urlMap = map[string]string{
 	"home":  "https://pan.baidu.com/disk/home",
 	"list":  "https://pan.baidu.com/api/list",
 	"dlink": "https://pan.baidu.com/api/download",
+	"usage": "https://pan.baidu.com/api/quota",
 }
 
 func newRequest(method, url string) *http.Request {
@@ -76,6 +77,41 @@ func GetSign() (ctx map[string]interface{}, err error) {
 	}
 	handleLoginSession(&raw)
 	ctx = raw
+	return
+}
+
+// 获取网盘使用空间
+func Usage() (result interface{}, err error) {
+	req := newRequest("GET", "usage")
+	params := map[string]interface{}{
+		"checkexpire": 1,
+		"checkfree":   1,
+		"channel":     "chunlei",
+		"web":         1,
+		"app_id":      250528,
+		"bdstoken":    LoginSession.Bdstoken,
+		"logid":       time.Now().UnixNano(),
+		"clienttype":  0,
+	}
+	q := req.URL.Query()
+	for k, v := range params {
+		q.Set(k, fmt.Sprint(v))
+		req.URL.RawQuery = q.Encode()
+	}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	body := readHtml(resp.Body)
+	var data tJson
+	err = json.Unmarshal(tBin(body), &data)
+	if err != nil {
+		return
+	}
+	if data["errno"].(float64) != 0 {
+		err = errors.New("获取磁盘空间错误, 错误码" + fmt.Sprint(data["errno"]))
+	}
+	result = data
 	return
 }
 

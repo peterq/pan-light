@@ -23,7 +23,6 @@
         <file>login/FixedWindow.qml</file>
         <file>comps/Alert.qml</file>
         <file>assets/images/icons/error.svg</file>
-        <file>pan/LeftPanel.qml</file>
         <file>pan/PathNav.qml</file>
         <file>js/app.js</file>
         <file>pan/FileList.qml</file>
@@ -136,5 +135,9 @@
         <file>comps/tool-tip-window.qml</file>
         <file>widget/ToolTip.qml</file>
         <file>pan/LoadDirError.qml</file>
+        <file>assets/images/icons/refresh.svg</file>
+        <file>pan/left-panel/LeftPanel.qml</file>
+        <file>pan/left-panel/User.qml</file>
+        <file>pan/left-panel/DiskUsage.qml</file>
     </qresource>
 </RCC>
