@@ -178,7 +178,8 @@ var alert
         var defaultOption = {
             parent: G.root,
             title: '请注意',
-            msg: '这是一条消息'
+            msg: '这是一条消息',
+            copyButton: false
         }
         for(var k in defaultOption) {
             if (!option.hasOwnProperty(k))
@@ -188,7 +189,8 @@ var alert
             var ins = comp.createObject(option.parent, {
                                             tipText: option.msg,
                                             title: option.title,
-                                            closeCb: resolve
+                                            closeCb: resolve,
+                                            copyButton: option.copyButton
                                         })
         })
     }

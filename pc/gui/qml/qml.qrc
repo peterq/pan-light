@@ -135,5 +135,6 @@
         <file>assets/images/icons/file/dir.svg</file>
         <file>comps/tool-tip-window.qml</file>
         <file>widget/ToolTip.qml</file>
+        <file>pan/LoadDirError.qml</file>
     </qresource>
 </RCC>

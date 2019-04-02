@@ -28,7 +28,7 @@ func init() {
 			return nil
 		},
 		Jar:     cookieJar,
-		Timeout: 0,
+		Timeout: 10 * time.Second,
 	}
 }
 

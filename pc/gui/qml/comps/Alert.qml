@@ -1,22 +1,25 @@
 import QtQuick.Dialogs 1.1
-import QtQuick 2.0
+import QtQuick 2.11
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
+
 Window {
     id: root
     //提示框内容
     property alias tipText: msg.text
     //Dialog header、contentItem、footer之间的间隔默认是12
     // 提示框的最小宽度是 100
+    property real minWidth: 200
     property real maxWidth: 800
-    property var closeCb: function(){console.log('close alert')}
+    property bool copyButton: false
+    property var closeCb: function () {
+        console.log('close alert')
+    }
     width: {
-//        console.log('w', msg.implicitWidth)
-        if(msg.implicitWidth < 100 || msg.implicitWidth == 100)
-            return 100;
-        else
-            return msg.implicitWidth > maxWidth ? maxWidth + 24 : (msg.implicitWidth + 24);
+        if (msg.implicitWidth <= minWidth)
+            return minWidth
+        return Math.min(msg.implicitWidth, maxWidth) + 24
     }
     height: msg.implicitHeight + 24 + 100
 
@@ -30,7 +33,6 @@ Window {
         header: Rectangle {
             width: dialog.width
             height: 50
-            radius: 5
             IconFont {
                 width: 50
                 height: 50
@@ -39,28 +41,46 @@ Window {
             }
         }
         contentItem: Rectangle {
-            Text {
-                anchors.fill: parent
+            anchors.fill: parent
+            TextEdit {
+                id: textContent
+                width: parent.width
                 anchors.centerIn: parent
                 color: "gray"
                 text: tipText
-                wrapMode: Text.WordWrap
+                wrapMode: Text.Wrap
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
                 onLinkActivated: Qt.openUrlExternally(link)
+                selectByMouse: true
+                readOnly: true
             }
         }
-        footer: Rectangle {
-            width: msg.width
+        footer: Item {
+            width: parent.width
             height: 50
-            radius: 5
-            Button {
+            Row {
+                spacing: 10
+                height: parent.height
                 anchors.centerIn: parent
-                width: 80
-                height: 30
-                text: '确定'
-                onClicked: {
-                    root.userClose()
+                Button {
+                    width: 80
+                    height: 30
+                    text: '复制'
+                    visible: copyButton
+                    onClicked: {
+                        textContent.selectAll()
+                        textContent.copy()
+                        text = '已复制'
+                    }
+                }
+                Button {
+                    width: 80
+                    height: 30
+                    text: '确定'
+                    onClicked: {
+                        root.userClose()
+                    }
                 }
             }
         }
@@ -72,12 +92,12 @@ Window {
         id: msg
         visible: false
         width: maxWidth
-        wrapMode: Text.WordWrap
+        wrapMode: Text.Wrap
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
     }
 
-    function userClose(){
+    function userClose() {
         root.destroy()
         root.closeCb()
     }
@@ -92,4 +112,3 @@ Window {
         requestActivate()
     }
 }
-

@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import 'util.js' as Util
 
 QtObject {
     id: appState
@@ -11,6 +12,7 @@ QtObject {
     property int accessDirHistoryIndex: -1
     property var player: null
     property var mainWindow: null
+    property var alertPromise: Util.Promise.resolve()
 
     onPathChanged: {
         if (path === '/') {
