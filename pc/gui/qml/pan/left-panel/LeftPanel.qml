@@ -1,22 +1,20 @@
 import QtQuick 2.0
-import QtGraphicalEffects 1.0
 import QtQuick.Controls 2.1
-import "../../comps"
-import "../../widget"
-import "../../js/util.js" as Util
-import "../../js/app.js" as App
 
 Item {
-
-    property var loginSession: App.appState.loginSession
-
-    User {
-        id: user
+    Column {
+        spacing: 10
+        anchors.fill: parent
+        User {
+            id: user
+        }
+        DiskUsage {
+            id: diskUsage
+        }
+        PathCollection {
+            height: Math.min(
+                        500,
+                        parent.height - user.height - diskUsage.height - 10 * 2)
+        }
     }
-    // 网盘用量
-   DiskUsage {
-       id: usage
-       anchors.top: user.bottom
-       anchors.topMargin: 10
-   }
 }

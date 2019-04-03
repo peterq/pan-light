@@ -6,7 +6,7 @@ import "../../widget"
 import "../../js/util.js" as Util
 
 // 网盘用量
-Item {
+Column {
     id: usage
     width: parent.width
     property real total: 0

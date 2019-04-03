@@ -139,5 +139,10 @@
         <file>pan/left-panel/LeftPanel.qml</file>
         <file>pan/left-panel/User.qml</file>
         <file>pan/left-panel/DiskUsage.qml</file>
+        <file>pan/left-panel/PathCollection.qml</file>
+        <file>pan/left-panel/PathCollectionItem.qml</file>
+        <file>comps/prompt-window.qml</file>
+        <file>assets/images/icons/delete.svg</file>
+        <file>assets/images/icons/order.svg</file>
     </qresource>
 </RCC>

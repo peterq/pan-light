@@ -38,7 +38,8 @@ Item {
         height: width
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 10
-        type: (meta.isdir && 'dir') || fileItem.meta.server_filename.split('.').pop()
+        type: (meta.isdir && 'dir') || fileItem.meta.server_filename.split(
+                  '.').pop()
     }
     Text {
         text: fileItem.meta.server_filename
@@ -112,6 +113,24 @@ Item {
                                     "name": '进入',
                                     "cb": function () {
                                         App.enterPath(fileItem.meta.path)
+                                    }
+                                })
+            fileItem.menus.push({
+                                    "name": '添加至快捷导航',
+                                    "cb": function () {
+                                        var p = App.prompt('请输入快捷方式名称',
+                                                           function (str) {
+                                                               if (str === '')
+                                                                   return '请输入名称'
+                                                               return true
+                                                           },
+                                                           fileItem.meta.server_filename)
+                                        p.then(function (name) {
+                                            App.addPathCollection({
+                                                                      "name": name,
+                                                                      "path": fileItem.meta.path
+                                                                  })
+                                        })
                                     }
                                 })
         }

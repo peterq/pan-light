@@ -198,6 +198,38 @@ var alert
     }
 })()
 
+var prompt
+;(function () {
+    var comp = loadComponent(function () {}, "../comps/prompt-window.qml")
+    prompt = function(option){
+        option = option || {}
+        var defaultOption = {
+            parent: G.root,
+            title: '请输入',
+            msg: '这是一条消息',
+            checkFunc: function() {return true},
+            content: ''
+        }
+        for(var k in defaultOption) {
+            if (!option.hasOwnProperty(k))
+                option[k] = defaultOption[k]
+        }
+        return new Promise(function(resolve, reject){
+            function onClose(result) {
+                if (result === false) reject('input canceled')
+                resolve(result)
+            }
+            var ins = comp.createObject(option.parent, {
+                                            tipText: option.msg,
+                                            title: option.title,
+                                            closeCb: onClose,
+                                            checkFunc: option.checkFunc,
+                                            content: option.content
+                                        })
+        })
+    }
+})()
+
 var showMenu = (function () {
     var comp = loadComponent(function () {}, "../comps/rightClickMenu.qml")
     return function(items, parent) {
@@ -258,8 +290,8 @@ var playVideo = (function(){
 var tooTip = (function(){
     var comp = loadComponent(function(){},'../comps/tool-tip-window.qml')
     var ins
-    return function(meta, useVip){
-        if (!ins || !ins.playVideo) {
+    return function(){
+        if (!ins) {
             ins = comp.createObject(G.root)
         }
         return ins

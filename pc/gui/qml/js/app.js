@@ -76,3 +76,45 @@ function alert(title, msg, copyButton) {
                           })
     })
 }
+
+function prompt(msg, checkFunc, content) {
+    return new Util.Promise(function (resolve, reject) {
+        appState.alertPromise = appState.alertPromise.finally(function () {
+            return Util.prompt({
+                                   "parent": appState.mainWindow,
+                                   "title": '请输入',
+                                   "msg": msg,
+                                   "checkFunc": checkFunc,
+                                   "content": content
+                               }).then(resolve, reject)
+        })
+    })
+}
+
+function syncPathCollection() {
+    var arr = []
+    for (var i = 0; i < appState.pathCollectionModel.count; i++) {
+        arr.push(appState.pathCollectionModel.get(i))
+    }
+    appState.pathCollection = arr
+}
+
+function addPathCollection(option) {
+    appState.pathCollectionModel.append(option)
+    syncPathCollection()
+}
+
+function clearPathCollection(option) {
+    appState.pathCollectionModel.clear()
+    appState.pathCollection = []
+}
+
+function removePathCollection(index) {
+    appState.pathCollectionModel.remove(index, 1)
+    syncPathCollection()
+}
+
+function movePathCollectionItem(from, to) {
+    appState.pathCollectionModel.move(from, to, 1)
+    syncPathCollection()
+}
