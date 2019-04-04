@@ -32,6 +32,7 @@ Window {
     }
     Loader {
         id: layoutLoader
+        focus: true
     }
     Login{}
     Component.onCompleted: {
