@@ -6,3 +6,4 @@ moc*
 rcc*
 qml.rcc
 gui-plugin.so
+.env
