@@ -1,7 +1,6 @@
 package realtime
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/peterq/pan-light/server/timewheel"
 	"github.com/pkg/errors"
@@ -190,12 +189,9 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 		}
 	}()
 	// 新session或者恢复之前的session
-	bin, err := receiveFullFrame(conn)
-	if err != nil {
-		return
-	}
-	var d gson
-	err = json.Unmarshal(bin, &d)
+	d, err := (&Session{
+		conn: conn,
+	}).Read()
 	if err != nil {
 		return
 	}
@@ -238,6 +234,10 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 		s.sessionMapLock.Lock()
 		s.sessionMap[session.id] = session
 		s.sessionMapLock.Unlock()
+		session.Emit("session.new", gson{
+			"id":     strconv.FormatInt(int64(session.id), 10),
+			"secret": session.secret,
+		})
 	} else {
 		session.Emit("session.resume", "ok")
 	}

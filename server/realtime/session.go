@@ -8,7 +8,6 @@ import (
 	"golang.org/x/net/websocket"
 	"io/ioutil"
 	"math/rand"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -51,10 +50,6 @@ func newSession(conn *websocket.Conn, missMessageSize int, server *Server) *Sess
 		online:      true,
 		missMessage: make([]gson, missMessageSize),
 	}
-	s.Emit("session.new", gson{
-		"id":     strconv.FormatInt(int64(s.id), 10),
-		"secret": s.secret,
-	})
 	return s
 }
 
@@ -112,7 +107,7 @@ func (ss *Session) InRoom(name string) bool {
 	return false
 }
 
-const enc = false
+const enc = true
 const key = "pan-light"
 
 func xorBin(bin []byte) []byte {
@@ -128,23 +123,45 @@ func encBin(bin []byte) []byte {
 	if !enc {
 		return bin
 	}
-	buf := bytes.NewBuffer(make([]byte, 0, len(bin)))
-	w := gzip.NewWriter(buf)
-	w.Write(bin)
-	w.Flush()
-	return xorBin(buf.Bytes())
+	zipped, _ := gzipEncode(bin)
+	return xorBin(zipped)
 }
 func dencBin(bin []byte) (dest []byte, err error) {
 	if !enc {
 		return bin, nil
 	}
-	buf := bytes.NewReader(xorBin(bin))
-	r, err := gzip.NewReader(buf)
+	return gzipDecode(xorBin(bin))
+}
+
+func gzipEncode(in []byte) ([]byte, error) {
+	var (
+		buffer bytes.Buffer
+		out    []byte
+		err    error
+	)
+	writer := gzip.NewWriter(&buffer)
+	_, err = writer.Write(in)
 	if err != nil {
-		return
+		writer.Close()
+		return out, err
 	}
-	dest, err = ioutil.ReadAll(r)
-	return
+	err = writer.Close()
+	if err != nil {
+		return out, err
+	}
+
+	return buffer.Bytes(), nil
+}
+
+func gzipDecode(in []byte) ([]byte, error) {
+	reader, err := gzip.NewReader(bytes.NewReader(in))
+	if err != nil {
+		var out []byte
+		return out, err
+	}
+	defer reader.Close()
+
+	return ioutil.ReadAll(reader)
 }
 
 // 接受完整帧

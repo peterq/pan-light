@@ -175,6 +175,7 @@ func hostVerify(data gson, ss *realtime.Session) error {
 	// 确保没有注册过
 	host, ok := manager.hostMap[name]
 	if ok {
+		ss.Emit("error.register.already", host.session.Id())
 		return errors.New("该host已经注册")
 	} else {
 		// 注册

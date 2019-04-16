@@ -12,4 +12,7 @@ var eventHandlers = map[string]func(data interface{}){
 		sessionId := p["sessionId"].(int64)
 		log.Println(candidate, requestId, sessionId)
 	},
+	"session.new": func(data interface{}) {
+		startServe()
+	},
 }

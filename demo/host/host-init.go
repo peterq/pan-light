@@ -35,7 +35,7 @@ func Start() {
 		Role:         "host",
 		HostName:     host.name,
 		HostPassWord: host.password,
-		OnConnected:  onRealTimeOk,
+		OnConnected:  nil,
 	}
 	rt.Init()
 	rt.RegisterEventListener(eventHandlers)
@@ -50,7 +50,7 @@ func env(name string) string {
 	return strings.Trim(s, " \"")
 }
 
-func onRealTimeOk() {
+func startServe() {
 	host.initLock.Lock()
 	defer host.initLock.Unlock()
 	if host.inited {

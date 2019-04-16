@@ -37,6 +37,7 @@ type RealTime struct {
 	listenerMap map[string][]func(data interface{})
 	callMap     map[float64]chan<- *callResult
 	callMapLock sync.Mutex
+	logWsMsg    bool
 }
 
 func (rt *RealTime) Init() {
@@ -141,7 +142,6 @@ func (rt *RealTime) readLoop() {
 }
 
 func (rt *RealTime) handleMsg(data gson) {
-	log.Println(data)
 	t := data["type"].(string)
 	if t == "event" {
 		event := data["event"].(string)
@@ -217,10 +217,16 @@ func (rt *RealTime) read() (data gson, err error) {
 		return
 	}
 	err = json.Unmarshal(bin, &data)
+	if rt.logWsMsg {
+		log.Println("ws <-", data)
+	}
 	return
 }
 
 func (rt *RealTime) write(data gson) (err error) {
+	if rt.logWsMsg {
+		log.Println("ws ->", data)
+	}
 	bin, err := json.Marshal(data)
 	if err != nil {
 		return errors.Wrap(err, "json encode error")
@@ -244,7 +250,7 @@ func (rt *RealTime) write(data gson) (err error) {
 	return
 }
 
-const enc = false
+const enc = true
 const key = "pan-light"
 
 func xorBin(bin []byte) []byte {
@@ -260,23 +266,45 @@ func encBin(bin []byte) []byte {
 	if !enc {
 		return bin
 	}
-	buf := bytes.NewBuffer(make([]byte, 0, len(bin)))
-	w := gzip.NewWriter(buf)
-	w.Write(bin)
-	w.Flush()
-	return xorBin(buf.Bytes())
+	zipped, _ := gzipEncode(bin)
+	return xorBin(zipped)
 }
 func dencBin(bin []byte) (dest []byte, err error) {
 	if !enc {
 		return bin, nil
 	}
-	buf := bytes.NewReader(xorBin(bin))
-	r, err := gzip.NewReader(buf)
+	return gzipDecode(xorBin(bin))
+}
+
+func gzipEncode(in []byte) ([]byte, error) {
+	var (
+		buffer bytes.Buffer
+		out    []byte
+		err    error
+	)
+	writer := gzip.NewWriter(&buffer)
+	_, err = writer.Write(in)
 	if err != nil {
-		return
+		writer.Close()
+		return out, err
 	}
-	dest, err = ioutil.ReadAll(r)
-	return
+	err = writer.Close()
+	if err != nil {
+		return out, err
+	}
+
+	return buffer.Bytes(), nil
+}
+
+func gzipDecode(in []byte) ([]byte, error) {
+	reader, err := gzip.NewReader(bytes.NewReader(in))
+	if err != nil {
+		var out []byte
+		return out, err
+	}
+	defer reader.Close()
+
+	return ioutil.ReadAll(reader)
 }
 
 // 接受完整帧
