@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"runtime/debug"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -205,11 +204,8 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 			s.sessionMapLock.RLock()
 			defer s.sessionMapLock.RUnlock()
 			var ok bool
-			var id int64
-			id, err = strconv.ParseInt(d["sessionId"].(string), 10, 64)
-			if err != nil {
-				return
-			}
+			var id string
+			id = d["sessionId"].(string)
 			session, ok = s.sessionMap[SessionId(id)]
 			if !ok || session.secret != d["sessionSecret"] {
 				isNewSession = true
@@ -235,7 +231,7 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 		s.sessionMap[session.id] = session
 		s.sessionMapLock.Unlock()
 		session.Emit("session.new", gson{
-			"id":     strconv.FormatInt(int64(session.id), 10),
+			"id":     session.id,
 			"secret": session.secret,
 		})
 	} else {

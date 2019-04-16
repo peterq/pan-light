@@ -7,7 +7,7 @@ let pc = new RTCPeerConnection({
         }
     ]
 })
-console.log('peer connection ', pc)
+window.debugObj.pc = pc
 pc.createDataChannel('init')
 pc.ondatachannel = e => console.log(e)
 
@@ -15,13 +15,14 @@ pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState, e)
 
 pc.onicecandidate = event => {
     if (event.candidate === null) {
-        console.log('candidate is ok', pc.localDescription)
+        // console.log('candidate is ok', pc.localDescription)
         window.$event.fire('rtc.candidate', pc.localDescription)
     }
 }
 
 pc.onnegotiationneeded = e => {
-    console.log("onnegotiationneeded", e)
+    // console.log("onnegotiationneeded", e)
+    window.debugObj.onnegotiationneeded = e
     pc.createOffer().then(d => pc.setLocalDescription(d)).catch(console.log.bind(console))
 }
 

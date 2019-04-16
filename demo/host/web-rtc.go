@@ -38,7 +38,7 @@ type p2p struct {
 	sendInfoLock      sync.Mutex
 }
 
-func handleNewUser(cand string, sessionId int64) {
+func handleNewUser(cand string, sessionId string) {
 	remoteSd := webrtc.SessionDescription{}
 	err := json.Unmarshal([]byte(cand), &remoteSd)
 	if err != nil {

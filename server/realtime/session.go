@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"github.com/pkg/errors"
 	"golang.org/x/net/websocket"
 	"io/ioutil"
@@ -12,7 +13,7 @@ import (
 	"time"
 )
 
-type SessionId int64
+type SessionId string
 
 type Session struct {
 	Data interface{} // 业务数据存放
@@ -43,7 +44,7 @@ func randomStr(lenght int) string {
 
 func newSession(conn *websocket.Conn, missMessageSize int, server *Server) *Session {
 	s := &Session{
-		id:          SessionId(time.Now().UnixNano()),
+		id:          SessionId(fmt.Sprint(time.Now().UnixNano())),
 		secret:      randomStr(16),
 		server:      server,
 		conn:        conn,

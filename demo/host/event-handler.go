@@ -9,7 +9,7 @@ var eventHandlers = map[string]func(data interface{}){
 		p := data.(gson)
 		candidate := p["candidate"]
 		requestId := p["requestId"].(string)
-		sessionId := int64(p["sessionId"].(float64))
+		sessionId := p["sessionId"].(string)
 		log.Println(candidate, requestId, sessionId)
 	},
 	"session.new": func(data interface{}) {

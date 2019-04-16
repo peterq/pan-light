@@ -27,7 +27,7 @@ var host = &struct {
 	cancelInsServe []context.CancelFunc
 	holderMap      map[string]*instance.Holder
 
-	p2pMap     map[int64]*p2p
+	p2pMap     map[string]*p2p
 	p2pMapLock sync.Mutex
 }{}
 var rt *realtime.RealTime

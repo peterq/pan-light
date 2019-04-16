@@ -3,16 +3,12 @@ package rpc
 import (
 	"github.com/kataras/iris/core/errors"
 	"github.com/peterq/pan-light/server/realtime"
-	"strconv"
 	"strings"
 )
 
 var hostRpcMap = map[string]realtime.RpcHandler{
 	"host.rtc.candidate": realtime.RpcHandleFunc(func(ss *realtime.Session, p gson) (result interface{}, err error) {
-		userSessionId, err := strconv.ParseInt(p["user"].(string), 10, 64)
-		if err != nil {
-			return
-		}
+		userSessionId := p["user"].(string)
 		user, ok := server.SessionById(realtime.SessionId(userSessionId))
 		if !ok {
 			err = errors.New("user not in here")
