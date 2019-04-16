@@ -27,6 +27,7 @@ func main() {
 			{"pc dev", "启动pc客户端, 开发模式, 用plugin加速编译, 不支持windows"},
 			{"pc start", "启动pc客户端"},
 			{"pc moc", "生成moc"},
+			{"server start", "启动server"},
 		} {
 			fmt.Printf("  %v%v%v\n", m.name, strings.Repeat(" ", 12-len(m.name)), m.desc)
 		}
@@ -43,9 +44,63 @@ func main() {
 	switch cmd {
 	case "pc":
 		pcCmd()
+	case "demo":
+		demoCmd()
+	case "server":
+		serverCmd()
 	default:
 		flag.Usage()
 	}
+}
+
+func serverCmd() {
+	cmd := flag.Arg(1)
+	switch cmd {
+	case "start":
+		serverStart()
+	default:
+		flag.Usage()
+	}
+}
+
+func serverStart() {
+	os.Setenv("pan_light_server_conf", "pan-light-server.yaml")
+	runCmd("./server", "go", "run", "pan-light-server.go")
+}
+
+func demoCmd() {
+	cmd := flag.Arg(1)
+	switch cmd {
+	case "test":
+		demoTest()
+	case "ins":
+		demoIns()
+	case "host":
+		demoHost()
+	default:
+		flag.Usage()
+	}
+}
+
+func demoHost() {
+	runCmd("./demo", "go", "run", "host.go")
+}
+
+func demoTest() {
+	runCmd("./demo", "go", "build", "rtc.go")
+	c := cmd("./rtc")
+	c.Dir, _ = filepath.Abs("./demo")
+	c.Start()
+	runCmd("./demo", "cpulimit", "--pid", fmt.Sprint(c.Process.Pid), "--limit", "30")
+	c.Wait()
+}
+
+func demoIns() {
+	log.Println("building demo_instance_manager....")
+	runCmd("./demo", "go", "build", "-o", "slave/ubuntu16.04/demo_instance_manager", "slave/demo_instance_manager.go")
+	log.Println("starting container...")
+	//runCmd("./demo/slave", "docker-compose", "build")
+	runCmd("./demo/slave", "docker-compose", "up", "--force-recreate")
 }
 
 func pcCmd() {
@@ -153,7 +208,27 @@ func cmd(name string, arg ...string) *exec.Cmd {
 func runCmd(path, name string, arg ...string) {
 	c := cmd(name, arg...)
 	c.Dir, _ = filepath.Abs(path)
+	c.Env = append(os.Environ(), envFile(c.Dir)...)
 	c.Run()
+}
+
+func envFile(path string) (env []string) {
+	bin, err := ioutil.ReadFile(path + "/.env")
+	if err != nil {
+		return
+	}
+	str := string(bin)
+	for _, ln := range strings.Split(str, "\n") {
+		ln = strings.Trim(ln, "\n")
+		if ln == "" {
+			continue
+		}
+		if ln[0] == '#' {
+			continue
+		}
+		env = append(env, ln)
+	}
+	return
 }
 
 type gson = map[string]interface{}
