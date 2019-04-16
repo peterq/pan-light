@@ -5,6 +5,7 @@ import (
 	"github.com/kataras/iris"
 	"github.com/peterq/pan-light/server/realtime"
 	"github.com/pkg/errors"
+	"log"
 	"math/rand"
 	"strings"
 	"sync"
@@ -139,13 +140,14 @@ func onNewSession(ss *realtime.Session) (err error) {
 // user 会话认证
 func userVerify(data gson, ss *realtime.Session) error {
 	// 随机数回声, 防止有人用机器攻击
-	i := rand.Int()
+	i := rand.Intn(86400)
 	ss.Emit("rand.check", i)
 	ret, err := ss.Read()
 	if err != nil {
 		return errors.Wrap(err, "回声检测失败")
 	}
 	if i+1 != int(ret["rand.back"].(float64)) {
+		log.Println(i+1, int(ret["rand.back"].(float64)))
 		return errors.New("回声检测未通过")
 	}
 	manager.userMapLock.Lock()

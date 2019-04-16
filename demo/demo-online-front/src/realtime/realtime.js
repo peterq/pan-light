@@ -6,7 +6,7 @@ export default class Rpc {
     sessionId
     sessionSecret
 
-    constructor (url) {
+    constructor(url) {
         this.encrypt = true
         this.encryptKey = 'pan-light'
         this.url = url
@@ -15,7 +15,7 @@ export default class Rpc {
         this.init()
     }
 
-    init () {
+    init() {
 
         this.openPromise = this.connect()
 
@@ -24,12 +24,16 @@ export default class Rpc {
             this.sessionSecret = data.secret
         })
 
+        this.onRemote('rand.check', data => {
+            this.wsSend({'rand.back': data + 1})
+        })
+
         setInterval(() => this.call('ping'), 10e3)
     }
 
     connect() {
         return new Promise((resolve) => {
-            const ws  = this.ws = new WebSocket(this.url)
+            const ws = this.ws = new WebSocket(this.url)
             if (this.encrypt) {
                 ws.binaryType = 'arraybuffer'
             }
@@ -40,13 +44,13 @@ export default class Rpc {
         })
     }
 
-    reconnnect () {
+    reconnnect() {
         this.ws.close()
         return this.connect()
     }
 
 
-    onWsError (evt) {
+    onWsError(evt) {
         console.log('ws error', evt)
         let cbs = this.eventListener['rt.error'] || []
         cbs.forEach(function (cb) {
@@ -56,7 +60,7 @@ export default class Rpc {
         })
     }
 
-    onWsClose (evt) {
+    onWsClose(evt) {
         console.log('ws close', evt)
         let cbs = this.eventListener['realtime.closed'] || []
         cbs.forEach(function (cb) {
@@ -69,7 +73,7 @@ export default class Rpc {
         }, 5e3)
     }
 
-    onWsOpen () {
+    onWsOpen() {
         if (this.sessionId) {
             this.wsSend({
                 type: 'session.resume',
@@ -94,7 +98,7 @@ export default class Rpc {
         this.ws.send(send)
     }
 
-    onWsMessage (evt) {
+    onWsMessage(evt) {
         const data = JSON.parse(this._decrypt(evt.data))
         if (!(
             (data.type === 'event' && data.event === 'ping') ||
@@ -112,7 +116,7 @@ export default class Rpc {
             return
         }
         if (data.type === 'call.result') {
-            const { id, success } = data
+            const {id, success} = data
             if (success) {
                 this.requestMap[id].resolve(data.result)
             } else {
@@ -123,12 +127,12 @@ export default class Rpc {
         }
     }
 
-    addEventListener (name, cb) {
+    addEventListener(name, cb) {
         this.eventListener[name] = this.eventListener[name] || []
         this.eventListener[name].push(cb)
     }
 
-    on (name, cb) {
+    on(name, cb) {
         return this.addEventListener(name, cb)
     }
 
@@ -136,7 +140,7 @@ export default class Rpc {
         return this.on('$remote.' + name, cb)
     }
 
-    call (method, param = {}) {
+    call(method, param = {}) {
         method = 'user.' + method
         const id = 'cb' + new Date().getTime() + ~~(Math.random() * 1e5)
         let done = {}
@@ -176,12 +180,17 @@ export default class Rpc {
         }
         let plain = Array.prototype.slice.call(new Uint8Array(buf), 0)
         plain.forEach((b, i) => {
-            plain[i] ^=  this.encryptKey[i % this.encryptKey.length].charCodeAt(0)
+            plain[i] ^= this.encryptKey[i % this.encryptKey.length].charCodeAt(0)
         })
         // console.log('接收, 明文', JSON.stringify(plain))
         let raw = gzip.unzip(plain)
+        let bin = new ArrayBuffer(raw.length)
+        bin = new Uint8Array(bin)
+        for (let i = 0; i < bin.length; i++) {
+            bin[i] = raw[i]
+        }
         // console.log('接收, 解压', raw)
-        return raw.map(b => String.fromCharCode(b)).join('')
+        return new TextDecoder("utf-8").decode(bin)
     }
 
 }

@@ -13,7 +13,7 @@ var userRpcMap = map[string]realtime.RpcHandler{
 		return "pong", nil
 	}),
 	"user.connect.host": realtime.RpcHandleFunc(func(ss *realtime.Session, data gson) (result interface{}, err error) {
-		candidate := data["candidate"].(string)
+		candidate := data["candidate"]
 		requestId := data["requestId"].(string)
 		hostName := data["hostName"].(string)
 		manager.hostMapLock.Lock()

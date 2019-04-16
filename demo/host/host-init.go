@@ -1,23 +1,34 @@
 package host
 
 import (
+	"context"
 	"fmt"
+	"github.com/peterq/pan-light/demo/host/instance"
 	"github.com/peterq/pan-light/demo/realtime"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 var host = &struct {
 	name       string
 	password   string
 	wsAddr     string
-	initLock   sync.Mutex
-	inited     bool
 	slaveCount int
-	slaves     []string
+
+	slaves []string
+
+	initLock       sync.Mutex
+	inited         bool
+	cancelServe    context.CancelFunc
+	cancelInsServe []context.CancelFunc
+	holderMap      map[string]*instance.Holder
+
+	p2pMap     map[int64]*p2p
+	p2pMapLock sync.Mutex
 }{}
 var rt *realtime.RealTime
 
@@ -54,7 +65,10 @@ func startServe() {
 	host.initLock.Lock()
 	defer host.initLock.Unlock()
 	if host.inited {
-		return
+		host.cancelServe()
+		host.inited = false
+		host.cancelServe = nil
+		host.cancelInsServe = nil
 	}
 	host.slaves = make([]string, host.slaveCount)
 	for i := 0; i < host.slaveCount; i++ {
@@ -67,7 +81,21 @@ func startServe() {
 		log.Println("注册slave失败", err)
 		return
 	}
-	log.Println(rt.Call("host.next.user", gson{
-		"slave": host.slaves[0],
-	}))
+	serveCtx, cancel := context.WithCancel(context.Background())
+	host.cancelServe = cancel
+	host.cancelInsServe = make([]context.CancelFunc, host.slaveCount)
+	host.holderMap = map[string]*instance.Holder{}
+	host.inited = true
+	for idx, slaveName := range host.slaves {
+		holder := &instance.Holder{
+			SlaveName:    slaveName,
+			HostName:     host.name,
+			HostPassword: host.password,
+		}
+		host.holderMap[slaveName] = holder
+		ctx, cancel := context.WithCancel(serveCtx)
+		host.cancelInsServe[idx] = cancel
+		time.Sleep(100 * time.Millisecond)
+		go holder.Init(rt, ctx)
+	}
 }
