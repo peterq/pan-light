@@ -29,8 +29,8 @@ type Session struct {
 	rooms            []*Room
 }
 
-func (s *Session) Rooms() []*Room {
-	return s.rooms
+func (ss *Session) Rooms() []*Room {
+	return ss.rooms
 }
 
 func randomStr(lenght int) string {

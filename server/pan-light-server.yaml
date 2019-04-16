@@ -1,0 +1,9 @@
+Other:
+  demo:
+    hosts:
+      -
+        name: asus-test
+        password: asus-test
+      -
+        name: asus-home
+        password: PeterQ-is-doomed-to-SucceSS
