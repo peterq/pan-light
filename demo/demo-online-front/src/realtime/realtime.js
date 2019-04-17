@@ -5,6 +5,7 @@ export default class Rpc {
     openPromise
     sessionId
     sessionSecret
+    openDone
 
     constructor(url) {
         this.encrypt = true
@@ -26,6 +27,7 @@ export default class Rpc {
 
         this.onRemote('rand.check', data => {
             this.wsSend({'rand.back': data + 1})
+            this.openDone()
         })
 
         setInterval(() => this.call('ping'), 10e3)
@@ -33,11 +35,12 @@ export default class Rpc {
 
     connect() {
         return new Promise((resolve) => {
+            this.openDone = resolve
             const ws = this.ws = new WebSocket(this.url)
             if (this.encrypt) {
                 ws.binaryType = 'arraybuffer'
             }
-            ws.onopen = async evt => (resolve(), this.onWsOpen(evt))
+            ws.onopen = async evt => this.onWsOpen(evt)
             ws.onerror = evt => this.onWsError(evt)
             ws.onmessage = evt => this.onWsMessage(evt)
             ws.onclose = evt => this.onWsClose(evt)

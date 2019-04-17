@@ -25,8 +25,8 @@ func (r *Room) Name() string {
 }
 
 func (r *Room) Join(id SessionId) {
-	r.lock.RUnlock()
-	defer r.lock.RUnlock()
+	r.lock.Lock()
+	defer r.lock.Unlock()
 	if r.members.index(id) > -1 {
 		return
 	}
@@ -39,11 +39,19 @@ func (r *Room) Join(id SessionId) {
 	go r.Broadcast("room.member.join", id)
 }
 
+func (r *Room) Count() int {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+	return len(r.members)
+}
+
 func (r *Room) Broadcast(event string, payload interface{}, expect ...SessionId) {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
 	for _, id := range r.members {
 		if sessionIdSlice(expect).index(id) < 0 {
 			ss, _ := r.server.SessionById(id)
-			ss.Emit(event, payload)
+			ss.Emit(event, payload, r.name)
 		}
 	}
 }
@@ -51,6 +59,9 @@ func (r *Room) Broadcast(event string, payload interface{}, expect ...SessionId)
 func (r *Room) Remove(id SessionId) {
 	func() {
 		ss, _ := r.server.SessionById(id)
+		if ss == nil {
+			return
+		}
 		ss.lock.Lock()
 		defer ss.lock.Unlock()
 		rooms := make([]*Room, 0, cap(ss.rooms))

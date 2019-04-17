@@ -190,6 +190,7 @@ export default class RFB extends EventTargetMixin {
                 (this._rfb_init_state === '')) {
                 this._rfb_init_state = 'ProtocolVersion';
                 Log.Debug("Starting VNC handshake");
+                console.log('shake')
             } else {
                 this._fail("Unexpected server connection while " +
                            this._rfb_connection_state);

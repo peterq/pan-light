@@ -97,7 +97,7 @@ func demoTest() {
 
 func demoIns() {
 	log.Println("building demo_instance_manager....")
-	runCmd("./demo", "go", "build", "-o", "slave/ubuntu16.04/demo_instance_manager", "slave/demo_instance_manager.go")
+	runCmd("./demo", "go", "build", "-o", "slave/ubuntu16.04/demo_instance_manager", "slave.go")
 	log.Println("starting container...")
 	//runCmd("./demo/slave", "docker-compose", "build")
 	runCmd("./demo/slave", "docker-compose", "up", "--force-recreate")

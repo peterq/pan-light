@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"log"
 	"math/rand"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -15,9 +16,9 @@ import (
 type gson = map[string]interface{}
 
 type waitState struct {
-	ticket  string           // 排队凭证
-	order   int64            // 排序
-	session realtime.Session // 用户会话
+	ticket  string            // 排队凭证
+	order   int64             // 排序
+	session *realtime.Session // 用户会话
 }
 
 var server *realtime.Server
@@ -92,7 +93,7 @@ func onSlaveLeave(slave *roleSlave, ss *realtime.Session) {
 
 func onHostLeave(host *roleHost) {
 	// 通知所有用户
-	server.RoomByName("user_all").
+	server.RoomByName("room.all.user").
 		Broadcast("system.host.leave", host.name)
 	// 取消注册
 	manager.hostMapLock.Lock()
@@ -101,10 +102,6 @@ func onHostLeave(host *roleHost) {
 }
 
 func onUserLeave(user *roleUser) {
-	// 通知同房间的其他用户
-	for _, room := range user.session.Rooms() {
-		room.Broadcast("user.leave", user.session.Id())
-	}
 	// 踢出队列
 	if user.waitState != nil {
 		manager.waitSessionMapLock.Lock()
@@ -118,6 +115,7 @@ func onNewSession(ss *realtime.Session) (err error) {
 		e := recover()
 		if e != nil {
 			err = errors.New(fmt.Sprint("roleType handshake error", e))
+			debug.PrintStack()
 		}
 	}()
 	data, err := ss.Read()
@@ -158,6 +156,10 @@ func userVerify(data gson, ss *realtime.Session) error {
 	}
 	ss.Data = user
 	manager.userMap[ss.Id()] = user
+	go func() {
+		time.Sleep(time.Second)
+		server.RoomByName("room.all.user").Join(ss.Id())
+	}()
 	return nil
 }
 
@@ -188,6 +190,11 @@ func hostVerify(data gson, ss *realtime.Session) error {
 		ss.Data = host
 		manager.hostMap[name] = host
 	}
+	go func() {
+		time.Sleep(time.Second)
+		server.RoomByName("room.all.host").Join(ss.Id())
+		server.RoomByName("room.host.slaves." + host.name).Join(ss.Id())
+	}()
 	return nil
 }
 
@@ -199,6 +206,12 @@ func slaveVerify(data gson, ss *realtime.Session) error {
 	correctSecret, ok := manager.hostSecret[hostName]
 	if !ok {
 		return errors.New("host 不存在")
+	}
+	manager.hostMapLock.RLock()
+	host, ok := manager.hostMap[hostName]
+	manager.hostMapLock.RUnlock()
+	if !ok {
+		return errors.New("host 未注册")
 	}
 	if correctSecret != secret {
 		return errors.New("秘钥错误")
@@ -218,6 +231,10 @@ func slaveVerify(data gson, ss *realtime.Session) error {
 		server.RemoveSession(slave.session.Id())
 	}
 	slave.session = ss
+	go func() {
+		time.Sleep(time.Second)
+		server.RoomByName("room.host.slaves." + host.name).Join(ss.Id())
+	}()
 	return nil
 }
 

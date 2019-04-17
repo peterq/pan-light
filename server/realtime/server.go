@@ -141,13 +141,18 @@ func (s *Server) RemoveSession(id SessionId) {
 		return
 	}
 	delete(s.sessionMap, id)
-	for _, room := range ss.rooms {
-		room.Remove(id)
+	go func() {
+		for _, room := range ss.rooms {
+			room.Remove(id)
+		}
+		if ss.online {
+			ss.conn.Close()
+		}
+	}()
+	if s.OnSessionLost != nil {
+		go s.OnSessionLost(ss)
 	}
-	if ss.online {
-		ss.conn.Close()
-	}
-	go s.OnSessionLost(ss)
+
 }
 
 func (s *Server) SessionById(id SessionId) (ss *Session, ok bool) {
@@ -226,6 +231,7 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 			if err = s.BeforeAcceptSession(session); err != nil {
 				return
 			}
+			log.Println("finish veriffy")
 		}
 		s.sessionMapLock.Lock()
 		s.sessionMap[session.id] = session
@@ -248,6 +254,7 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 }
 
 func (s *Server) readMessageLoop(ss *Session) (err error) {
+	log.Println("read loop")
 	var data gson
 	for {
 		data, err = ss.Read()
@@ -304,7 +311,7 @@ func (s *Server) handleMessage(data gson, ss *Session) {
 		resp := gson{
 			"type":    "call.result",
 			"success": err == nil,
-			"data":    result,
+			"result":  result,
 			"id":      data["id"],
 		}
 		if err != nil {

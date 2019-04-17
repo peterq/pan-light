@@ -58,12 +58,16 @@ func (ss *Session) Id() SessionId {
 	return ss.id
 }
 
-func (ss *Session) Emit(event string, data interface{}) {
-	ss.write(gson{
+func (ss *Session) Emit(event string, data interface{}, room ...string) {
+	d := gson{
 		"type":    "event",
 		"event":   event,
 		"payload": data,
-	})
+	}
+	if len(room) > 0 {
+		d["room"] = room[0]
+	}
+	ss.write(d)
 }
 
 func (ss *Session) write(data gson) (err error) {

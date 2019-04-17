@@ -7,7 +7,23 @@ import (
 
 var userRpcMap = map[string]realtime.RpcHandler{
 	"user.hosts.info": realtime.RpcHandleFunc(func(ss *realtime.Session, data gson) (result interface{}, err error) {
-		return
+		manager.hostMapLock.RLock()
+		defer manager.hostMapLock.RUnlock()
+		var arr []gson
+		for _, host := range manager.hostMap {
+			var slaves []gson
+			for slaveName := range host.slaves {
+				slaves = append(slaves, gson{
+					"slaveName":    slaveName,
+					"visitorCount": server.RoomByName("room.slave.all.user." + slaveName).Count(),
+				})
+			}
+			arr = append(arr, gson{
+				"name":   host.name,
+				"slaves": slaves,
+			})
+		}
+		return arr, nil
 	}),
 	"user.ping": realtime.RpcHandleFunc(func(ss *realtime.Session, data gson) (result interface{}, err error) {
 		return "pong", nil
@@ -30,7 +46,23 @@ var userRpcMap = map[string]realtime.RpcHandler{
 		})
 		return
 	}),
+	// 请求在线体验票据
+	"user.ticket.new": realtime.RpcHandleFunc(func(ss *realtime.Session, data gson) (result interface{}, err error) {
+		user := ss.Data.(*roleUser)
+		return user.requestTicket()
+	}),
 	"user.hosts.hello": realtime.RpcHandleFunc(func(ss *realtime.Session, data gson) (result interface{}, err error) {
+		return
+	}),
+	"user.join.slave": realtime.RpcHandleFunc(func(ss *realtime.Session, data gson) (result interface{}, err error) {
+		manager.slaveMapLock.RLock()
+		defer manager.slaveMapLock.RUnlock()
+		slaveName := data["slave"].(string)
+		_, ok := manager.slaveMap[slaveName]
+		if !ok {
+			err = errors.New("slave 不存在")
+		}
+		server.RoomByName("room.slave.all.user." + slaveName).Join(ss.Id())
 		return
 	}),
 }

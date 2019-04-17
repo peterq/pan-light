@@ -13,4 +13,9 @@ var eventHandlers = map[string]func(data interface{}){
 	"session.new": func(data interface{}) {
 		startServe()
 	},
+	"wait.user.new": func(data interface{}) {
+		for _, holder := range host.holderMap {
+			holder.CheckUser()
+		}
+	},
 }

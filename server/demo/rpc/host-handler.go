@@ -61,6 +61,11 @@ var hostRpcMap = map[string]realtime.RpcHandler{
 					"ticket":    state.ticket,
 					"sessionId": state.session.Id(),
 				}
+				manager.lastInServiceOrder = state.order
+				state.session.Emit("your.turn", gson{
+					"host":  host.name,
+					"slave": slave,
+				})
 				return
 			}
 		}

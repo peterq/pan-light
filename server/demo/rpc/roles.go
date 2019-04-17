@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"github.com/peterq/pan-light/server/realtime"
+	"math/rand"
 	"sync"
 )
 
@@ -29,6 +30,29 @@ func (*roleUser) roleName() string {
 	return "user"
 }
 
+func (user *roleUser) requestTicket() (data gson, err error) {
+	if user.waitState != nil {
+		data = gson{
+			"order":  user.waitState.order,
+			"ticket": user.waitState.ticket,
+		}
+		return
+	} else {
+		manager.waitSessionMapLock.Lock()
+		defer manager.waitSessionMapLock.Lock()
+		manager.lastDistributedOrder++
+		w := &waitState{
+			ticket:  randomStr(32),
+			order:   manager.lastDistributedOrder,
+			session: user.session,
+		}
+		manager.waitSessionMap[manager.lastDistributedOrder] = w
+		user.waitState = w
+		server.RoomByName("room.all.host").Broadcast("wait.user.new", nil)
+	}
+	return
+}
+
 type roleSlave struct {
 	name        string
 	host        *roleHost
@@ -39,4 +63,13 @@ type roleSlave struct {
 
 func (*roleSlave) roleName() string {
 	return "slave"
+}
+
+func randomStr(lenght int) string {
+	arr := make([]byte, lenght)
+	src := "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890"
+	for i := 0; i < lenght; i++ {
+		arr[i] = byte(src[rand.Intn(len(src))])
+	}
+	return string(arr)
 }

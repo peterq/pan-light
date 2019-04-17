@@ -2,15 +2,18 @@ package instance
 
 import (
 	"context"
-	"fmt"
 	"github.com/peterq/pan-light/demo/realtime"
 	"github.com/pkg/errors"
 	"io"
 	"log"
 	"net"
+	"os"
+	"os/exec"
+	"strings"
 	"sync"
-	"time"
 )
+
+const dockerImage = "pan-light-slave"
 
 type gson = map[string]interface{}
 
@@ -29,6 +32,9 @@ type Holder struct {
 	vncAddr     string
 	vncAddrLock sync.Mutex
 	vncAddrCond *sync.Cond
+	pid         int // 进程号
+	viewPwd     string
+	operatePwd  string
 
 	order     int64
 	ticket    string
@@ -78,16 +84,35 @@ func (h *Holder) startIns() {
 		defer h.vncAddrLock.Unlock()
 		h.vncAddr = ""
 	}()
+	// 删除已有容器
+	defer exec.Command("docker", "rm", "-v", "-f", h.SlaveName).Run()
+	exec.Command("docker", "rm", "-v", "-f", h.SlaveName).Run()
 	// 启动docker
-
+	dockerP := exec.Command("docker", "run",
+		"-m", "200m", "--memory-swap", "400m", // 200m 内存
+		"--cpu-period=100000", "--cpu-quota=20000", // 20% cpu
+		"-e", "vnc_operate_pwd="+h.operatePwd, "-e", "vnc_view_pwd="+h.viewPwd, // vnc 密码
+		"--name='"+h.SlaveName+"'", // 容器名
+		dockerImage)
+	dockerP.Stdout = os.Stdout
+	dockerP.Stderr = os.Stderr
+	dockerP.Start()
+	h.pid = dockerP.Process.Pid
+	// 查询ip
+	bin, err := exec.Command("sh", "-c", "docker inspect --format '{{ .NetworkSettings.IPAddress }}' "+h.SlaveName).Output()
+	if err != nil {
+		log.Println("获取ip错误", err)
+		return
+	}
+	addr := strings.Trim(string(bin), "\r\n") + ":5091"
 	// 配置地址
 	func() {
 		h.vncAddrLock.Lock()
 		defer h.vncAddrLock.Unlock()
-		h.vncAddr = "127.0.0.1:5901"
+		h.vncAddr = addr
 		h.vncAddrCond.Broadcast() // 通知等待链接的代理
 	}()
-	time.Sleep(10 * time.Minute)
+	dockerP.Wait()
 }
 
 func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error), viewOnly bool) {
@@ -113,13 +138,17 @@ func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error), viewOn
 	// 开始进行数据转发
 	proxyCb(nil)
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	var messageSize = 1024
 	var ReadLoop = func(d io.Reader) {
 		for {
 			buffer := make([]byte, messageSize)
 			n, err := d.Read(buffer)
+			log.Println("r", buffer[:n])
 			if err != nil {
-				fmt.Println("Datachannel closed; Exit the readloop:", err)
+				log.Println("Datachannel closed; Exit the ReadLoop:", err)
+				cancel()
 				return
 			}
 			con.Write(buffer[:n])
@@ -130,17 +159,21 @@ func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error), viewOn
 		for {
 			buffer := make([]byte, messageSize)
 			n, err := con.Read(buffer)
+			log.Println("w", buffer[:n])
 			if err != nil {
-				fmt.Println("Datachannel closed; Exit the readloop:", err)
-				con.Close()
+				log.Println("Datachannel closed; Exit the WriteLoop:", err)
+				cancel()
 				return
 			}
 			d.Write(buffer[:n])
 		}
 	}
 
+	log.Println("proxy for rw", rw)
+	go ReadLoop(rw)
 	go WriteLoop(rw)
-	ReadLoop(rw)
+	<-ctx.Done()
+	log.Println("proxy gone rw", rw)
 }
 
 func (h *Holder) VncProxyForOperation(rw io.ReadWriteCloser, proxyCb func(err error), order int64, ticket string) {

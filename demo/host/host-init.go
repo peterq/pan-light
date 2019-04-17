@@ -25,7 +25,7 @@ var host = &struct {
 	inited         bool
 	cancelServe    context.CancelFunc
 	cancelInsServe []context.CancelFunc
-	holderMap      map[string]*instance.Holder
+	holderMap      map[string]*instance.Holder // slave name -> holder
 
 	p2pMap     map[string]*p2p
 	p2pMapLock sync.Mutex
