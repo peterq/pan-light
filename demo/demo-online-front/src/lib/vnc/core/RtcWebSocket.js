@@ -23,11 +23,14 @@ export function registerProxyChannelResolver(fn) {
 export default class RtcWebSocket {
     constructor(uri, protocols) {
 
-        console.log('web rtc -> web socket', uri, protocols)
+        // console.log('web rtc -> web socket', uri, protocols)
 
-        getProxyChannel()
+        getProxyChannel(uri)
             .then((proxyChannel) => {
+                this.proxyChannel = proxyChannel
+                console.log('proxyChannel', proxyChannel)
                 proxyChannel.onclose = () => {
+
                     console.log('sendChannel has closed')
                     this.close(0, 'data channel closed')
                 }
@@ -36,7 +39,7 @@ export default class RtcWebSocket {
                 //     this._open()
                 // }
                 proxyChannel.onmessage = e => {
-                    // console.log(`Message from DataChannel '${sendChannel.label}' payload '${e.data}'`)
+                    console.log(`Message from DataChannel '${proxyChannel.label}' payload '${e.data}'`)
                     this._receive_data(e.data)
                 }
                 this._open()
@@ -73,6 +76,7 @@ export default class RtcWebSocket {
     }
 
     send(data) {
+        console.log('rtc web socket send', data)
         if (this.protocol == 'base64') {
             data = Base64.decode(data)
         } else {
@@ -80,8 +84,7 @@ export default class RtcWebSocket {
         }
         // this._send_queue.set(data, this.bufferedAmount);
         // this.bufferedAmount += data.length;
-        this.sendChannel.send(data)
-        console.log('rtc web socket send', data)
+        this.proxyChannel.send(data)
     }
 
     // _get_sent_data() {
@@ -102,7 +105,7 @@ export default class RtcWebSocket {
         this.readyState = RtcWebSocket.OPEN
         if (this.onerror) {
             this.onerror(make_event('error'))
-            console.log('rtc web socket open')
+            console.log('rtc web socket error')
         }
     }
 

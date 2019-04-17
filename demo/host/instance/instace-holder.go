@@ -92,6 +92,7 @@ func (h *Holder) startIns() {
 
 func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error), viewOnly bool) {
 	var addr string
+	h.vncAddr = "127.0.0.1:5901"
 	func() {
 		h.vncAddrLock.Lock()
 		defer h.vncAddrLock.Unlock()

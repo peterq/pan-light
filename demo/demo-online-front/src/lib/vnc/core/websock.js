@@ -13,7 +13,8 @@
  */
 
 import * as Log from './util/logging.js';
-import RtcWebSocket from './RtcWebSocket.js'
+import RtcWebSocket from "./RtcWebSocket"
+
 // this has performance issues in some versions Chromium, and
 // doesn't gain a tremendous amount of performance increase in Firefox
 // at the moment.  It may be valuable to turn it on in the future.
@@ -184,25 +185,25 @@ export default class Websock {
         this._websocket = new RtcWebSocket(uri, protocols);
         this._websocket.binaryType = 'arraybuffer';
 
-        this._websocket.onWsMessage = this._recv_message.bind(this);
-        this._websocket.onWsOpen = () => {
-            Log.Debug('>> WebSock.onWsOpen');
+        this._websocket.onmessage = this._recv_message.bind(this);
+        this._websocket.onopen = () => {
+            Log.Debug('>> WebSock.onopen');
             if (this._websocket.protocol) {
                 Log.Info("Server choose sub-protocol: " + this._websocket.protocol);
             }
 
             this._eventHandlers.open();
-            Log.Debug("<< WebSock.onWsOpen");
+            Log.Debug("<< WebSock.onopen");
         };
-        this._websocket.onWsClose = (e) => {
-            Log.Debug(">> WebSock.onWsClose");
+        this._websocket.onclose = (e) => {
+            Log.Debug(">> WebSock.onclose");
             this._eventHandlers.close(e);
-            Log.Debug("<< WebSock.onWsClose");
+            Log.Debug("<< WebSock.onclose");
         };
-        this._websocket.onWsError = (e) => {
-            Log.Debug(">> WebSock.onWsError: " + e);
+        this._websocket.onerror = (e) => {
+            Log.Debug(">> WebSock.onerror: " + e);
             this._eventHandlers.error(e);
-            Log.Debug("<< WebSock.onWsError: " + e);
+            Log.Debug("<< WebSock.onerror: " + e);
         };
     }
 
@@ -214,7 +215,7 @@ export default class Websock {
                 this._websocket.close();
             }
 
-            this._websocket.onWsMessage = () => {};
+            this._websocket.onmessage = () => {};
         }
     }
 

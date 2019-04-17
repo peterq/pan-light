@@ -1,43 +1,29 @@
 <template>
-    <div id="app">
+    <div id="app" style="width: 100vw;height: 100vh; display: flex;flex-direction: column">
         <h1>Hello pan-light</h1>
+        <vnc style="flex: 1;"></vnc>
     </div>
 </template>
 
 <script>
-
-    import setRemoteDescription from "./realtime/webRtc"
+    import vnc from './comp/vnc'
 
     export default {
         data() {
-            return {
-                candidate: null,
-            }
+            return {}
         },
-        created() {
-            this.$event.on('rtc.candidate', (candidate) =>  {
-                this.candidate = candidate
-                this.connectHost('asus-test')
-            })
-            this.$rt.onRemote('host.candidate.ok', c => {
-                console.log(c)
-                setRemoteDescription(c)
-            })
+        async created() {
         },
-        methods: {
-            async connectHost(host) {
-                if (!this.candidate) return
-                await this.$rt.openPromise
-                let result = await this.$rt.call('connect.host', {
-                    candidate: this.candidate,
-                    hostName: host,
-                    requestId: 'connect'
-                })
-                console.log(result)
-            }
+        methods: {},
+        components: {
+            vnc
         }
     }
 </script>
 
 <style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
 </style>

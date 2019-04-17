@@ -8,7 +8,9 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"log"
+	"math/rand"
 	"sync"
+	"time"
 )
 
 var webRtcApi *webrtc.API
@@ -36,9 +38,10 @@ type p2p struct {
 	cancel            context.CancelFunc
 	infoChannelWriter io.Writer
 	sendInfoLock      sync.Mutex
+	connected         bool
 }
 
-func handleNewUser(cand string, sessionId string) {
+func handleNewUser(cand, sessionId, requestId string) {
 	remoteSd := webrtc.SessionDescription{}
 	err := json.Unmarshal([]byte(cand), &remoteSd)
 	if err != nil {
@@ -51,38 +54,58 @@ func handleNewUser(cand string, sessionId string) {
 		return
 	}
 
+	p := &p2p{
+		peerConnection: peerConnection,
+		ctx:            ctx,
+		cancel:         cancel,
+	}
 	peerConnection.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
-		log.Printf("ICE Connection State has changed: %s\n", connectionState.String())
+		//log.Printf("ICE Connection State has changed: %s\n", connectionState.String())
+		if connectionState == webrtc.ICEConnectionStateConnected {
+			p.connected = true
+		} else if connectionState == webrtc.ICEConnectionStateClosed {
+			p.cancel()
+		}
 	})
 	infoChannel, err := peerConnection.CreateDataChannel("info", nil)
 	if err != nil {
 		log.Println("创建info channel错误", err)
 	}
-	p := &p2p{
-		peerConnection: peerConnection,
-		infoChannel:    infoChannel,
-		ctx:            ctx,
-		cancel:         cancel,
-	}
+	p.infoChannel = infoChannel
 	infoChannel.OnOpen(p.handleInfoChannel)
-
-	offer, err := peerConnection.CreateOffer(nil)
-	if err != nil {
-		log.Println("获取本地sd错误", err)
-		return
-	}
-
-	err = peerConnection.SetLocalDescription(offer)
-	if err != nil {
-		log.Println("设置本地sd错误", err)
-		return
-	}
 
 	err = peerConnection.SetRemoteDescription(remoteSd)
 	if err != nil {
 		log.Println("设置远端sd错误", err)
 		return
 	}
+
+	// Create an answer
+	answer, err := peerConnection.CreateAnswer(nil)
+	if err != nil {
+		log.Println("create answer错误", err)
+	}
+
+	// Sets the LocalDescription, and starts our UDP listeners
+	err = peerConnection.SetLocalDescription(answer)
+	if err != nil {
+		log.Println("设置本地sd错误", err)
+		return
+	}
+
+	rt.Call("host.rtc.candidate", gson{
+		"candidate": answer,
+		"requestId": requestId,
+		"sessionId": sessionId,
+	})
+
+	go func() {
+		time.Sleep(10 * time.Second)
+		if !p.connected {
+			p.cancel()
+		}
+	}()
+
 	func() {
 		host.p2pMapLock.Lock()
 		defer host.p2pMapLock.Unlock()
@@ -180,7 +203,7 @@ func (p *p2p) handleInfoMsg(data gson) {
 			err = errors.New("slave 不存在")
 			return
 		}
-		c := "proxy.view" + slaveName
+		c := "proxy.view." + slaveName + "." + fmt.Sprint(rand.Int())
 		viewChanel, err := p.peerConnection.CreateDataChannel(c, nil)
 		if err != nil {
 			err = errors.Wrap(err, "创建view channel 错误")
@@ -201,6 +224,7 @@ func (p *p2p) handleInfoMsg(data gson) {
 				})
 			} else {
 				p.sendInfo(gson{
+					"result":  "ok",
 					"type":    "proxy.callback",
 					"success": true,
 					"id":      id,

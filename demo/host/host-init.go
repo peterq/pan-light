@@ -85,6 +85,7 @@ func startServe() {
 	host.cancelServe = cancel
 	host.cancelInsServe = make([]context.CancelFunc, host.slaveCount)
 	host.holderMap = map[string]*instance.Holder{}
+	host.p2pMap = map[string]*p2p{}
 	host.inited = true
 	for idx, slaveName := range host.slaves {
 		holder := &instance.Holder{

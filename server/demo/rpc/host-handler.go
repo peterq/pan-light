@@ -8,12 +8,17 @@ import (
 
 var hostRpcMap = map[string]realtime.RpcHandler{
 	"host.rtc.candidate": realtime.RpcHandleFunc(func(ss *realtime.Session, p gson) (result interface{}, err error) {
-		userSessionId := p["user"].(string)
+		userSessionId := p["sessionId"].(string)
+		requestId := p["requestId"].(string)
 		user, ok := server.SessionById(realtime.SessionId(userSessionId))
 		if !ok {
 			err = errors.New("user not in here")
 		}
-		user.Emit("host.candidate.ok", p["candidate"])
+		user.Emit("host.candidate.ok", gson{
+			"candidate": p["candidate"],
+			"sessionId": userSessionId,
+			"requestId": requestId,
+		})
 		return
 	}),
 	// 作废, 不走这个逻辑

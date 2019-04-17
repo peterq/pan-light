@@ -396,7 +396,7 @@ export default class RFB extends EventTargetMixin {
         Log.Info("connecting to " + this._url);
 
         try {
-            // WebSocket.onWsOpen transitions to the RFB init states
+            // WebSocket.onopen transitions to the RFB init states
             this._sock.open(this._url, ['binary']);
         } catch (e) {
             if (e.name === 'SyntaxError') {

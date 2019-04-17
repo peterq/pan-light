@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/websocket"
 	"io/ioutil"
 	"log"
+	"runtime/debug"
 	"sync"
 	"time"
 )
@@ -150,7 +151,15 @@ func (rt *RealTime) handleMsg(data gson) {
 			return
 		}
 		for _, cb := range cbs {
-			go cb(data["payload"])
+			go func() {
+				defer func() {
+					if e := recover(); e != nil {
+						log.Println(e)
+						debug.PrintStack()
+					}
+				}()
+				cb(data["payload"])
+			}()
 		}
 		return
 	}
