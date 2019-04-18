@@ -37,6 +37,7 @@ type Server struct {
 	SessionKeepTime         time.Duration // 断线, 回话维持时间
 	KeepMessageCount        int           // 断线保留的消息数量
 	BeforeAcceptSession     func(ss *Session) (err error)
+	AfterAcceptSession      func(ss *Session) (err error)
 	BeforeDispatchUserEvent func(ss *Session, event string) (err error)
 	BeforeDispatchUserRpc   func(ss *Session, method string) (err error)
 	OnSessionLost           func(ss *Session)
@@ -231,7 +232,6 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 			if err = s.BeforeAcceptSession(session); err != nil {
 				return
 			}
-			log.Println("finish veriffy")
 		}
 		s.sessionMapLock.Lock()
 		s.sessionMap[session.id] = session
@@ -240,6 +240,11 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 			"id":     session.id,
 			"secret": session.secret,
 		})
+		if s.AfterAcceptSession != nil {
+			if err = s.AfterAcceptSession(session); err != nil {
+				log.Println(err)
+			}
+		}
 	} else {
 		session.Emit("session.resume", "ok")
 	}
@@ -254,7 +259,6 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 }
 
 func (s *Server) readMessageLoop(ss *Session) (err error) {
-	log.Println("read loop")
 	var data gson
 	for {
 		data, err = ss.Read()

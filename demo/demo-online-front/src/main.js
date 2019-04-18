@@ -3,13 +3,14 @@ import App from './App.vue'
 import ElementUI from 'element-ui'
 import {$event, $rt, $state} from "./app"
 
+import 'element-ui/lib/theme-chalk/index.css'
 Vue.config.productionTip = false
 
 Vue.use(ElementUI)
 Vue.mixin({
     created: function () {
-        this.$state = this.$options.state || (this.$parent && this.$parent.$state) || {}
-        this.$event = this.$options.event || (this.$parent && this.$parent.$event) || window.$event || {}
+        this.$state = this.$options.$state || (this.$parent && this.$parent.$state) || {}
+        this.$event = this.$options.$event || (this.$parent && this.$parent.$event) || window.$event || {}
         this.$rt = this.$options.$rt || (this.$parent && this.$parent.$rt) || {}
     }
 })

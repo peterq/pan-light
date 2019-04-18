@@ -39,7 +39,7 @@ func (user *roleUser) requestTicket() (data gson, err error) {
 		return
 	} else {
 		manager.waitSessionMapLock.Lock()
-		defer manager.waitSessionMapLock.Lock()
+		defer manager.waitSessionMapLock.Unlock()
 		manager.lastDistributedOrder++
 		w := &waitState{
 			ticket:  randomStr(32),

@@ -51,7 +51,8 @@ func Init(router iris.Party, hostSecret map[string]string) {
 	server = &realtime.Server{
 		SessionKeepTime:         10 * time.Second,
 		KeepMessageCount:        32,
-		BeforeAcceptSession:     onNewSession,
+		BeforeAcceptSession:     beforeAcceptSession,
+		AfterAcceptSession:      onNewSession,
 		BeforeDispatchUserEvent: eventFilter,
 		BeforeDispatchUserRpc:   rpcFilter,
 		OnSessionLost:           onSessionLost,
@@ -110,7 +111,28 @@ func onUserLeave(user *roleUser) {
 	}
 }
 
-func onNewSession(ss *realtime.Session) (err error) {
+func onNewSession(ss *realtime.Session) error {
+	role := ss.Data.(roleType).roleName()
+
+	if role == "user" {
+		server.RoomByName("room.all.user").Join(ss.Id())
+	}
+
+	if role == "host" {
+		host := ss.Data.(*roleHost)
+		server.RoomByName("room.all.host").Join(ss.Id())
+		server.RoomByName("room.host.slaves." + host.name).Join(ss.Id())
+	}
+
+	if role == "slave" {
+		host := ss.Data.(*roleSlave).host
+		server.RoomByName("room.host.slaves." + host.name).Join(ss.Id())
+	}
+
+	return nil
+}
+
+func beforeAcceptSession(ss *realtime.Session) (err error) {
 	defer func() {
 		e := recover()
 		if e != nil {
@@ -156,10 +178,6 @@ func userVerify(data gson, ss *realtime.Session) error {
 	}
 	ss.Data = user
 	manager.userMap[ss.Id()] = user
-	go func() {
-		time.Sleep(time.Second)
-		server.RoomByName("room.all.user").Join(ss.Id())
-	}()
 	return nil
 }
 
@@ -190,11 +208,6 @@ func hostVerify(data gson, ss *realtime.Session) error {
 		ss.Data = host
 		manager.hostMap[name] = host
 	}
-	go func() {
-		time.Sleep(time.Second)
-		server.RoomByName("room.all.host").Join(ss.Id())
-		server.RoomByName("room.host.slaves." + host.name).Join(ss.Id())
-	}()
 	return nil
 }
 
@@ -208,7 +221,7 @@ func slaveVerify(data gson, ss *realtime.Session) error {
 		return errors.New("host 不存在")
 	}
 	manager.hostMapLock.RLock()
-	host, ok := manager.hostMap[hostName]
+	_, ok = manager.hostMap[hostName]
 	manager.hostMapLock.RUnlock()
 	if !ok {
 		return errors.New("host 未注册")
@@ -231,10 +244,6 @@ func slaveVerify(data gson, ss *realtime.Session) error {
 		server.RemoveSession(slave.session.Id())
 	}
 	slave.session = ss
-	go func() {
-		time.Sleep(time.Second)
-		server.RoomByName("room.host.slaves." + host.name).Join(ss.Id())
-	}()
 	return nil
 }
 

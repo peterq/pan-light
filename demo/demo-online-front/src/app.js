@@ -167,3 +167,17 @@ export async function connectHost(name) {
     return new Host(name, infoChannel, pc)
 }
 
+
+export async function getTicket() {
+    if ($state.loading.getTicket || $state.ticket)
+        throw new Error('cant repeat')
+    $state.loading.getTicket = true
+    let t =  await $rt.call('ticket.new').finally(() => {
+        $state.loading.getTicket = false
+    })
+    console.log(t)
+}
+
+export function showError(e) {
+    $state.$message.error(e.message || e)
+}

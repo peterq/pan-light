@@ -50,7 +50,11 @@ func (r *Room) Broadcast(event string, payload interface{}, expect ...SessionId)
 	defer r.lock.RUnlock()
 	for _, id := range r.members {
 		if sessionIdSlice(expect).index(id) < 0 {
-			ss, _ := r.server.SessionById(id)
+			ss, ok := r.server.SessionById(id)
+			if !ok {
+				go r.Remove(id)
+				continue
+			}
 			ss.Emit(event, payload, r.name)
 		}
 	}
