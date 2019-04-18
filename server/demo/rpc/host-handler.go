@@ -62,7 +62,11 @@ var hostRpcMap = map[string]realtime.RpcHandler{
 					"sessionId": state.session.Id(),
 				}
 				manager.lastInServiceOrder = state.order
-				server.RoomByName("room.all.user").Broadcast("ticket.turn", state.order)
+				server.RoomByName("room.all.user").Broadcast("ticket.turn", gson{
+					"order": state.order,
+					"host":  host.name,
+					"slave": slave,
+				})
 				return
 			}
 		}

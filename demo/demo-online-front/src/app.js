@@ -8,24 +8,32 @@ import {registerProxyChannelResolver} from "./lib/vnc/core/RtcWebSocket"
 export const $rt = new RealTime((location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/demo/ws')
 export const $state = new Vue(State)
 export const $event = (function () {
-    function e(e, t) {
-        n[e] && n[e].map(function (e) {
-            setTimeout(() => e(t), 0)
+    function fire(evt, payload) {
+        map.has(evt) && map.get(evt).forEach(fn => {
+            setTimeout(() => {
+                fn(payload)
+            }, 0)
         })
     }
 
-    function t(e, t) {
-        n[e] || (n[e] = []), n[e].push(t)
+    function on(event, handler) {
+        map.has(event) || map.set(event, new Set())
+        map.get(event).add(handler)
     }
 
-    var n = {}
-    return {fire: e, on: t}
+    function off(event, handler) {
+        map.has(event) && map.get(event).delete(handler)
+    }
+
+    const map = new Map()
+    return {fire, on, off}
 })()
 
 registerProxyChannelResolver(async function (uri) {
     uri = uri.replace('ws://', '').replace('wss://', '')
     let [hostName, slave, method] = uri.split('/')
     let host = await connectHost(hostName)
+    console.log(host)
     return await host.vncProxyChanel(slave, method === 'view')
 })
 
@@ -37,6 +45,39 @@ $rt.onRemote("host.candidate.ok", data => {
     const candidate = data.candidate
     const handler = connectionRequestMap[id]
     handler.pc.continueWithRemote(candidate)
+})
+$rt.onRemote('room.member.join', (sid, room) => {
+    $state.roomMap[room] || Vue.set($state.roomMap, room, {
+        name: room,
+        members: new Set()
+    })
+    if (sid === $rt.sessionId) {
+        // todo get members
+    } else {
+        $state.roomMap[room].members.add(sid)
+    }
+})
+
+$rt.onRemote('room.member.join', (sid, room) => {
+    $state.roomMap[room] = $state.roomMap[room] || {
+        name: room,
+        members: new Set()
+    }
+    if (sid === $rt.sessionId) {
+        // todo get members
+    } else {
+        $state.roomMap[room].members.add(sid)
+    }
+})
+
+$rt.onRemote('ticket.turn', data => {
+    console.log(data, $state.ticket)
+    const {order} = data
+    if ($state.ticket && $state.ticket.order === order) {
+        $state.ticket.inService = true
+        $event.fire('operate.turn', data)
+        console.log(data)
+    }
 })
 
 class Host {
@@ -84,6 +125,7 @@ class Host {
         let bin = evt.data
         let msg = this.textDecoder.decode(bin)
         msg = JSON.parse(msg)
+        console.log('info <-', msg)
         if (msg.type === 'call.ret') {
             let handler = this.callHostMap[msg.id]
             msg.result && (msg.result.__callId = msg.id)
@@ -118,11 +160,17 @@ class Host {
             }
         })
         await proxyPromise
+        console.log(proxyPromise)
         return channel
     }
 
     _callHost(method, param) {
         const id = Math.random() + ''
+        console.log('info -> ', {
+            ...param,
+            method,
+            id,
+        })
         this.infoChannel.send(JSON.stringify({
             ...param,
             method,
@@ -172,10 +220,12 @@ export async function getTicket() {
     if ($state.loading.getTicket || $state.ticket)
         throw new Error('cant repeat')
     $state.loading.getTicket = true
-    let t =  await $rt.call('ticket.new').finally(() => {
+    let t = await $rt.call('ticket.new').finally(() => {
         $state.loading.getTicket = false
     })
-    console.log(t)
+    t.inService = false
+    $state.ticket = t
+    return t
 }
 
 export function showError(e) {

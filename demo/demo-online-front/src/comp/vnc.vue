@@ -1,5 +1,5 @@
 <template>
-    <div ref="vncContainer" class="vnc-con"></div>
+    <div ref="vncContainer" style="height: 100%; width: 100%;" class="vnc-con"></div>
 </template>
 
 <script>
@@ -7,19 +7,19 @@
     import {init_logging} from "../lib/vnc/core/util/logging"
 
     export default {
-        props: ['host', 'slave', 'viewOnly'],
+        props: ['config'],
         data() {
-            return {
-                rfb: null
-            }
+            return {}
         },
         created() {
             window.debugObj.vnc = this
             init_logging('debug')
         },
         mounted() {
-            let rfb = this.rfb = new RFB(this.$refs.vncContainer,
-                `wss://${this.host}/${this.slave}/` + this.viewOnly ? 'view' : 'operate', {credentials: {password: ''}})
+            const addr = `wss://${this.config.host}/${this.config.slave}/` + (this.config.viewOnly ? 'view' : 'operate')
+            console.log(addr)
+            let rfb = this.$data.$rfb = new RFB(this.$refs.vncContainer,
+                addr, {credentials: {password: this.config.password}})
             rfb.addEventListener("connect", e => console.log('connect', e))
             rfb.addEventListener("disconnect", e => console.log('disconnect', e))
             rfb.addEventListener("credentialsrequired", e => console.log('credentialsrequired', e))
@@ -28,6 +28,9 @@
                 console.log('fail', e)
                 alert(e.detail)
             })
+        },
+        beforeDestroy() {
+            this.$data.$rfb.close()
         }
     }
 </script>

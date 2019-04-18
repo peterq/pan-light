@@ -31,13 +31,7 @@ func (*roleUser) roleName() string {
 }
 
 func (user *roleUser) requestTicket() (data gson, err error) {
-	if user.waitState != nil {
-		data = gson{
-			"order":  user.waitState.order,
-			"ticket": user.waitState.ticket,
-		}
-		return
-	} else {
+	if user.waitState == nil {
 		manager.waitSessionMapLock.Lock()
 		defer manager.waitSessionMapLock.Unlock()
 		manager.lastDistributedOrder++
@@ -49,6 +43,10 @@ func (user *roleUser) requestTicket() (data gson, err error) {
 		manager.waitSessionMap[manager.lastDistributedOrder] = w
 		user.waitState = w
 		server.RoomByName("room.all.host").Broadcast("wait.user.new", nil)
+	}
+	data = gson{
+		"order":  user.waitState.order,
+		"ticket": user.waitState.ticket,
 	}
 	return
 }

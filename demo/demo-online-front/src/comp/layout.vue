@@ -6,9 +6,8 @@
         </el-header>
         <el-container>
             <el-main>
-                <vnc style="flex: 1;" v-if="connectVnc"
-                     :host="connectVnc.host" :slave="connectVnc.slave"
-                     :view-only="connectVnc.viewOnly"></vnc>
+                <vnc style="flex: 1;" v-if="vncShow"
+                     :config="connectVnc"></vnc>
             </el-main>
             <el-aside width="400px">Aside</el-aside>
         </el-container>
@@ -17,21 +16,50 @@
 
 <script>
     import {getTicket, showError} from "../app"
+    import vnc from './vnc'
 
+    const dataTemplate = {
+        connectVnc: {
+            host: '',
+            slave: '',
+            viewOnly: true
+        }
+    }
     export default {
         data() {
             return {
-                connectVnc: null
+                connectVnc: null,
+                vncShow: null,
             }
         },
         created() {
+            this.$event.on('operate.turn', ({host, slave}) => {
+                this.connectVnc = {
+                    host, slave, viewOnly: false,
+                    password: this.$state.ticket.ticket
+                }
+            })
         },
         methods: {
             async clickGetTicket() {
                 await getTicket().catch(showError)
             },
         },
-        components: {}
+        watch: {
+            async connectVnc(v) {
+                if (!v) {
+                    this.vncShow = false
+                } else {
+                    this.vncShow = false
+                    if (v.viewOnly) {
+                        this.connectVnc.password = 'peter.q.is.so.cool'
+                    }
+                    await this.$nextTick()
+                    this.vncShow = true
+                }
+            }
+        },
+        components: {vnc}
     }
 </script>
 
@@ -39,6 +67,7 @@
     .el-aside {
         background-color: #D3DCE6;
     }
+
     .el-header, .el-footer {
         background-color: #B3C0D1;
         color: #333;

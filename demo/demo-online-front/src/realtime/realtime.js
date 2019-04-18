@@ -113,7 +113,7 @@ export default class Rpc {
             let cbs = this.eventListener['$remote.' + data.event] || []
             cbs.forEach(function (cb) {
                 setTimeout(function () {
-                    cb(data.payload)
+                    cb(data.payload, data.room)
                 })
             })
             return

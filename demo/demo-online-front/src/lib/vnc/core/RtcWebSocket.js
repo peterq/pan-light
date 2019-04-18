@@ -39,12 +39,13 @@ export default class RtcWebSocket {
                 //     this._open()
                 // }
                 proxyChannel.onmessage = e => {
-                    console.log(`Message from DataChannel '${proxyChannel.label}' payload '${e.data}'`)
+                    // console.log(`Message from DataChannel '${proxyChannel.label}' payload '${e.data}'`)
                     this._receive_data(e.data)
                 }
                 this._open()
             })
             .catch(error => {
+                console.log('get proxy channel', error)
                 this._error()
                 this.close(-1, new Error(error).message)
             })
@@ -73,10 +74,11 @@ export default class RtcWebSocket {
         if (this.onclose) {
             this.onclose(make_event("close", {'code': code, 'reason': reason, 'wasClean': true}))
         }
+        this.proxyChannel.close()
     }
 
     send(data) {
-        console.log('rtc web socket send', data)
+        // console.log('rtc web socket send', data)
         if (this.protocol == 'base64') {
             data = Base64.decode(data)
         } else {
@@ -113,7 +115,7 @@ export default class RtcWebSocket {
         // Break apart the data to expose bugs where we assume data is
         // neatly packaged
         this.onmessage(make_event("message", {'data': data}))
-        console.log('rtc web socket on message', data)
+        // console.log('rtc web socket on message', data)
     }
 }
 

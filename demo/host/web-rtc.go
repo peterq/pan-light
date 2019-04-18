@@ -196,7 +196,7 @@ func (p *p2p) handleInfoMsg(data gson) {
 			})
 		}
 	}()
-	if method == "view" {
+	if method == "view" || method == "operate" {
 		slaveName := data["slave"].(string)
 		holder, ok := host.holderMap[slaveName]
 		if !ok {
@@ -230,7 +230,7 @@ func (p *p2p) handleInfoMsg(data gson) {
 					"id":      id,
 				})
 			}
-		}, true)
+		})
 		ret = gson{
 			"channel": c,
 		}

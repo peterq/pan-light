@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 )
 
 const dockerImage = "pan-light-slave"
@@ -29,16 +30,17 @@ type Holder struct {
 
 	checkUserChan chan struct{}
 
-	vncAddr     string
-	vncAddrLock sync.Mutex
-	vncAddrCond *sync.Cond
-	pid         int // 进程号
-	viewPwd     string
-	operatePwd  string
+	vncAddr       string
+	vncAddrLock   sync.Mutex
+	vncAddrCond   *sync.Cond
+	pid           int // 进程号
+	viewPwd       string
+	operatePwd    string
+	containerName string
 
 	order     int64
 	ticket    string
-	sessionId int64
+	sessionId string
 }
 
 func (h *Holder) Init(rt *realtime.RealTime, ctx context.Context) {
@@ -50,6 +52,7 @@ func (h *Holder) Init(rt *realtime.RealTime, ctx context.Context) {
 	h.ctx = ctx
 	h.checkUserChan = make(chan struct{})
 	h.vncAddrCond = sync.NewCond(&h.vncAddrLock)
+	h.containerName = h.SlaveName
 	for {
 		re, err := h.rt.Call("host.next.user", gson{
 			"slave": h.SlaveName,
@@ -61,7 +64,9 @@ func (h *Holder) Init(rt *realtime.RealTime, ctx context.Context) {
 		result := re.(gson)
 		h.order = int64(result["order"].(float64))
 		h.ticket = result["ticket"].(string)
-		h.sessionId = int64(result["sessionId"].(float64))
+		h.sessionId = result["sessionId"].(string)
+		h.viewPwd = "peter.q.is.so.cool"
+		h.operatePwd = h.ticket
 		h.startIns()
 		h.order = -1
 	}
@@ -85,26 +90,31 @@ func (h *Holder) startIns() {
 		h.vncAddr = ""
 	}()
 	// 删除已有容器
-	defer exec.Command("docker", "rm", "-v", "-f", h.SlaveName).Run()
-	exec.Command("docker", "rm", "-v", "-f", h.SlaveName).Run()
+	defer exec.Command("docker", "rm", "-v", "-f", h.containerName).Run()
+	exec.Command("docker", "rm", "-v", "-f", h.containerName).Run()
 	// 启动docker
 	dockerP := exec.Command("docker", "run",
 		"-m", "200m", "--memory-swap", "400m", // 200m 内存
 		"--cpu-period=100000", "--cpu-quota=20000", // 20% cpu
 		"-e", "vnc_operate_pwd="+h.operatePwd, "-e", "vnc_view_pwd="+h.viewPwd, // vnc 密码
-		"--name='"+h.SlaveName+"'", // 容器名
+		"--name="+h.containerName+"", // 容器名
 		dockerImage)
+	defer exec.Command("docker", "kill", h.containerName)
 	dockerP.Stdout = os.Stdout
 	dockerP.Stderr = os.Stderr
 	dockerP.Start()
+	defer dockerP.Process.Kill()
 	h.pid = dockerP.Process.Pid
 	// 查询ip
-	bin, err := exec.Command("sh", "-c", "docker inspect --format '{{ .NetworkSettings.IPAddress }}' "+h.SlaveName).Output()
+	time.Sleep(3 * time.Second)
+	bin, err := exec.Command("docker", "inspect", "--format",
+		"{{ .NetworkSettings.IPAddress }}", h.containerName).Output()
 	if err != nil {
-		log.Println("获取ip错误", err)
+		log.Println("获取ip错误", err, bin)
 		return
 	}
-	addr := strings.Trim(string(bin), "\r\n") + ":5091"
+	addr := strings.Trim(string(bin), "\r\n") + ":5901"
+	log.Println("docker vnc addr", addr)
 	// 配置地址
 	func() {
 		h.vncAddrLock.Lock()
@@ -115,9 +125,9 @@ func (h *Holder) startIns() {
 	dockerP.Wait()
 }
 
-func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error), viewOnly bool) {
+func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error)) {
+	defer rw.Close()
 	var addr string
-	h.vncAddr = "127.0.0.1:5901"
 	func() {
 		h.vncAddrLock.Lock()
 		defer h.vncAddrLock.Unlock()
@@ -145,7 +155,6 @@ func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error), viewOn
 		for {
 			buffer := make([]byte, messageSize)
 			n, err := d.Read(buffer)
-			log.Println("r", buffer[:n])
 			if err != nil {
 				log.Println("Datachannel closed; Exit the ReadLoop:", err)
 				cancel()
@@ -159,7 +168,6 @@ func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error), viewOn
 		for {
 			buffer := make([]byte, messageSize)
 			n, err := con.Read(buffer)
-			log.Println("w", buffer[:n])
 			if err != nil {
 				log.Println("Datachannel closed; Exit the WriteLoop:", err)
 				cancel()
@@ -174,12 +182,4 @@ func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error), viewOn
 	go WriteLoop(rw)
 	<-ctx.Done()
 	log.Println("proxy gone rw", rw)
-}
-
-func (h *Holder) VncProxyForOperation(rw io.ReadWriteCloser, proxyCb func(err error), order int64, ticket string) {
-	if order != h.order || ticket != h.ticket {
-		proxyCb(errors.New("ticket 验证失败"))
-		return
-	}
-	h.VncProxy(rw, proxyCb, false)
 }
