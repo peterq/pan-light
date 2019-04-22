@@ -20,6 +20,7 @@
             console.log(addr)
             let rfb = this.$data.$rfb = new RFB(this.$refs.vncContainer,
                 addr, {credentials: {password: this.config.password}})
+            rfb.scaleViewport = true
             rfb.addEventListener("connect", e => console.log('connect', e))
             rfb.addEventListener("disconnect", e => console.log('disconnect', e))
             rfb.addEventListener("credentialsrequired", e => console.log('credentialsrequired', e))

@@ -678,6 +678,9 @@ export default class RFB extends EventTargetMixin {
         this._updateConnectionState('disconnecting');
         this._updateConnectionState('disconnected');
 
+        this.dispatchEvent(new CustomEvent("fail",
+            {detail: details}))
+
         return false;
     }
 
