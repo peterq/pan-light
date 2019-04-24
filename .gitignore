@@ -8,3 +8,4 @@ qml.rcc
 gui-plugin.so
 .env
 /demo
+*.pb.go
