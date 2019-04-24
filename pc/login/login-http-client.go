@@ -1,6 +1,7 @@
 package login
 
 import (
+	"encoding/json"
 	"github.com/peterq/pan-light/pc/storage"
 	"github.com/pkg/errors"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"regexp"
 	"time"
 )
 
@@ -67,7 +69,22 @@ func handleLoginSuccess() {
 	//resp, _ := httpClient.Get(link)
 	//log.Println(readHtml(resp.Body))
 	req := newRequest("GET", link)
-	httpClient.Do(req)
+	res, err := httpClient.Do(req)
+	bin, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Println(string(bin))
+		return
+	}
+	body := string(bin)
+	reg := regexp.MustCompile(`var context=(.*);\n`)
+	find := reg.FindStringSubmatch(body)
+	raw := tJson{}
+	err = json.Unmarshal([]byte(find[1]), &raw)
+	if err != nil {
+		log.Println(body)
+		return
+	}
+	storage.OnLogin(raw["username"].(string))
 	log.Println(req.Cookies())
 	var cookies []*storage.Cookies
 	for _, c := range cookieJar.Cookies(u) {
@@ -76,6 +93,6 @@ func handleLoginSuccess() {
 			Value: c.Value,
 		})
 	}
-	storage.Global.PanCookie = cookies
-	log.Println("global pan cookie", storage.Global.PanCookie)
+	storage.UserState.PanCookie = cookies
+	log.Println("global pan cookie", storage.UserState.PanCookie)
 }

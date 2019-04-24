@@ -7,6 +7,7 @@ import (
 	"github.com/peterq/pan-light/pc/gui"
 )
 
+//go:generate protoc --go_out=. storage/types.proto
 func main() {
 	defer func() {
 		dep.DoClose()

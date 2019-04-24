@@ -34,12 +34,12 @@ func newRequest(method, url string) *http.Request {
 }
 
 func GetSign() (ctx map[string]interface{}, err error) {
-	if storage.Global.PanCookie != nil {
+	if storage.UserState.PanCookie != nil {
 		cookieJar, _ = cookiejar.New(nil)
 		httpClient.Jar = cookieJar
 
 		var cookies []*http.Cookie
-		for _, c := range storage.Global.PanCookie {
+		for _, c := range storage.UserState.PanCookie {
 			cookies = append(cookies, &http.Cookie{
 				Name:   c.Key,
 				Value:  c.Value,
