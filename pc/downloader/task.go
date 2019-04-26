@@ -76,7 +76,7 @@ func (task *Task) pause() error {
 	if task.state != DOWNLOADING {
 		return errors.New("当前状态不能暂停任务")
 	}
-	task.state = PAUSING
+	task.updateState(PAUSING)
 	for _, w := range task.workers {
 		w.cancel()
 	}
@@ -155,14 +155,14 @@ func (task *Task) start() (err error) {
 	if task.state != WaitStart {
 		return errors.New("当前状态不能开始任务")
 	}
-	task.state = STARTING
+	task.updateState(STARTING)
 	err = task.init()
 	if err != nil {
-		task.state = ERRORED
 		task.lastErr = err
+		task.updateState(ERRORED)
 		return errors.Wrap(err, "任务初始化出错")
 	}
-	task.state = DOWNLOADING
+	task.updateState(DOWNLOADING)
 	task.speedCoroutineContext, task.cancelSpeedCoroutine = context.WithCancel(context.Background())
 	go task.speedCalculateCoroutine()
 	for i := 0; i < task.coroutineNumber; i++ {
@@ -280,10 +280,11 @@ func (task *Task) onAllWorkerExit() {
 	log.Println("所有worker结束")
 	task.cancelSpeedCoroutine()
 	task.fileHandle.Close()
-	task.state = WaitStart
+	st := WaitStart
 	if len(task.undistributed) == 0 {
-		task.state = COMPLETED
+		st = COMPLETED
 	}
+	task.updateState(st)
 	log.Println(task.undistributed)
 }
 
@@ -295,14 +296,25 @@ func (task *Task) notifyEvent(event string, data interface{}) {
 	})
 }
 
+func (task *Task) updateState(state TaskState) {
+	task.state = state
+	data := map[string]interface{}{
+		"state": state,
+	}
+	if state == ERRORED {
+		data["error"] = task.lastErr.Error()
+	}
+	task.notifyEvent("task.state", data)
+}
+
 func (task *Task) resume(bin []byte) (err error) {
 	if task.state != WaitResume {
 		return errors.New("任务当前状态不能resume")
 	}
 	defer func() {
 		if err != nil {
-			task.state = ERRORED
 			task.lastErr = errors.Wrap(err, "任务恢复出错")
+			task.updateState(ERRORED)
 		}
 	}()
 	var data internal.TaskCapture
@@ -320,7 +332,7 @@ func (task *Task) resume(bin []byte) (err error) {
 			finish: seg.Len,
 		})
 	}
-	task.state = WaitStart
+	task.updateState(WaitStart)
 	return nil
 }
 

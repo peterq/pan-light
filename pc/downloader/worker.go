@@ -111,6 +111,7 @@ ReadStream:
 					err = writeErr
 					break ReadStream
 				}
+				seg.finish += bufLen
 				seg.start += seg.finish
 				seg.len -= seg.finish
 				seg.finish = 0
@@ -135,9 +136,8 @@ ReadStream:
 					err = writeErr
 					break
 				}
-				buf.Reset() // 重置缓冲区
-				seg.finish += bufLen
-				seg.finish += int64(buf.Len()) // 片段写入磁盘偏移量
+				buf.Reset()          // 重置缓冲区
+				seg.finish += bufLen // 片段写入磁盘偏移量
 			}
 		}
 
