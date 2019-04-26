@@ -2,6 +2,7 @@ package downloader
 
 import (
 	"bytes"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -35,7 +36,25 @@ func (m *Manager) Init() error {
 }
 
 // 从磁盘文件恢复, 下载中的任务
-func (*Manager) Resume(raw map[TaskId][]byte) error {
+func (m *Manager) Resume(
+	raw map[TaskId][]byte,
+	requestDecorator func(*http.Request) *http.Request) error {
+	for id, bin := range raw {
+		task := &Task{
+			id:               id,
+			state:            WaitResume,
+			manager:          m,
+			linkResolver:     m.LinkResolver,
+			requestDecorator: requestDecorator,
+			coroutineNumber:  m.CoroutineNumber,
+			segmentSize:      m.SegmentSize,
+			httpClient:       m.HttpClient,
+		}
+		err := task.resume(bin)
+		if err != nil {
+			log.Println(err)
+		}
+	}
 	return nil
 }
 
@@ -49,7 +68,7 @@ func (m *Manager) NewTask(fileId, savePath string,
 	requestDecorator func(*http.Request) *http.Request) (id TaskId, err error) {
 	id = TaskId(time.Now().UnixNano())
 	task := &Task{
-		Id:               id,
+		id:               id,
 		fileId:           fileId,
 		manager:          m,
 		linkResolver:     m.LinkResolver,

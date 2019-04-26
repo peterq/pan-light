@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/golang/protobuf/proto"
+	"github.com/peterq/pan-light/pc/downloader/internal"
 	"github.com/pkg/errors"
 	"io"
 	"log"
@@ -16,21 +18,22 @@ import (
 	"time"
 )
 
-type TaskState int
+type TaskState string
 
 const (
-	WAITE_START TaskState = iota
-	STARTING
-	DOWNLOADING
-	PAUSEING
-	PAUSED
-	ERRORED
+	WaitStart   TaskState = "wait.start"
+	WaitResume            = "wait.resume"
+	COMPLETED             = "completed"
+	STARTING              = "starting"
+	DOWNLOADING           = "downloading"
+	PAUSING               = "pausing"
+	ERRORED               = "errored"
 )
 
 var noMoreSeg = errors.New("no more seg") // 所有seg分配完毕
 
 type Task struct {
-	Id               TaskId
+	id               TaskId
 	fileId           string // 文件标识
 	manager          *Manager
 	linkResolver     LinkResolver
@@ -40,7 +43,6 @@ type Task struct {
 	savePath         string // 保存地址
 	httpClient       *http.Client
 
-	initialized   bool      // 是否初始化
 	state         TaskState // 任务当前状态
 	lastErr       error     // 保存上次错误
 	link          string    // 链接地址
@@ -51,8 +53,6 @@ type Task struct {
 
 	fileLength        int64      // 文件总大小
 	undistributed     []*segment // 尚未分配的片段
-	distributed       []*segment // 已经分配的片段
-	finished          []*segment // 已经完成的片段
 	wroteToDisk       []*segment // 文件内容写入磁盘的情况
 	distributeLock    sync.Mutex
 	undistributedLock sync.Mutex
@@ -68,11 +68,23 @@ type Task struct {
 	speedCoroutineContext context.Context
 }
 
+func (task *Task) Id() TaskId {
+	return task.id
+}
+
+func (task *Task) pause() error {
+	if task.state != DOWNLOADING {
+		return errors.New("当前状态不能暂停任务")
+	}
+	task.state = PAUSING
+	for _, w := range task.workers {
+		w.cancel()
+	}
+	return nil
+}
+
 // 初始化生成下载状态
 func (task *Task) init() (err error) {
-	if task.initialized {
-		return errors.New("重复初始化")
-	}
 	task.link, err = task.linkResolver(task.fileId)
 	if err != nil {
 		return errors.Wrap(err, "获取下载链接错误")
@@ -92,18 +104,22 @@ func (task *Task) init() (err error) {
 	if err != nil {
 		return errors.Wrap(err, "获取文件信息错误")
 	}
-	task.undistributed = append(task.undistributed, &segment{
-		start:  0,
-		len:    task.fileLength,
-		finish: 0,
-		state:  segmentWait,
-	})
 	if !supportRange {
 		return errors.New("该文件不支持并行下载")
 	}
 	task.fileHandle, err = os.OpenFile(task.savePath, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return errors.Wrap(err, "打开本地文件错误")
+	}
+	task.undistributed = append(task.undistributed, &segment{
+		start:  0,
+		len:    task.fileLength,
+		finish: 0,
+	})
+	task.downloadCount = 0
+	for _, seg := range task.wroteToDisk {
+		removeSegment(task.undistributed, seg)
+		task.downloadCount += seg.len
 	}
 	task.workers = map[int]*worker{}
 	return nil
@@ -136,15 +152,17 @@ func (task *Task) getSpeed() int64 {
 
 // 开始一个任务
 func (task *Task) start() (err error) {
-	if task.state != WAITE_START {
+	if task.state != WaitStart {
 		return errors.New("当前状态不能开始任务")
 	}
+	task.state = STARTING
 	err = task.init()
 	if err != nil {
 		task.state = ERRORED
 		task.lastErr = err
 		return errors.Wrap(err, "任务初始化出错")
 	}
+	task.state = DOWNLOADING
 	task.speedCoroutineContext, task.cancelSpeedCoroutine = context.WithCancel(context.Background())
 	go task.speedCalculateCoroutine()
 	for i := 0; i < task.coroutineNumber; i++ {
@@ -186,8 +204,6 @@ func (task *Task) distributeSegment() (seg *segment, err error) {
 	} else {
 		task.undistributed = task.undistributed[:segLen-1]
 	}
-	seg.state = segmentDownloading
-	task.distributed = append(task.distributed, seg)
 	return seg, nil
 }
 
@@ -199,12 +215,18 @@ func (task *Task) writeToDisk(from int64, buffer *bytes.Buffer) (err error) {
 	if err != nil {
 		return errors.Wrap(err, "文件seek错误")
 	}
-	_, err = buffer.WriteTo(task.fileHandle)
-	//l, err := buffer.WriteTo(task.fileHandle)
+	l, err := buffer.WriteTo(task.fileHandle)
 	//log.Println("写入片段", from, l)
 	if err != nil {
 		return errors.Wrap(err, "文件写入错误")
 	}
+	task.wroteToDiskLock.Lock()
+	defer task.wroteToDiskLock.Unlock()
+	putBackSegment(task.wroteToDisk, &segment{
+		start:  from,
+		len:    l,
+		finish: l,
+	})
 	return
 }
 
@@ -212,18 +234,17 @@ func (task *Task) writeToDisk(from int64, buffer *bytes.Buffer) (err error) {
 func (task *Task) downloadSegmentError(seg *segment) {
 	task.undistributedLock.Lock()
 	defer task.undistributedLock.Unlock()
-	seg.state = segmentWait
 	seg.finish = 0
 	task.undistributed = putBackSegment(task.undistributed, seg)
 	log.Println("下载片段错误", seg)
-	logerr(fmt.Sprint(seg))
+	logErr(fmt.Sprint(seg))
 }
 
-func logerr(str_content string) {
+func logErr(strContent string) {
 	fd, _ := os.OpenFile("seg.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	fd_time := time.Now().Format("2006-01-02 15:04:05")
-	fd_content := strings.Join([]string{"======", fd_time, "=====", str_content, "\n"}, "")
-	buf := []byte(fd_content)
+	fdTime := time.Now().Format("2006-01-02 15:04:05")
+	fdContent := strings.Join([]string{"======", fdTime, "=====", strContent, "\n"}, "")
+	buf := []byte(fdContent)
 	fd.Write(buf)
 	fd.Close()
 }
@@ -235,23 +256,13 @@ func (task *Task) downloadSegmentSuccess(seg *segment) {
 	task.finishedLock.Lock()
 	defer task.finishedLock.Unlock()
 	if seg.len == seg.finish {
-		seg.state = segmentFinished
-		putBackSegment(task.finished, seg)
 		return
-	}
-	seg1 := &segment{
-		start:  seg.start,
-		len:    seg.finish,
-		finish: seg.finish,
-		state:  segmentFinished,
 	}
 	seg2 := &segment{
 		start:  seg.start + seg.finish,
 		len:    seg.len - seg.finish,
 		finish: 0,
-		state:  segmentWait,
 	}
-	task.finished = putBackSegment(task.finished, seg1)
 	task.undistributed = putBackSegment(task.undistributed, seg2)
 }
 
@@ -259,7 +270,7 @@ func (task *Task) onWorkerExit(w *worker) {
 	task.workersLock.Lock()
 	defer task.workersLock.Unlock()
 	delete(task.workers, w.id)
-	log.Println(fmt.Sprintf("task %d, worker %d exit", task.Id, w.id))
+	log.Println(fmt.Sprintf("task %d, worker %d exit", task.id, w.id))
 	if len(task.workers) == 0 {
 		go task.onAllWorkerExit()
 	}
@@ -268,17 +279,49 @@ func (task *Task) onWorkerExit(w *worker) {
 func (task *Task) onAllWorkerExit() {
 	log.Println("所有worker结束")
 	task.cancelSpeedCoroutine()
+	task.fileHandle.Close()
+	task.state = WaitStart
+	if len(task.undistributed) == 0 {
+		task.state = COMPLETED
+	}
 	log.Println(task.undistributed)
-	log.Println(task.distributed)
-	log.Println(task.finished)
 }
 
 func (task *Task) notifyEvent(event string, data interface{}) {
 	task.manager.eventNotify(&DownloadEvent{
-		TaskId: task.Id,
+		TaskId: task.id,
 		Event:  event,
 		Data:   data,
 	})
+}
+
+func (task *Task) resume(bin []byte) (err error) {
+	if task.state != WaitResume {
+		return errors.New("任务当前状态不能resume")
+	}
+	defer func() {
+		if err != nil {
+			task.state = ERRORED
+			task.lastErr = errors.Wrap(err, "任务恢复出错")
+		}
+	}()
+	var data internal.TaskCapture
+	err = proto.Unmarshal(bin, &data)
+	if err != nil {
+		return errors.Wrap(err, "无法decode数据")
+	}
+	task.fileId = data.Fid
+	task.savePath = data.SavePath
+	task.fileLength = data.Length
+	for _, seg := range data.Completed {
+		putBackSegment(task.wroteToDisk, &segment{
+			start:  seg.Start,
+			len:    seg.Len,
+			finish: seg.Len,
+		})
+	}
+	task.state = WaitStart
+	return nil
 }
 
 func putBackSegment(queue []*segment, seg *segment) []*segment {
@@ -313,5 +356,41 @@ func putBackSegment(queue []*segment, seg *segment) []*segment {
 	}
 	// 插入队列
 	queue = append(queue, seg)
+	return queue
+}
+
+func removeSegment(queue []*segment, seg *segment) []*segment {
+	head := seg.start
+	tail := seg.start + seg.len
+	// 头部衔接
+	for idx := 0; idx < len(queue); idx++ {
+		segInQueue := queue[idx]
+		if segInQueue.start <= head && segInQueue.start+segInQueue.len >= tail {
+			// 完全重合, 直接去掉
+			if segInQueue.start == head && segInQueue.len == seg.len {
+				return append(queue[:idx], queue[idx+1:]...)
+			}
+			// 头部重合, 留下后半段
+			if segInQueue.start == head {
+				segInQueue.start += seg.len
+				segInQueue.len -= seg.len
+				return queue
+			}
+			// 尾部重合, 留下头部
+			if segInQueue.start+segInQueue.len == tail {
+				segInQueue.len -= seg.len
+				return queue
+			}
+			// 包含其中, 拆分
+			seg2 := &segment{
+				start: tail + 1,
+				len:   segInQueue.start + segInQueue.len - tail,
+			}
+			segInQueue.len = seg.start - segInQueue.start
+			rear := append([]*segment{}, queue[idx:]...)
+			return append(append(queue[:idx], seg2), rear...)
+		}
+	}
+	log.Print("去除错误, 未找到包含的段")
 	return queue
 }

@@ -2,7 +2,9 @@ package downloader
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"io"
 	"log"
 	"net/http"
@@ -10,11 +12,14 @@ import (
 
 // 实际下载协程
 type worker struct {
-	id   int
-	task *Task
+	id     int
+	task   *Task
+	cancel func()
+	ctx    context.Context
 }
 
 func (w *worker) work() {
+	w.ctx, w.cancel = context.WithCancel(context.Background())
 	errorNumber := 0
 	maxErrorNumber := 2
 	// 循环下载片段
@@ -24,6 +29,13 @@ func (w *worker) work() {
 		if errorNumber > maxErrorNumber {
 			log.Println("too many errors occurred")
 			break
+		}
+
+		// 判断是否被取消
+		select {
+		case <-w.ctx.Done():
+			break
+		default:
 		}
 
 		// 获取新的下载片段
@@ -73,6 +85,7 @@ func (w *worker) downloadSeg(seg *segment) (err error) {
 	s := make([]byte, 1024)
 	buffLeft := 0
 	// 循环读取流
+ReadStream:
 	for {
 		bin := s[:]
 		buffLeft = buf.Cap() - buf.Len()
@@ -80,7 +93,31 @@ func (w *worker) downloadSeg(seg *segment) (err error) {
 			bin = s[:buffLeft]
 		}
 		var l int
-		l, err = reader.Read(bin)
+		// 读取流,with context
+		select {
+		case <-func() chan bool {
+			ch := make(chan bool)
+			go func() {
+				l, err = reader.Read(bin)
+				close(ch)
+			}()
+			return ch
+		}():
+		case <-w.ctx.Done():
+			bufLen := int64(buf.Len())
+			if bufLen > 0 {
+				writeErr := w.task.writeToDisk(seg.start+seg.finish, buf)
+				if writeErr != nil {
+					err = writeErr
+					break ReadStream
+				}
+				seg.start += seg.finish
+				seg.len -= seg.finish
+				seg.finish = 0
+			}
+			err = errors.New("canceled")
+			break ReadStream
+		}
 		if l > 0 { // 有数据, 写入缓存
 			func() { // 投毒检测
 				s := make([]byte, 1024)
