@@ -46,8 +46,13 @@ func handleDownloadEvent(event *downloader.DownloadEvent) {
 		speed := float64(event.Data.(int64))
 		log.Println(speed / 1024 / 1024)
 	} else {
-		log.Println(event)
+		//log.Println(event)
 	}
+	dep.NotifyQml("task.event", map[string]interface{}{
+		"type":   event.Event,
+		"taskId": event.TaskId,
+		"data":   event.Data,
+	})
 }
 
 func test() {

@@ -36,3 +36,7 @@ func AsyncRouteRegister(routes map[string]func(map[string]interface{},
 	func(interface{}), func(interface{}), func(interface{}), chan interface{})) {
 	bridge.AsyncRouteRegister(routes)
 }
+
+func NotifyQml(event string, data map[string]interface{}) {
+	bridge.NotifyQml(event, data)
+}

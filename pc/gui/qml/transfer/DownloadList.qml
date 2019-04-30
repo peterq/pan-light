@@ -22,6 +22,7 @@ Rectangle {
             id: item
             meta: listModel.get(index)
             isFinish: root.isFinish
+            idx: index
             Connections {
                 target: root
                 onCheckFid: {
@@ -42,6 +43,19 @@ Rectangle {
     Component.onCompleted: {
         Util.arrToListModel(list(), listModel)
 //        updateList(Util.listModelClear(listModel))
+        if (!isFinish) {
+            Util.event.on('go.task.event', function(evt) {
+                var id = evt.taskId
+                for (var i = 0; i < listModel.count; i++) {
+                    if (listModel.get(i).downloadId === id) {
+                        listView.currentIndex = i
+                        listView.currentItem.taskEvent(evt.type, evt.data)
+                        return
+                    }
+                }
+                console.log('-------- task id not found', JSON.stringify(evt))
+            })
+        }
     }
 
     function list() {

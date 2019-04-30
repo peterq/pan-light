@@ -395,26 +395,12 @@ function listModelMove(model, from, to) {
     return listModelToArr(model)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function humanSize(size) {
+    var i, unit = ['B', 'KB', 'MB', 'GB']
+    for (i = 0; i < unit.length - 1; i++) {
+        if (size < 1024)
+            break
+        size /= 1024
+    }
+    return size.toFixed(2) + unit[i]
+}

@@ -106,17 +106,10 @@ ReadStream:
 		case <-w.ctx.Done():
 			bufLen := int64(buf.Len())
 			if bufLen > 0 {
-				writeErr := w.task.writeToDisk(seg.start+seg.finish, buf)
-				if writeErr != nil {
-					err = writeErr
-					break ReadStream
-				}
-				seg.finish += bufLen
-				seg.start += seg.finish
-				seg.len -= seg.finish
-				seg.finish = 0
+				err = w.task.writeToDisk(seg.start+seg.finish, buf)
+			} else {
+				err = errors.New("canceled")
 			}
-			err = errors.New("canceled")
 			break ReadStream
 		}
 		if l > 0 { // 有数据, 写入缓存

@@ -54,16 +54,13 @@ type Task struct {
 	fileLength        int64      // 文件总大小
 	undistributed     []*segment // 尚未分配的片段
 	wroteToDisk       []*segment // 文件内容写入磁盘的情况
-	distributeLock    sync.Mutex
 	undistributedLock sync.Mutex
-	distributedLock   sync.Mutex
-	finishedLock      sync.Mutex
 	wroteToDiskLock   sync.Mutex
+	lastCaptureTime   time.Time // 上次快照时间
 
 	workers               map[int]*worker // 工作协程map
 	workersLock           sync.Mutex
 	fileHandle            *os.File
-	fileLock              sync.Mutex
 	cancelSpeedCoroutine  context.CancelFunc
 	speedCoroutineContext context.Context
 }
@@ -183,8 +180,6 @@ func (task *Task) start() (err error) {
 func (task *Task) distributeSegment() (seg *segment, err error) {
 	task.undistributedLock.Lock()
 	defer task.undistributedLock.Unlock()
-	task.distributedLock.Lock()
-	defer task.distributedLock.Unlock()
 	segLen := len(task.undistributed)
 	if segLen == 0 {
 		return nil, noMoreSeg
@@ -210,8 +205,8 @@ func (task *Task) distributeSegment() (seg *segment, err error) {
 
 // 写入数据到磁盘
 func (task *Task) writeToDisk(from int64, buffer *bytes.Buffer) (err error) {
-	task.fileLock.Lock()
-	defer task.fileLock.Unlock()
+	task.wroteToDiskLock.Lock()
+	defer task.wroteToDiskLock.Unlock()
 	_, err = task.fileHandle.Seek(from, io.SeekStart)
 	if err != nil {
 		return errors.Wrap(err, "文件seek错误")
@@ -221,14 +216,38 @@ func (task *Task) writeToDisk(from int64, buffer *bytes.Buffer) (err error) {
 	if err != nil {
 		return errors.Wrap(err, "文件写入错误")
 	}
-	task.wroteToDiskLock.Lock()
-	defer task.wroteToDiskLock.Unlock()
 	putBackSegment(task.wroteToDisk, &segment{
 		start:  from,
 		len:    l,
 		finish: l,
 	})
+	task.capture()
 	return
+}
+
+func (task *Task) capture() {
+	if time.Now().Sub(task.lastCaptureTime) < time.Second {
+		return
+	}
+	task.lastCaptureTime = time.Now()
+	c := &internal.TaskCapture{
+		Fid:       string(task.id),
+		SavePath:  task.savePath,
+		Completed: []*internal.FinishSeg{},
+		Length:    task.fileLength,
+	}
+	for _, seg := range task.wroteToDisk {
+		c.Completed = append(c.Completed, &internal.FinishSeg{
+			Start: seg.start,
+			Len:   seg.len,
+		})
+	}
+	bin, err := proto.Marshal(c)
+	if err != nil {
+		log.Println("快照编码错误", err)
+		return
+	}
+	task.notifyEvent("capture", string(bin))
 }
 
 // 下载出错, 放回片段到未下载
@@ -252,10 +271,6 @@ func logErr(strContent string) {
 
 // 下载成功, 放回片段到已下载
 func (task *Task) downloadSegmentSuccess(seg *segment) {
-	task.distributedLock.Lock()
-	defer task.distributedLock.Unlock()
-	task.finishedLock.Lock()
-	defer task.finishedLock.Unlock()
 	if seg.len == seg.finish {
 		return
 	}
@@ -264,6 +279,8 @@ func (task *Task) downloadSegmentSuccess(seg *segment) {
 		len:    seg.len - seg.finish,
 		finish: 0,
 	}
+	task.undistributedLock.Lock()
+	defer task.undistributedLock.Unlock()
 	task.undistributed = putBackSegment(task.undistributed, seg2)
 }
 
@@ -272,7 +289,7 @@ func (task *Task) onWorkerExit(w *worker) {
 	task.workersLock.Lock()
 	defer task.workersLock.Unlock()
 	delete(task.workers, w.id)
-	log.Println(fmt.Sprintf("task %d, worker %d exit", task.id, w.id))
+	log.Println(fmt.Sprintf("task %s, worker %d exit", task.id, w.id))
 	if len(task.workers) == 0 {
 		go task.onAllWorkerExit()
 	}

@@ -34,3 +34,7 @@ func DoClose() {
 	}
 	closeCb = nil
 }
+
+var NotifyQml = func(event string, data map[string]interface{}) {
+	log.Println("not ready")
+}

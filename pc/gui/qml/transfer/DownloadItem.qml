@@ -11,10 +11,13 @@ Item {
     property bool isFinish
     property string downloadId: meta.downloadId
     property var meta
-
+    property int idx
     property string resumeData: ''
-
     property bool isNewAdd: true
+
+    signal taskEvent(string event, var data)
+
+    property string speed: ''
 
     Component.onCompleted: {
         if (!isNewAdd) {
@@ -23,6 +26,21 @@ Item {
                                 "downloadId": downloadId,
                                 "bin": resumeData
                             })
+        }
+    }
+
+    Timer {
+        id: speedClearTimer
+        interval: 2000
+        onTriggered: {
+            speed = ''
+        }
+    }
+
+    onTaskEvent: {
+        if (event === 'task.speed') {
+            speed = Util.humanSize(data) + '/s'
+            speedClearTimer.restart()
         }
     }
 
@@ -45,13 +63,19 @@ Item {
         type: root.meta.saveName.split('.').pop()
     }
     Text {
+        id: fileNameText
         text: root.meta.saveName
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: fileIcon.right
         anchors.leftMargin: 5
-        anchors.right: parent.right
-        anchors.rightMargin: 5
+        width: parent.width * 0.5
         elide: Text.ElideRight
+    }
+
+    Text {
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: fileNameText.right
+        text: speed
     }
 
     MouseArea {

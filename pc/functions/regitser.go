@@ -2,7 +2,14 @@
 
 package functions
 
-import "github.com/peterq/pan-light/pc/gui/bridge"
+import (
+	"github.com/peterq/pan-light/pc/dep"
+	"github.com/peterq/pan-light/pc/gui/bridge"
+)
+
+func init() {
+	dep.NotifyQml = NotifyQml
+}
 
 type syncHandler func(p map[string]interface{}) (result interface{})
 
@@ -24,4 +31,8 @@ func asyncMap(r map[string]asyncHandler) {
 		r1[p] = h
 	}
 	bridge.AsyncRouteRegister(r1)
+}
+
+func NotifyQml(event string, data map[string]interface{}) {
+	bridge.NotifyQml(event, data)
 }
