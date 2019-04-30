@@ -216,7 +216,7 @@ func (task *Task) writeToDisk(from int64, buffer *bytes.Buffer) (err error) {
 	if err != nil {
 		return errors.Wrap(err, "文件写入错误")
 	}
-	putBackSegment(task.wroteToDisk, &segment{
+	task.wroteToDisk = putBackSegment(task.wroteToDisk, &segment{
 		start:  from,
 		len:    l,
 		finish: l,
@@ -349,7 +349,7 @@ func (task *Task) resume(bin []byte) (err error) {
 	task.savePath = data.SavePath
 	task.fileLength = data.Length
 	for _, seg := range data.Completed {
-		putBackSegment(task.wroteToDisk, &segment{
+		task.wroteToDisk = putBackSegment(task.wroteToDisk, &segment{
 			start:  seg.Start,
 			len:    seg.Len,
 			finish: seg.Len,
@@ -362,11 +362,11 @@ func (task *Task) resume(bin []byte) (err error) {
 // 把一个段放回到一个slice中, 并进行必要的合并
 func putBackSegment(queue []*segment, seg *segment) []*segment {
 	head := seg.start
-	tail := seg.start + seg.len
+	tail := seg.start + seg.len - 1
 	// 头部衔接
 	for idx := 0; idx < len(queue); idx++ {
 		segInQueue := queue[idx]
-		if segInQueue.start+segInQueue.len+1 == head {
+		if segInQueue.start+segInQueue.len == head {
 			if idx == len(queue)-1 {
 				queue = queue[:idx]
 			} else {
