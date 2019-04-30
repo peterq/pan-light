@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"fmt"
 	"github.com/peterq/pan-light/pc/pan-download"
 )
 
@@ -15,7 +16,14 @@ var downloadSyncRoutes = map[string]syncHandler{
 		if err != nil {
 			return err
 		}
-		return taskId
+		return fmt.Sprint(taskId)
+	},
+	"download.resume": func(p map[string]interface{}) interface{} {
+		err := pan_download.Resume(p["downloadId"].(string), []byte(p["bin"].(string)))
+		if err != nil {
+			return err
+		}
+		return true
 	},
 }
 

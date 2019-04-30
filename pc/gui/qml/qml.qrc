@@ -144,5 +144,10 @@
         <file>comps/prompt-window.qml</file>
         <file>assets/images/icons/delete.svg</file>
         <file>assets/images/icons/order.svg</file>
+        <file>transfer/HeaderBar.qml</file>
+        <file>transfer/DownloadItem.qml</file>
+        <file>comps/confirm-window.qml</file>
+        <file>comps/select-save-path.qml</file>
+        <file>transfer/DownloadList.qml</file>
     </qresource>
 </RCC>

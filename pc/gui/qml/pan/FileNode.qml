@@ -137,6 +137,7 @@ Item {
     }
     function clickDownload() {
         console.log('down')
+        App.appState.transferComp.addDownload(fileItem.meta)
     }
     function clickDownloadViaVip() {
         console.log('vip down')

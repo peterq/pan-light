@@ -230,6 +230,66 @@ var prompt
     }
 })()
 
+var confirm
+;(function () {
+    var comp = loadComponent(function () {}, "../comps/confirm-window.qml")
+    confirm = function(option){
+        option = option || {}
+        var defaultOption = {
+            parent: G.root,
+            title: '是否继续',
+            msg: '这是一条消息',
+        }
+        for(var k in defaultOption) {
+            if (!option.hasOwnProperty(k))
+                option[k] = defaultOption[k]
+        }
+        return new Promise(function(resolve, reject){
+            function onClose(result) {
+                if (result === false) reject(result)
+                resolve(result)
+            }
+            var ins = comp.createObject(option.parent, {
+                                            tipText: option.msg,
+                                            title: option.title,
+                                            closeCb: onClose
+                                        })
+        })
+    }
+})()
+
+var pickSavePath
+;(function () {
+    var comp = loadComponent(function () {}, "../comps/select-save-path.qml")
+    pickSavePath = function(option){
+        option = option || {}
+        var defaultOption = {
+            parent: G.root,
+            title: '选择保存位置',
+            defaultFolder: '',
+            fileName: '',
+        }
+        for(var k in defaultOption) {
+            if (!option.hasOwnProperty(k))
+                option[k] = defaultOption[k]
+        }
+        return new Promise(function(resolve, reject){
+            function onClose(result) {
+                if (result === false) reject(result)
+                resolve(result)
+            }
+            var ins = comp.createObject(option.parent, {
+                                            defaultFolder: option.defaultFolder,
+                                            title: option.title,
+                                            fileName: option.fileName,
+                                            resolve: resolve,
+                                            reject: reject
+                                        })
+            ins.open()
+        })
+    }
+})()
+
 var showMenu = (function () {
     var comp = loadComponent(function () {}, "../comps/rightClickMenu.qml")
     return function(items, parent) {
@@ -298,6 +358,42 @@ var tooTip = (function(){
 
     }
 })()
+
+function listModelToArr(model) {
+    var arr = []
+    for (var i = 0; i < model.count; i++) {
+        arr.push(model.get(i))
+    }
+    return arr
+}
+
+function arrToListModel(arr, model) {
+    model.clear()
+    arr.forEach(function (item) {
+        model.append(item)
+    })
+    return model
+}
+
+function listModelAdd(model, data) {
+    model.append(data)
+    return listModelToArr(model)
+}
+
+function listModelClear(model) {
+    model.clear()
+    return []
+}
+
+function listModelRemove(model, index) {
+    model.remove(index, 1)
+    return listModelToArr(model)
+}
+
+function listModelMove(model, from, to) {
+    model.move(from, to, 1)
+    return listModelToArr(model)
+}
 
 
 

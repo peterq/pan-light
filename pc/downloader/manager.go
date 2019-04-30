@@ -2,13 +2,14 @@ package downloader
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 )
 
-type TaskId int64
+type TaskId string
 type LinkResolver func(fileId string) (link string, err error) // 由file id转link的回调
 
 // 下载管理器
@@ -66,7 +67,7 @@ func (*Manager) Capture() (map[TaskId][]byte, error) {
 // 新建任务
 func (m *Manager) NewTask(fileId, savePath string,
 	requestDecorator func(*http.Request) *http.Request) (id TaskId, err error) {
-	id = TaskId(time.Now().UnixNano())
+	id = TaskId(fmt.Sprint(time.Now().UnixNano()))
 	task := &Task{
 		id:               id,
 		fileId:           fileId,
@@ -77,9 +78,10 @@ func (m *Manager) NewTask(fileId, savePath string,
 		segmentSize:      m.SegmentSize,
 		savePath:         savePath,
 		httpClient:       m.HttpClient,
+		state:            WaitStart,
 	}
 	m.taskMap[id] = task
-	err = task.start()
+	go task.start()
 	return
 }
 

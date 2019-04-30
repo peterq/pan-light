@@ -146,6 +146,7 @@ Loop:
 	}
 }
 
+// 获取当前速度
 func (task *Task) getSpeed() int64 {
 	return atomic.LoadInt64(&task.speed)
 }
@@ -266,6 +267,7 @@ func (task *Task) downloadSegmentSuccess(seg *segment) {
 	task.undistributed = putBackSegment(task.undistributed, seg2)
 }
 
+// 当有工作线程退出时的回调
 func (task *Task) onWorkerExit(w *worker) {
 	task.workersLock.Lock()
 	defer task.workersLock.Unlock()
@@ -276,6 +278,7 @@ func (task *Task) onWorkerExit(w *worker) {
 	}
 }
 
+// 当所有线程退出时的回调
 func (task *Task) onAllWorkerExit() {
 	log.Println("所有worker结束")
 	task.cancelSpeedCoroutine()
@@ -288,6 +291,7 @@ func (task *Task) onAllWorkerExit() {
 	log.Println(task.undistributed)
 }
 
+// 通知事件给外部
 func (task *Task) notifyEvent(event string, data interface{}) {
 	task.manager.eventNotify(&DownloadEvent{
 		TaskId: task.id,
@@ -296,6 +300,7 @@ func (task *Task) notifyEvent(event string, data interface{}) {
 	})
 }
 
+// 更新任务状态
 func (task *Task) updateState(state TaskState) {
 	task.state = state
 	data := map[string]interface{}{
@@ -307,6 +312,7 @@ func (task *Task) updateState(state TaskState) {
 	task.notifyEvent("task.state", data)
 }
 
+// 恢复任务
 func (task *Task) resume(bin []byte) (err error) {
 	if task.state != WaitResume {
 		return errors.New("任务当前状态不能resume")
@@ -336,6 +342,7 @@ func (task *Task) resume(bin []byte) (err error) {
 	return nil
 }
 
+// 把一个段放回到一个slice中, 并进行必要的合并
 func putBackSegment(queue []*segment, seg *segment) []*segment {
 	head := seg.start
 	tail := seg.start + seg.len
@@ -371,6 +378,7 @@ func putBackSegment(queue []*segment, seg *segment) []*segment {
 	return queue
 }
 
+// seg做减法, 只应用于恢复任务时
 func removeSegment(queue []*segment, seg *segment) []*segment {
 	head := seg.start
 	tail := seg.start + seg.len

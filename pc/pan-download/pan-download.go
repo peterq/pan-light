@@ -64,11 +64,19 @@ func DownloadFile(fid, savePath string) (taskId downloader.TaskId, err error) {
 	if err != nil {
 		return
 	}
-	taskId, err = manager.NewTask(fid, savePath, func(request *http.Request) *http.Request {
-		request.Header.Set("User-Agent", pan_api.BaiduUA)
-		return request
-	})
+	taskId, err = manager.NewTask(fid, savePath, requestDecorator)
 	return
+}
+
+func requestDecorator(request *http.Request) *http.Request {
+	request.Header.Set("User-Agent", pan_api.BaiduUA)
+	return request
+}
+
+func Resume(id string, bin []byte) error {
+	return manager.Resume(map[downloader.TaskId][]byte{
+		downloader.TaskId(id): bin,
+	}, requestDecorator)
 }
 
 func fileCompare() {
