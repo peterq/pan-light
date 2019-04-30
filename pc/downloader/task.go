@@ -398,11 +398,11 @@ func putBackSegment(queue []*segment, seg *segment) []*segment {
 // seg做减法, 只应用于恢复任务时
 func removeSegment(queue []*segment, seg *segment) []*segment {
 	head := seg.start
-	tail := seg.start + seg.len
+	tail := seg.start + seg.len - 1
 	// 头部衔接
 	for idx := 0; idx < len(queue); idx++ {
 		segInQueue := queue[idx]
-		if segInQueue.start <= head && segInQueue.start+segInQueue.len >= tail {
+		if segInQueue.start <= head && segInQueue.start+segInQueue.len-1 >= tail {
 			// 完全重合, 直接去掉
 			if segInQueue.start == head && segInQueue.len == seg.len {
 				return append(queue[:idx], queue[idx+1:]...)
@@ -414,14 +414,14 @@ func removeSegment(queue []*segment, seg *segment) []*segment {
 				return queue
 			}
 			// 尾部重合, 留下头部
-			if segInQueue.start+segInQueue.len == tail {
+			if segInQueue.start+segInQueue.len-1 == tail {
 				segInQueue.len -= seg.len
 				return queue
 			}
 			// 包含其中, 拆分
 			seg2 := &segment{
 				start: tail + 1,
-				len:   segInQueue.start + segInQueue.len - tail,
+				len:   segInQueue.start + segInQueue.len - 1 - tail,
 			}
 			segInQueue.len = seg.start - segInQueue.start
 			rear := append([]*segment{}, queue[idx:]...)
