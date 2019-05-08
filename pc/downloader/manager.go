@@ -3,9 +3,12 @@ package downloader
 import (
 	"bytes"
 	"fmt"
+	"github.com/pkg/errors"
 	"log"
 	"net/http"
+	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -38,7 +41,7 @@ func (m *Manager) Init() error {
 
 // 从磁盘文件恢复, 下载中的任务
 func (m *Manager) Resume(
-	raw map[TaskId][]byte,
+	raw map[TaskId]string,
 	requestDecorator func(*http.Request) *http.Request) error {
 	for id, bin := range raw {
 		task := &Task{
@@ -54,6 +57,8 @@ func (m *Manager) Resume(
 		err := task.resume(bin)
 		if err != nil {
 			log.Println(err)
+		} else {
+			m.taskMap[id] = task
 		}
 	}
 	return nil
@@ -81,7 +86,7 @@ func (m *Manager) NewTask(fileId, savePath string,
 		state:            WaitStart,
 	}
 	m.taskMap[id] = task
-	go task.start()
+	//go task.start()
 	return
 }
 
@@ -96,19 +101,57 @@ func (*Manager) StartAll() error {
 }
 
 // 暂停任务
-func (*Manager) PauseTask(id TaskId) error {
-
-	return nil
+func (m *Manager) PauseTask(id TaskId) error {
+	t, ok := m.taskMap[id]
+	if !ok {
+		return errors.New("task 不存在")
+	}
+	return t.pause()
 }
 
 // 开始任务
-func (*Manager) StartTask(id TaskId) error {
-	return nil
+func (m *Manager) StartTask(id TaskId) error {
+	t, ok := m.taskMap[id]
+	if !ok {
+		return errors.New("task 不存在")
+	}
+	return t.start()
 }
 
 // 取消任务
-func (*Manager) CancelTask(id TaskId) error {
-	return nil
+func (m *Manager) CancelTask(id TaskId) error {
+	t, ok := m.taskMap[id]
+	if !ok {
+		return errors.New("task 不存在")
+	}
+	t.deleteFileWhenStop = true
+	delete(m.taskMap, id)
+	err := t.pause()
+	if err != nil {
+		os.Remove(t.savePath)
+	}
+	return err
+}
+
+// get state
+func (m *Manager) State(id TaskId) map[string]interface{} {
+	t, ok := m.taskMap[id]
+	if !ok {
+		return nil
+	}
+	return map[string]interface{}{
+		"state":    t.state,
+		"progress": atomic.LoadInt64(&t.downloadCount),
+	}
+}
+
+// get progress
+func (m *Manager) Progress(id TaskId) int64 {
+	t, ok := m.taskMap[id]
+	if !ok {
+		return 0
+	}
+	return atomic.LoadInt64(&t.downloadCount)
 }
 
 // 获取一个缓存

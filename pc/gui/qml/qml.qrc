@@ -149,5 +149,8 @@
         <file>comps/confirm-window.qml</file>
         <file>comps/select-save-path.qml</file>
         <file>transfer/DownloadList.qml</file>
+        <file>comps/IconButton.qml</file>
+        <file>assets/images/icons/pause.svg</file>
+        <file>assets/images/icons/start.svg</file>
     </qresource>
 </RCC>

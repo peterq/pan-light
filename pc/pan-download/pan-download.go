@@ -18,7 +18,7 @@ var manager *downloader.Manager
 
 func init() {
 	dep.OnInit(func() {
-		parallel := 128
+		parallel := 1
 		manager = &downloader.Manager{
 			CoroutineNumber:       parallel,
 			SegmentSize:           1024 * 1024 * 2,
@@ -37,17 +37,11 @@ func init() {
 				go handleDownloadEvent(evt)
 			}
 		}()
-		go test()
+		//go test()
 	})
 }
 
 func handleDownloadEvent(event *downloader.DownloadEvent) {
-	if event.Event == "task.speed" {
-		speed := float64(event.Data.(int64))
-		log.Println(speed / 1024 / 1024)
-	} else {
-		//log.Println(event)
-	}
 	dep.NotifyQml("task.event", map[string]interface{}{
 		"type":   event.Event,
 		"taskId": event.TaskId,
@@ -78,10 +72,30 @@ func requestDecorator(request *http.Request) *http.Request {
 	return request
 }
 
-func Resume(id string, bin []byte) error {
-	return manager.Resume(map[downloader.TaskId][]byte{
+func Resume(id string, bin string) error {
+	return manager.Resume(map[downloader.TaskId]string{
 		downloader.TaskId(id): bin,
 	}, requestDecorator)
+}
+
+func State(id string) interface{} {
+	return manager.State(downloader.TaskId(id))
+}
+
+func Start(id string) error {
+	return manager.StartTask(downloader.TaskId(id))
+}
+
+func Pause(id string) error {
+	return manager.PauseTask(downloader.TaskId(id))
+}
+
+func Delete(id string) error {
+	return manager.CancelTask(downloader.TaskId(id))
+}
+
+func Progress(id string) int64 {
+	return manager.Progress(downloader.TaskId(id))
 }
 
 func fileCompare() {

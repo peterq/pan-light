@@ -36,7 +36,6 @@ Window {
     }
     Login{}
     Component.onCompleted: {
-
         // 初始化js工具
         G.init(mainWindow)
         App.appState.mainWindow = mainWindow

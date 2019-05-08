@@ -73,4 +73,12 @@ Rectangle {
     function add(data) {
         updateList(Util.listModelAdd(listModel, data))
     }
+
+    function get(idx) {
+        return listModel.get(idx)
+    }
+
+    function remove(idx) {
+        updateList(Util.listModelRemove(listModel, idx))
+    }
 }

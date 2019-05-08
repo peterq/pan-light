@@ -3,6 +3,7 @@ package downloader
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"github.com/peterq/pan-light/pc/downloader/internal"
@@ -63,6 +64,7 @@ type Task struct {
 	fileHandle            *os.File
 	cancelSpeedCoroutine  context.CancelFunc
 	speedCoroutineContext context.Context
+	deleteFileWhenStop    bool // 删除文件标识
 }
 
 func (task *Task) Id() TaskId {
@@ -137,15 +139,13 @@ Loop:
 			break Loop
 		case <-t:
 			cnt := atomic.SwapInt64(&task.speedCount, 0)
-			task.notifyEvent("task.speed", cnt)
-			atomic.SwapInt64(&task.speed, cnt)
+			p := atomic.LoadInt64(&task.downloadCount)
+			task.notifyEvent("task.speed", map[string]interface{}{
+				"speed":    cnt,
+				"progress": p,
+			})
 		}
 	}
-}
-
-// 获取当前速度
-func (task *Task) getSpeed() int64 {
-	return atomic.LoadInt64(&task.speed)
 }
 
 // 开始一个任务
@@ -231,7 +231,7 @@ func (task *Task) capture() {
 	}
 	task.lastCaptureTime = time.Now()
 	c := &internal.TaskCapture{
-		Fid:       string(task.id),
+		Fid:       string(task.fileId),
 		SavePath:  task.savePath,
 		Completed: []*internal.FinishSeg{},
 		Length:    task.fileLength,
@@ -247,7 +247,7 @@ func (task *Task) capture() {
 		log.Println("快照编码错误", err)
 		return
 	}
-	task.notifyEvent("capture", string(bin))
+	task.notifyEvent("task.capture", base64.StdEncoding.EncodeToString(bin))
 }
 
 // 下载出错, 放回片段到未下载
@@ -306,6 +306,10 @@ func (task *Task) onAllWorkerExit() {
 	}
 	task.updateState(st)
 	log.Println(task.undistributed)
+	if task.deleteFileWhenStop {
+		os.Remove(task.savePath)
+		log.Println("delete", task.savePath)
+	}
 }
 
 // 通知事件给外部
@@ -323,6 +327,7 @@ func (task *Task) updateState(state TaskState) {
 	data := map[string]interface{}{
 		"state": state,
 	}
+	data["progress"] = atomic.LoadInt64(&task.downloadCount)
 	if state == ERRORED {
 		data["error"] = task.lastErr.Error()
 	}
@@ -330,7 +335,7 @@ func (task *Task) updateState(state TaskState) {
 }
 
 // 恢复任务
-func (task *Task) resume(bin []byte) (err error) {
+func (task *Task) resume(str string) (err error) {
 	if task.state != WaitResume {
 		return errors.New("任务当前状态不能resume")
 	}
@@ -340,6 +345,7 @@ func (task *Task) resume(bin []byte) (err error) {
 			task.updateState(ERRORED)
 		}
 	}()
+	bin, err := base64.StdEncoding.DecodeString(str)
 	var data internal.TaskCapture
 	err = proto.Unmarshal(bin, &data)
 	if err != nil {
@@ -355,6 +361,7 @@ func (task *Task) resume(bin []byte) (err error) {
 			finish: seg.Len,
 		})
 	}
+	task.init()
 	task.updateState(WaitStart)
 	return nil
 }

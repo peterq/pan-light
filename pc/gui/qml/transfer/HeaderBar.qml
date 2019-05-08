@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
+import "../js/app.js" as App
 
 Item {
     width: parent.width - 20
@@ -8,7 +9,7 @@ Item {
     property alias currentTab: typeTab.currentTab
     Text {
         id: taskLeft
-        text: "剩余任务: 51"
+        text: "剩余任务: " + App.appState.downloadingList.length
         anchors.verticalCenter: parent.verticalCenter
     }
 

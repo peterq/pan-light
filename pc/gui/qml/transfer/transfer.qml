@@ -22,6 +22,7 @@ Item {
         height: parent.height - headerBar.height
     }
     DownloadList {
+        id: downloadedList
         visible: headerBar.currentTab == '已完成'
         isFinish: true
         anchors.top: headerBar.bottom
@@ -64,5 +65,16 @@ Item {
             obj.savePath = savePath
             downloadingList.add(obj)
         })
+    }
+
+    function deleteItem(idx, isFinish) {
+        var c = isFinish ? downloadedList : downloadingList
+        c.remove(idx)
+    }
+
+    function itemCompleted(idx) {
+        var data = JSON.parse(JSON.stringify(downloadingList.get(idx)))
+        downloadingList.remove(idx)
+        downloadedList.add(data)
     }
 }

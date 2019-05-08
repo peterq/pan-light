@@ -194,7 +194,8 @@ func Link(fid string) (link string, err error) {
 		return
 	}
 	if data["errno"].(float64) != 0 {
-		err = errors.New("获取文件夹信息错误, 错误码" + fmt.Sprint(data["errno"]))
+		err = errors.New("获取文件信息错误, 错误码" + fmt.Sprint(data["errno"]))
+		return
 	}
 	link = data["dlink"].([]interface{})[0].(map[string]interface{})["dlink"].(string)
 	link = getRedirectedLink(link)
