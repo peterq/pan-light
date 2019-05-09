@@ -42,12 +42,21 @@ Item {
                   '.').pop()
     }
     Text {
+        id: filenameText
         text: fileItem.meta.server_filename
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: fileIcon.right
         anchors.leftMargin: 5
-        anchors.right: parent.right
-        anchors.rightMargin: 5
+        width: parent.width * 0.6
+        elide: Text.ElideRight
+    }
+
+    Text {
+        text: meta.isdir ? '-' : Util.humanSize(fileItem.meta.size)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: filenameText.right
+        anchors.leftMargin: 20
+        width: 100
         elide: Text.ElideRight
     }
 

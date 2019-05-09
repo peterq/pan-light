@@ -97,6 +97,13 @@ Item {
         return []
     }
 
+    Rectangle {
+        height: parent.height
+        width: Math.min(progress / meta.size, 1) * parent.width
+        color: Qt.rgba(140 / 255, 197 / 255, 1, .4)
+        visible: !isFinish
+    }
+
     Item {
         id: topRow
         width: parent.width - 20
