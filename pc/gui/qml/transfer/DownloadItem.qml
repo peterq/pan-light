@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Controls 2.4
 import "../pan"
 import "../comps"
 import "../js/app.js" as App
@@ -32,7 +33,8 @@ Item {
     }
 
     function dataSaverOk() {
-        if (isFinish) return
+        if (isFinish)
+            return
         if (!isNewAdd) {
             console.log('恢复任务', downloadId)
             var res = Util.callGoSync('download.resume', {
@@ -136,6 +138,28 @@ Item {
             }
         }
 
+        PromiseDialog {
+            id: comfirmDeleteDialog
+            w: 500
+            h: 200
+            title: '确认删除'
+            onClickConfirm: function() {
+                result = checkBox.checked
+                return true
+            }
+            contentItem: Column {
+                Text {
+                    text: '删除后不可恢复! 确认删除?'
+                }
+                CheckBox {
+                    id: checkBox
+                    visible: isFinish
+                    checked: true
+                    text: '同时删除本地文件'
+                }
+            }
+        }
+
         Row {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
@@ -171,14 +195,32 @@ Item {
                     updateState()
                 }
             }
+
+            IconButton {
+                iconType: 'folder'
+                title: '打开所在文件夹'
+                onClicked: {
+                    var dir = meta.savePath.split(Util.fileSep)
+                    dir.pop()
+
+                    dir = dir.join(Util.fileSep)
+                    var ret = Qt.openUrlExternally('file://' + dir)
+                    console.log(ret)
+                }
+            }
+
             IconButton {
                 iconType: 'delete'
                 title: '删除'
                 onClicked: {
-                    Util.callGoSync('download.delete', {
-                                        "downloadId": downloadId
-                                    })
-                    App.appState.transferComp.deleteItem(idx, isFinish)
+                    comfirmDeleteDialog.open().then(function (deleteFile) {
+                        Util.callGoSync('download.delete', {
+                                            "downloadId": downloadId,
+                                            "path": meta.savePath,
+                                            "deleteFile": isFinish ? deleteFile : false
+                                        })
+                        App.appState.transferComp.deleteItem(idx, isFinish)
+                    })
                 }
             }
         }

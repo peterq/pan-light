@@ -8,6 +8,7 @@ console.log('--------------util js init------------')
 
 var Promise = P.Promise
 var setTimeout = G.setTimeout
+var fileSep = Qt.platform === 'windows' ? '\\' : '/'
 
 var dialog = (function(){
     var comp = Qt.createComponent('../comps/dialog.qml')

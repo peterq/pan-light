@@ -3,6 +3,7 @@ package functions
 import (
 	"fmt"
 	"github.com/peterq/pan-light/pc/pan-download"
+	"os"
 )
 
 func init() {
@@ -35,6 +36,9 @@ var downloadSyncRoutes = map[string]syncHandler{
 		return pan_download.Pause(p["downloadId"].(string))
 	},
 	"download.delete": func(p map[string]interface{}) interface{} {
+		if p["deleteFile"].(bool) {
+			os.Remove(p["path"].(string))
+		}
 		return pan_download.Delete(p["downloadId"].(string))
 	},
 }
