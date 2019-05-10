@@ -16,6 +16,8 @@ import (
 
 var manager *downloader.Manager
 
+var useVipMap = map[downloader.TaskId]bool{}
+
 func init() {
 	dep.OnInit(func() {
 		parallel := 1
@@ -53,17 +55,20 @@ func test() {
 	//fileCompare()
 	//return
 	time.Sleep(3 * time.Second)
-	id, err := DownloadFile("730136432970379", "./yx.mp4")
+	id, err := DownloadFile("730136432970379", "./yx.mp4", false)
 	//id, err := DownloadFile("835313540804", "./project.mp4")
 	log.Println(id, err)
 }
 
-func DownloadFile(fid, savePath string) (taskId downloader.TaskId, err error) {
+func DownloadFile(fid, savePath string, useVip bool) (taskId downloader.TaskId, err error) {
 	savePath, err = filepath.Abs(savePath)
 	if err != nil {
 		return
 	}
 	taskId, err = manager.NewTask(fid, savePath, requestDecorator)
+	if err == nil {
+		useVipMap[taskId] = true
+	}
 	return
 }
 
@@ -72,7 +77,10 @@ func requestDecorator(request *http.Request) *http.Request {
 	return request
 }
 
-func Resume(id string, bin string) error {
+func Resume(id string, bin string, useVip bool) error {
+	if useVip {
+		useVipMap[downloader.TaskId(id)] = true
+	}
 	return manager.Resume(map[downloader.TaskId]string{
 		downloader.TaskId(id): bin,
 	}, requestDecorator)

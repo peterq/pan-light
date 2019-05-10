@@ -37,6 +37,8 @@ func main() {
 	}
 	flag.Parse()
 
+	os.Setenv("GOPROXY", "https://goproxy.io")
+
 	cmd := "pc"
 
 	cmd = flag.Arg(0)

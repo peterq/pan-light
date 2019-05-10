@@ -154,5 +154,6 @@
         <file>assets/images/icons/start.svg</file>
         <file>assets/images/icons/folder.svg</file>
         <file>comps/PromiseDialog.qml</file>
+        <file>assets/images/icons/vip.svg</file>
     </qresource>
 </RCC>

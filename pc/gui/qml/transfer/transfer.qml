@@ -33,7 +33,7 @@ Item {
         App.appState.transferComp = root
     }
 
-    function addDownload(meta) {
+    function addDownload(meta, useVip) {
         return Util.Promise.resolve().then(function () {
             var evt = {
                 "fid": meta.fs_id + '',
@@ -55,7 +55,8 @@ Item {
             savePath = savePath.replace('file://', '')
             var id = Util.callGoSync('download.new', {
                                        "fid": meta.fs_id + '',
-                                       "savePath": savePath
+                                       "savePath": savePath,
+                                       "useVip": !!useVip
                                    })
             var obj = JSON.parse(JSON.stringify(meta))
             obj.downloadId = id
@@ -63,6 +64,7 @@ Item {
             var t = String.prototype.split.call(savePath, sep)
             obj.saveName = t.pop()
             obj.savePath = savePath
+            obj.useVip = !!useVip
             downloadingList.add(obj)
         })
     }

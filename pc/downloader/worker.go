@@ -23,6 +23,7 @@ func (w *worker) work() {
 	errorNumber := 0
 	maxErrorNumber := 2
 	// 循环下载片段
+WorkLoop:
 	for {
 
 		// 检查是否有连续错误
@@ -34,7 +35,7 @@ func (w *worker) work() {
 		// 判断是否被取消
 		select {
 		case <-w.ctx.Done():
-			break
+			break WorkLoop
 		default:
 		}
 

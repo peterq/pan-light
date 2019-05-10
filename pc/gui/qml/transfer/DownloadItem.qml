@@ -39,7 +39,8 @@ Item {
             console.log('恢复任务', downloadId)
             var res = Util.callGoSync('download.resume', {
                                           "downloadId": downloadId,
-                                          "bin": resumeData
+                                          "bin": resumeData,
+                                          "useVip": meta.useVip
                                       })
         } else {
             isNewAdd = false
@@ -61,7 +62,7 @@ Item {
 
     Timer {
         id: speedClearTimer
-        interval: 2000
+        interval: 1100
         onTriggered: {
             speed = ''
         }
@@ -126,6 +127,14 @@ Item {
             anchors.leftMargin: 5
             width: parent.width * 0.4
             elide: Text.ElideRight
+        }
+        IconFont {
+            type: 'vip'
+            width: 30
+            visible: !isFinish && meta.useVip
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: fileNameText.left
+            anchors.leftMargin: 10 + Math.min(fileNameText.width, fileNameText.implicitWidth)
         }
 
         MouseArea {

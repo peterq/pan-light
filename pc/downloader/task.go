@@ -257,7 +257,7 @@ func (task *Task) downloadSegmentError(seg *segment) {
 	seg.finish = 0
 	task.undistributed = putBackSegment(task.undistributed, seg)
 	log.Println("下载片段错误", seg)
-	logErr(fmt.Sprint(seg))
+	//logErr(fmt.Sprint(seg))
 }
 
 func logErr(strContent string) {
@@ -361,8 +361,15 @@ func (task *Task) resume(str string) (err error) {
 			finish: seg.Len,
 		})
 	}
-	task.init()
-	task.updateState(WaitStart)
+	go func() {
+		err := task.init()
+		if err != nil {
+			task.lastErr = err
+			task.updateState(ERRORED)
+		} else {
+			task.updateState(WaitStart)
+		}
+	}()
 	return nil
 }
 

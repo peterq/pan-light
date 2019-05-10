@@ -150,5 +150,6 @@ Item {
     }
     function clickDownloadViaVip() {
         console.log('vip down')
+        App.appState.transferComp.addDownload(fileItem.meta, true)
     }
 }
