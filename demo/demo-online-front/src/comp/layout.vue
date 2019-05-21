@@ -8,6 +8,7 @@
             <el-main>
                 <vnc style="flex: 1;" v-if="vncShow"
                      :config="connectVnc"></vnc>
+                <host-list v-else></host-list>
             </el-main>
             <el-aside width="400px">Aside</el-aside>
         </el-container>
@@ -17,6 +18,7 @@
 <script>
     import {getTicket, showError} from "../app"
     import vnc from './vnc'
+    import hostList from './hostList'
 
     const dataTemplate = {
         connectVnc: {
@@ -59,7 +61,7 @@
                 }
             }
         },
-        components: {vnc}
+        components: {vnc, hostList}
     }
 </script>
 

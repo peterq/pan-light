@@ -7,3 +7,4 @@ rcc*
 qml.rcc
 gui-plugin.so
 .env
+*.pb.go

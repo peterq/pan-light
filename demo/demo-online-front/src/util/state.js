@@ -18,7 +18,14 @@ function data() {
             getTicket: false,
         },
         ticket: null, // tpl: ticket
-        roomMap: {} // tpl roomMap
+        roomMap: {}, // tpl roomMap
+        timestamp: 0,
+        hosts: [],
+        slaveStateMap: {
+            wait: '空闲',
+            running: '运行中',
+            starting: '启动中',
+        }
     }
 }
 
@@ -28,5 +35,8 @@ export default {
     },
     created() {
         window.debugObj.$state = this
+        setInterval(() => {
+            this.timestamp++
+        }, 100)
     }
 }

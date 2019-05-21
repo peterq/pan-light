@@ -7,19 +7,21 @@ export default class Rpc {
     sessionSecret
     openDone
 
-    constructor(url) {
+    constructor(url, promise) {
         this.encrypt = true
         this.encryptKey = 'pan-light'
         this.url = url
         this.eventListener = {}
         this.requestMap = {}
-        this.init()
+        this.init(promise)
     }
 
-    init() {
-
-        this.openPromise = this.connect()
-
+    async init(promise) {
+        this.openPromise = promise.then(c => {
+            if (c)
+                return this.connect()
+            return Promise.reject('cancel connect')
+        })
         this.onRemote('session.new', data => {
             this.sessionId = data.id
             this.sessionSecret = data.secret
@@ -116,6 +118,9 @@ export default class Rpc {
                     cb(data.payload, data.room)
                 })
             })
+            if (data.room) {
+                Room.handleRoomMsg(data, this)
+            }
             return
         }
         if (data.type === 'call.result') {
@@ -161,6 +166,9 @@ export default class Rpc {
         return promise
     }
 
+    getRoom(name) {
+        return Room.roomMap[name]
+    }
 
     _encrypt(str) {
         if (!this.encrypt) {
@@ -196,4 +204,52 @@ export default class Rpc {
         return new TextDecoder("utf-8").decode(bin)
     }
 
+}
+
+class Room {
+    name
+    static roomMap = {}
+
+    static handleRoomMsg(msg, rt) {
+        let r = Room.roomMap[msg.room] || new Room(msg.room, rt)
+        Room.roomMap[msg.room] = r
+        r.handleMsg(msg)
+    }
+
+    constructor(name, rt) {
+        this.name = name
+        this.eventListener = new Map()
+        ;(rt.eventListener['room.new'] || []).forEach(
+            cb => {
+                try {
+                    cb(this)
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+        )
+    }
+
+    addEventListener(name, cb) {
+        this.eventListener[name] = this.eventListener.get(name) || new Set()
+        this.eventListener[name].add(cb)
+    }
+
+    off(name, cb) {
+        this.eventListener[name] = this.eventListener.get(name) || new Set()
+        this.eventListener[name].delete(cb)
+    }
+
+    on(name, cb) {
+        return this.addEventListener(name, cb)
+    }
+
+    handleMsg(data) {
+        let cbs = this.eventListener['$remote.' + data.event] || []
+        cbs.forEach(function (cb) {
+            setTimeout(function () {
+                cb(data.payload)
+            })
+        })
+    }
 }

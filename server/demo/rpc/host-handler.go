@@ -46,10 +46,11 @@ var hostRpcMap = map[string]realtime.RpcHandler{
 	}),*/
 	"host.next.user": realtime.RpcHandleFunc(func(ss *realtime.Session, p gson) (result interface{}, err error) {
 		host := ss.Data.(*roleHost)
-		slave := p["slave"].(string)
-		if strings.Index(slave, host.name) != 0 {
+		slaveName := p["slave"].(string)
+		if strings.Index(slaveName, host.name) != 0 {
 			err = errors.New("forbidden")
 		}
+		slave := host.slaves[slaveName]
 		manager.waitSessionMapLock.Lock()
 		defer manager.waitSessionMapLock.Unlock()
 		for i := manager.lastInServiceOrder + 1; i <= manager.lastDistributedOrder; i++ {
@@ -65,8 +66,11 @@ var hostRpcMap = map[string]realtime.RpcHandler{
 				server.RoomByName("room.all.user").Broadcast("ticket.turn", gson{
 					"order": state.order,
 					"host":  host.name,
-					"slave": slave,
+					"slave": slaveName,
 				})
+				server.RoomByName("room.slave.all.user." + slaveName).Join(state.session.Id())
+				slave.userWaitState = state
+				slave.state = slaveStateStarting
 				return
 			}
 		}
@@ -82,8 +86,9 @@ var hostRpcMap = map[string]realtime.RpcHandler{
 		host.slaves = map[string]*roleSlave{}
 		for _, name := range p["slaves"].([]interface{}) {
 			slave := &roleSlave{
-				name: name.(string),
-				host: host,
+				name:  name.(string),
+				host:  host,
+				state: slaveStateWait,
 			}
 			host.slaves[name.(string)] = slave
 		}

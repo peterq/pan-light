@@ -84,12 +84,13 @@ func onSessionLost(ss *realtime.Session) {
 func onSlaveLeave(slave *roleSlave, ss *realtime.Session) {
 	slave.lock.Lock()
 	defer slave.lock.Unlock()
-	// slave 会话每次结束演示会断开, 因此slave对象会重复使用, 这里需要检测Session一致性
+	// slave 会话每次结束演示会断开, 但是slave对象会重复使用, 这里需要检测Session一致性
 	if slave.session != ss {
 		return
 	}
 	slave.session = nil
-	slave.userSession = nil
+	slave.userWaitState = nil
+	slave.state = slaveStateWait
 }
 
 func onHostLeave(host *roleHost) {

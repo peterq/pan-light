@@ -3,9 +3,15 @@ import RealTime from "./realtime/realtime"
 import Vue from "vue"
 import State from "./util/state"
 import {registerProxyChannelResolver} from "./lib/vnc/core/RtcWebSocket"
+import whatJpg from './assets/what.jpeg'
 
 // const $rt = new RealTime('ws://localhost:8001/demo/ws')
-export const $rt = new RealTime((location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/demo/ws')
+
+var connectWs
+var p = new Promise(function (resolve) {
+    connectWs = resolve
+})
+export const $rt = new RealTime((location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/demo/ws', p)
 export const $state = new Vue(State)
 export const $event = (function () {
     function fire(evt, payload) {
@@ -28,6 +34,7 @@ export const $event = (function () {
     const map = new Map()
     return {fire, on, off}
 })()
+
 
 registerProxyChannelResolver(async function (uri) {
     uri = uri.replace('ws://', '').replace('wss://', '')
@@ -230,4 +237,98 @@ export async function getTicket() {
 
 export function showError(e) {
     $state.$message.error(e.message || e)
+}
+
+export async function startApp(fn) {
+    if (!await canStart())
+        return
+    connectWs(true)
+    fn()
+}
+
+
+const roomWaitMap = {}
+
+export async function getRoom(name) {
+    let room = $rt.getRoom(name)
+    if (room)
+        return room
+    return await new Promise(res => {
+        roomWaitMap[name] = roomWaitMap[name] || []
+        roomWaitMap.push(res)
+    })
+}
+
+$rt.on('room.new', function (room) {
+    console.log('new room', room)
+    ;(roomWaitMap[room.name] || []).forEach(cb => cb(room))
+})
+
+function isOpenDev() {
+    return new Promise(function (resolve) {
+        var element = new Image()
+        Object.defineProperty(element, 'id', {
+            get: function () {
+                resolve(true)
+                return 0
+            }
+        })
+        element.toString = function () {
+            return 'hello pan-light'
+        }
+        console.log(element)
+        console.clear()
+        setTimeout(resolve, 100)
+    })
+}
+
+function nestDebugger(depth) {
+    if (depth === 1)
+        return 'debugger'
+    return `eval(${JSON.stringify(nestDebugger(depth - 1))});debugger`
+}
+
+function isOpenByDebugger() {
+    let start = new Date()
+    eval(nestDebugger(10))
+    let end = new Date()
+    return end - start > 100
+}
+
+// 禁止调试
+async function canStart() {
+    if (localStorage.getItem('debug') === 'pan-light')
+        return true
+    let open = await isOpenDev()
+    if (!open) { // 没有打开开发工具, 等待未来打开
+        var element = new Image()
+        Object.defineProperty(element, 'id', {
+            get: function () {
+                fuckDebug()
+                location.reload()
+                return 0
+            }
+        })
+        console.log(element)
+    } else { // 打开了开发工具, 等待关闭
+        fuckDebug()
+        while (isOpenByDebugger()) {
+            await new Promise(res => setTimeout(res, 500))
+        }
+        location.reload()
+    }
+    return !open
+}
+
+function fuckDebug() {
+    console.clear()
+    document.body.innerHTML = `<h1>偷窥人家可是不好的哦</h1>`
+    consoleImage(location.origin + whatJpg, 240, 240)
+    console.log('%c想要演示系统源码? 快去点个star啦, 超过 200 star 开源此在线演示系统 https://github.com/peterq/pan-light', 'font-size:24px;color:#0a0')
+    console.log('如果你想现在拿到源码, 你可以尝试分析一下: web端和服务端通信规则, 以及远程桌面的实现原理; 把分析结果发送到邮箱 me@peterq.cn , 我会回复源码哦. ps:难度其实不是特别大哦.')
+    console.log('%c请求各位大佬不要对我的服务器进行压测, 阿里云最低配机器, 穷.', 'font-size:18px;')
+}
+
+function consoleImage(url, w, h) {
+    console.log("%c+", `font-size: 1px; padding: ${~~(h / 2)}px ${~~(w / 2)}px; background: url(${url}) no-repeat; background-size: ${w}px ${h}px; color: transparent;`)
 }

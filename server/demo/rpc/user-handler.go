@@ -25,6 +25,36 @@ var userRpcMap = map[string]realtime.RpcHandler{
 		}
 		return arr, nil
 	}),
+	"user.host.detail": realtime.RpcHandleFunc(func(ss *realtime.Session, p gson) (result interface{}, err error) {
+		manager.hostMapLock.RLock()
+		defer manager.hostMapLock.RUnlock()
+		host, ok := manager.hostMap[p["hostName"].(string)]
+		if !ok {
+			err = errors.New("host not exist")
+			return
+		}
+		var slaves []gson
+		for slaveName, slave := range host.slaves {
+			slaves = append(slaves, gson{
+				"slaveName":    slaveName,
+				"visitorCount": server.RoomByName("room.slave.all.user." + slaveName).Count(),
+				"state":        slave.state,
+				"user": func() interface{} {
+					if slave.userWaitState != nil {
+						return gson{
+							"order":     slave.userWaitState.order,
+							"sessionId": slave.userWaitState.session.Id(),
+						}
+					}
+					return nil
+				}(),
+			})
+		}
+		result = gson{
+			"slaves": slaves,
+		}
+		return
+	}),
 	"user.ping": realtime.RpcHandleFunc(func(ss *realtime.Session, data gson) (result interface{}, err error) {
 		return "pong", nil
 	}),

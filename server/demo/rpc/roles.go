@@ -51,22 +51,31 @@ func (user *roleUser) requestTicket() (data gson, err error) {
 	return
 }
 
+type slaveState string
+
+const (
+	slaveStateWait     slaveState = "wait"
+	slaveStateStarting slaveState = "starting"
+	slaveStateRuning   slaveState = "running"
+)
+
 type roleSlave struct {
-	name        string
-	host        *roleHost
-	session     *realtime.Session
-	userSession *realtime.Session
-	lock        sync.Mutex
+	name          string            // slave 名称, 需要已host名称为前缀, 用来鉴权
+	host          *roleHost         // 指向host
+	session       *realtime.Session // slave 进程链接的session
+	userWaitState *waitState        // 用户排队票据
+	state         slaveState
+	lock          sync.Mutex
 }
 
 func (*roleSlave) roleName() string {
 	return "slave"
 }
 
-func randomStr(lenght int) string {
-	arr := make([]byte, lenght)
+func randomStr(length int) string {
+	arr := make([]byte, length)
 	src := "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890"
-	for i := 0; i < lenght; i++ {
+	for i := 0; i < length; i++ {
 		arr[i] = byte(src[rand.Intn(len(src))])
 	}
 	return string(arr)
