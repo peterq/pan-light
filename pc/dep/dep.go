@@ -1,8 +1,12 @@
 package dep
 
-import "log"
+import (
+	"log"
+	"runtime/debug"
+)
 
 var Fatal = func(str string) {
+	debug.PrintStack()
 	log.Fatal(str)
 }
 
@@ -29,4 +33,8 @@ func DoClose() {
 		cb()
 	}
 	closeCb = nil
+}
+
+var NotifyQml = func(event string, data map[string]interface{}) {
+	log.Println("not ready")
 }

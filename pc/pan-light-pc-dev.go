@@ -31,11 +31,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	NotifyQml, err := p.Lookup("NotifyQml")
+	if err != nil {
+		panic(err)
+	}
 
 	functions.RegisterAsync(AsyncRouteRegister.(func(routes map[string]func(map[string]interface{},
 		func(interface{}), func(interface{}), func(interface{}), chan interface{}))))
 
 	functions.RegisterSync(SyncRouteRegister.(func(routes map[string]func(map[string]interface{}) interface{})))
 
+	functions.NotifyQml = NotifyQml.(func(event string, data map[string]interface{}))
+	dep.NotifyQml = functions.NotifyQml
 	StartGui.(func(rccFile, mainQml string))("./gui/qml/qml.rcc", "qrc:/main.qml")
 }

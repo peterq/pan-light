@@ -145,5 +145,16 @@
         <file>assets/images/icons/delete.svg</file>
         <file>assets/images/icons/order.svg</file>
         <file>demo/main.qml</file>
+        <file>transfer/HeaderBar.qml</file>
+        <file>transfer/DownloadItem.qml</file>
+        <file>comps/confirm-window.qml</file>
+        <file>comps/select-save-path.qml</file>
+        <file>transfer/DownloadList.qml</file>
+        <file>comps/IconButton.qml</file>
+        <file>assets/images/icons/pause.svg</file>
+        <file>assets/images/icons/start.svg</file>
+        <file>assets/images/icons/folder.svg</file>
+        <file>comps/PromiseDialog.qml</file>
+        <file>assets/images/icons/vip.svg</file>
     </qresource>
 </RCC>

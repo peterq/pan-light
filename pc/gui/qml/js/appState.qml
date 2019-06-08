@@ -19,10 +19,23 @@ Item {
     property var alertPromise: Util.Promise.resolve()
     property var pathCollection: []
     property var pathCollectionModel: null
+    property var downloadingList: []
+    property var completedList: []
+    property var transferComp: null
+    property alias settings: settings
 
     DataSaver {
         $key: 'app-state'
         property alias pathCollection: appState.pathCollection
+        property alias completedList: appState.completedList
+        property alias downloadingList: appState.downloadingList
+    }
+
+    DataSaver {
+        id: settings
+        $key: 'app-settings'
+        property string defaultDownloadPath: ''
+        property string lastDownloadPath: ''
     }
 
     onPathChanged: {

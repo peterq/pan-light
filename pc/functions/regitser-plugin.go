@@ -2,6 +2,15 @@
 
 package functions
 
+import (
+	"github.com/peterq/pan-light/pc/dep"
+	"log"
+)
+
+func init() {
+	dep.NotifyQml = NotifyQml
+}
+
 type syncHandler func(p map[string]interface{}) interface{}
 
 type asyncHandler func(p map[string]interface{}, resolve func(interface{}),
@@ -42,4 +51,8 @@ func RegisterSync(register func(routes map[string]func(map[string]interface{}) i
 		}
 		register(r1)
 	}
+}
+
+var NotifyQml = func(event string, data map[string]interface{}) {
+	log.Println("this function should be load from plugin", event, data)
 }

@@ -16,9 +16,11 @@ import (
 
 var manager *downloader.Manager
 
+var useVipMap = map[downloader.TaskId]bool{}
+
 func init() {
 	dep.OnInit(func() {
-		parallel := 128
+		parallel := 1
 		manager = &downloader.Manager{
 			CoroutineNumber:       parallel,
 			SegmentSize:           1024 * 1024 * 2,
@@ -37,38 +39,71 @@ func init() {
 				go handleDownloadEvent(evt)
 			}
 		}()
-		go test()
+		//go test()
 	})
 }
 
 func handleDownloadEvent(event *downloader.DownloadEvent) {
-	if event.Event == "task.speed" {
-		speed := float64(event.Data.(int64))
-		log.Println(speed / 1024 / 1024)
-	} else {
-		log.Println(event)
-	}
+	dep.NotifyQml("task.event", map[string]interface{}{
+		"type":   event.Event,
+		"taskId": event.TaskId,
+		"data":   event.Data,
+	})
 }
 
 func test() {
 	//fileCompare()
 	//return
 	time.Sleep(3 * time.Second)
-	id, err := DownloadFile("730136432970379", "./yx.mp4")
+	id, err := DownloadFile("730136432970379", "./yx.mp4", false)
 	//id, err := DownloadFile("835313540804", "./project.mp4")
 	log.Println(id, err)
 }
 
-func DownloadFile(fid, savePath string) (taskId downloader.TaskId, err error) {
+func DownloadFile(fid, savePath string, useVip bool) (taskId downloader.TaskId, err error) {
 	savePath, err = filepath.Abs(savePath)
 	if err != nil {
 		return
 	}
-	taskId, err = manager.NewTask(fid, savePath, func(request *http.Request) *http.Request {
-		request.Header.Set("User-Agent", pan_api.BaiduUA)
-		return request
-	})
+	taskId, err = manager.NewTask(fid, savePath, requestDecorator)
+	if err == nil {
+		useVipMap[taskId] = true
+	}
 	return
+}
+
+func requestDecorator(request *http.Request) *http.Request {
+	request.Header.Set("User-Agent", pan_api.BaiduUA)
+	return request
+}
+
+func Resume(id string, bin string, useVip bool) error {
+	if useVip {
+		useVipMap[downloader.TaskId(id)] = true
+	}
+	return manager.Resume(map[downloader.TaskId]string{
+		downloader.TaskId(id): bin,
+	}, requestDecorator)
+}
+
+func State(id string) interface{} {
+	return manager.State(downloader.TaskId(id))
+}
+
+func Start(id string) error {
+	return manager.StartTask(downloader.TaskId(id))
+}
+
+func Pause(id string) error {
+	return manager.PauseTask(downloader.TaskId(id))
+}
+
+func Delete(id string) error {
+	return manager.CancelTask(downloader.TaskId(id))
+}
+
+func Progress(id string) int64 {
+	return manager.Progress(downloader.TaskId(id))
 }
 
 func fileCompare() {

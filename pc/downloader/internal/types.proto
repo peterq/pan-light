@@ -1,0 +1,15 @@
+syntax = "proto3";
+package internal;
+
+
+message taskCapture {
+    string fid = 1;
+    string savePath = 2;
+    repeated finishSeg completed = 3;
+    int64 length = 4;
+}
+
+message finishSeg {
+    int64 start = 1;
+    int64 len = 2;
+}

@@ -21,13 +21,13 @@ var setTimeout = (function(){
     return function (cb, time) {
         cb = cb || function (){}
         time = time || 0
-        timer.createObject(root, {
+        var ins = timer.createObject(root, {
                                interval: time,
                                cb: cb
                            })
         return function cancel() {
-            if (timer) {
-                timer.destroy()
+            if (ins) {
+                ins.destroy()
             }
         }
     }

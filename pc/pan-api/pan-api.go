@@ -34,12 +34,12 @@ func newRequest(method, url string) *http.Request {
 }
 
 func GetSign() (ctx map[string]interface{}, err error) {
-	if storage.Global.PanCookie != nil {
+	if storage.UserState.PanCookie != nil {
 		cookieJar, _ = cookiejar.New(nil)
 		httpClient.Jar = cookieJar
 
 		var cookies []*http.Cookie
-		for _, c := range storage.Global.PanCookie {
+		for _, c := range storage.UserState.PanCookie {
 			cookies = append(cookies, &http.Cookie{
 				Name:   c.Key,
 				Value:  c.Value,
@@ -194,7 +194,8 @@ func Link(fid string) (link string, err error) {
 		return
 	}
 	if data["errno"].(float64) != 0 {
-		err = errors.New("获取文件夹信息错误, 错误码" + fmt.Sprint(data["errno"]))
+		err = errors.New("获取文件信息错误, 错误码" + fmt.Sprint(data["errno"]))
+		return
 	}
 	link = data["dlink"].([]interface{})[0].(map[string]interface{})["dlink"].(string)
 	link = getRedirectedLink(link)
