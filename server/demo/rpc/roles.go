@@ -8,12 +8,17 @@ import (
 
 type roleType interface {
 	roleName() string
+	publicInfo() gson
 }
 
 type roleHost struct {
 	name    string
 	session *realtime.Session
 	slaves  map[string]*roleSlave
+}
+
+func (*roleHost) publicInfo() gson {
+	panic("implement me")
 }
 
 func (*roleHost) roleName() string {
@@ -23,7 +28,13 @@ func (*roleHost) roleName() string {
 type roleUser struct {
 	session *realtime.Session
 
+	nickname string // 随机分配花名
+
 	waitState *waitState
+}
+
+func (user *roleUser) publicInfo() gson {
+	panic("implement me")
 }
 
 func (*roleUser) roleName() string {
@@ -56,7 +67,7 @@ type slaveState string
 const (
 	slaveStateWait     slaveState = "wait"
 	slaveStateStarting slaveState = "starting"
-	slaveStateRuning   slaveState = "running"
+	slaveStateRunning  slaveState = "running"
 )
 
 type roleSlave struct {
@@ -64,8 +75,29 @@ type roleSlave struct {
 	host          *roleHost         // 指向host
 	session       *realtime.Session // slave 进程链接的session
 	userWaitState *waitState        // 用户排队票据
+	startTime     int               // 启动时间
+	endTime       int               // 结束时间
 	state         slaveState
 	lock          sync.Mutex
+}
+
+func (slave *roleSlave) publicInfo() gson {
+	return gson{
+		"slaveName":    slave.name,
+		"visitorCount": server.RoomByName("room.slave.all.user." + slave.name).Count(),
+		"state":        slave.state,
+		"startTime":    slave.startTime,
+		"endTime":      slave.endTime,
+		"user": func() interface{} {
+			if slave.userWaitState != nil {
+				return gson{
+					"order":     slave.userWaitState.order,
+					"sessionId": slave.userWaitState.session.Id(),
+				}
+			}
+			return nil
+		}(),
+	}
 }
 
 func (*roleSlave) roleName() string {

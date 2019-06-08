@@ -34,21 +34,8 @@ var userRpcMap = map[string]realtime.RpcHandler{
 			return
 		}
 		var slaves []gson
-		for slaveName, slave := range host.slaves {
-			slaves = append(slaves, gson{
-				"slaveName":    slaveName,
-				"visitorCount": server.RoomByName("room.slave.all.user." + slaveName).Count(),
-				"state":        slave.state,
-				"user": func() interface{} {
-					if slave.userWaitState != nil {
-						return gson{
-							"order":     slave.userWaitState.order,
-							"sessionId": slave.userWaitState.session.Id(),
-						}
-					}
-					return nil
-				}(),
-			})
+		for _, slave := range host.slaves {
+			slaves = append(slaves, slave.publicInfo())
 		}
 		result = gson{
 			"slaves": slaves,
@@ -92,7 +79,20 @@ var userRpcMap = map[string]realtime.RpcHandler{
 		if !ok {
 			err = errors.New("slave 不存在")
 		}
-		server.RoomByName("room.slave.all.user." + slaveName).Join(ss.Id())
+		roomName := "room.slave.all.user." + slaveName
+		server.RoomByName(roomName).Join(ss.Id())
+		return
+	}),
+	"user.leave.slave": realtime.RpcHandleFunc(func(ss *realtime.Session, data gson) (result interface{}, err error) {
+		manager.slaveMapLock.RLock()
+		defer manager.slaveMapLock.RUnlock()
+		slaveName := data["slave"].(string)
+		_, ok := manager.slaveMap[slaveName]
+		if !ok {
+			err = errors.New("slave 不存在")
+		}
+		roomName := "room.slave.all.user." + slaveName
+		server.RoomByName(roomName).Remove(ss.Id())
 		return
 	}),
 }
@@ -110,4 +110,5 @@ var userEventMap = map[string]realtime.EventHandler{
 			}, ss.Id())
 		}
 	}),
+	"user.broadcast": roleBroadcast,
 }

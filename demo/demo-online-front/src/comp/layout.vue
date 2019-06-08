@@ -2,10 +2,9 @@
     <el-container style="height: 100vh;width: 100vw;">
         <el-header>
             pan-light 在线体验
-            <el-button @click="clickGetTicket" :loading="$state.loading.getTicket">立即体验</el-button>
         </el-header>
         <el-container>
-            <el-main>
+            <el-main style="min-width: 800px">
                 <vnc style="flex: 1;" v-if="vncShow"
                      :config="connectVnc"></vnc>
                 <host-list v-else></host-list>
@@ -16,17 +15,10 @@
 </template>
 
 <script>
-    import {getTicket, showError} from "../app"
     import vnc from './vnc'
     import hostList from './hostList'
+    import {$state} from "../app"
 
-    const dataTemplate = {
-        connectVnc: {
-            host: '',
-            slave: '',
-            viewOnly: true
-        }
-    }
     export default {
         data() {
             return {
@@ -35,31 +27,21 @@
             }
         },
         created() {
-            this.$event.on('operate.turn', ({host, slave}) => {
-                this.connectVnc = {
-                    host, slave, viewOnly: false,
-                    password: this.$state.ticket.ticket
-                }
-            })
-        },
-        methods: {
-            async clickGetTicket() {
-                await getTicket().catch(showError)
-            },
-        },
-        watch: {
-            async connectVnc(v) {
+            this.$watch(() => $state.connectVnc, async (v) => {
+                this.connectVnc = v
                 if (!v) {
                     this.vncShow = false
                 } else {
                     this.vncShow = false
-                    if (v.viewOnly) {
-                        this.connectVnc.password = 'peter.q.is.so.cool'
-                    }
                     await this.$nextTick()
                     this.vncShow = true
                 }
-            }
+            })
+        },
+        methods: {
+        },
+        watch: {
+
         },
         components: {vnc, hostList}
     }

@@ -25,6 +25,7 @@ type RealTime struct {
 	Role         string
 	HostName     string
 	HostPassWord string
+	SlaveName    string // role 为 slave 时可用
 	OnConnected  func()
 
 	inited        bool
@@ -35,7 +36,7 @@ type RealTime struct {
 	sessionId     string
 	sessionSecret string
 
-	listenerMap map[string][]func(data interface{})
+	listenerMap map[string][]func(data interface{}, room string)
 	callMap     map[float64]chan<- *callResult
 	callMapLock sync.Mutex
 	logWsMsg    bool
@@ -47,15 +48,15 @@ func (rt *RealTime) Init() {
 	}
 	rt.inited = true
 	rt.connectOkCond = sync.NewCond(&rt.connectLock)
-	rt.listenerMap = map[string][]func(data interface{}){}
+	rt.listenerMap = map[string][]func(data interface{}, room string){}
 	rt.callMap = map[float64]chan<- *callResult{}
 	go rt.connect()
 }
 
-func (rt *RealTime) RegisterEventListener(mp map[string]func(data interface{})) {
+func (rt *RealTime) RegisterEventListener(mp map[string]func(data interface{}, room string)) {
 	for event, fn := range mp {
 		if _, ok := rt.listenerMap[event]; !ok {
-			rt.listenerMap[event] = []func(interface{}){fn}
+			rt.listenerMap[event] = []func(interface{}, string){fn}
 		} else {
 			rt.listenerMap[event] = append(rt.listenerMap[event], fn)
 		}
@@ -110,13 +111,15 @@ func (rt *RealTime) connect() {
 				err = rt.write(gson{
 					"type": "session.new",
 				})
+				err = rt.write(gson{
+					"role":        rt.Role,
+					"host_name":   rt.HostName,
+					"host_secret": rt.HostPassWord,
+					"slave_name":  rt.SlaveName,
+				})
 			}
-			err = rt.write(gson{
-				"role":        rt.Role,
-				"host_name":   rt.HostName,
-				"host_secret": rt.HostPassWord,
-			})
 			if err != nil {
+				log.Println("write error")
 				rt.connectOK = false
 				return
 			}
@@ -146,6 +149,10 @@ func (rt *RealTime) handleMsg(data gson) {
 	t := data["type"].(string)
 	if t == "event" {
 		event := data["event"].(string)
+		room, ok := data["room"]
+		if !ok {
+			room = ""
+		}
 		cbs, ok := rt.listenerMap[event]
 		if !ok {
 			return
@@ -158,7 +165,7 @@ func (rt *RealTime) handleMsg(data gson) {
 						debug.PrintStack()
 					}
 				}()
-				cb(data["payload"])
+				cb(data["payload"], room.(string))
 			}()
 		}
 		return
@@ -193,6 +200,14 @@ func (rt *RealTime) Emit(event string, data interface{}) {
 	})
 }
 
+func (rt *RealTime) Broadcast(room string, event string, data interface{}) {
+	rt.Emit("broadcast", gson{
+		"room":    room,
+		"event":   event,
+		"payload": data,
+	})
+}
+
 func (rt *RealTime) Call(method string, param gson) (result interface{}, err error) {
 
 	id := float64(time.Now().UnixNano())
@@ -204,7 +219,7 @@ func (rt *RealTime) Call(method string, param gson) (result interface{}, err err
 
 	rt.write(gson{
 		"type":   "call",
-		"method": method,
+		"method": rt.Role + "." + method,
 		"param":  param,
 		"id":     id,
 	})

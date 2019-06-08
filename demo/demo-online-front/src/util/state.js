@@ -9,6 +9,11 @@ const dataTemplate = {
             name: 'room.user.all',
             members: ['234']
         }
+    },
+    connectVnc: {
+        host: '',
+        slave: '',
+        viewOnly: true
     }
 }
 
@@ -25,7 +30,8 @@ function data() {
             wait: '空闲',
             running: '运行中',
             starting: '启动中',
-        }
+        },
+        connectVnc: null
     }
 }
 

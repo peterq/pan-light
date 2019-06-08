@@ -93,7 +93,7 @@ func handleNewUser(cand, sessionId, requestId string) {
 		return
 	}
 
-	rt.Call("host.rtc.candidate", gson{
+	rt.Call("rtc.candidate", gson{
 		"candidate": answer,
 		"requestId": requestId,
 		"sessionId": sessionId,

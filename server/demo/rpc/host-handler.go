@@ -91,6 +91,7 @@ var hostRpcMap = map[string]realtime.RpcHandler{
 				state: slaveStateWait,
 			}
 			host.slaves[name.(string)] = slave
+			manager.slaveMap[name.(string)] = slave
 		}
 		return
 	}),
@@ -103,4 +104,5 @@ var hostEventMap = map[string]realtime.EventHandler{
 	"host": realtime.EventHandleFunc(func(ss *realtime.Session, data interface{}) {
 
 	}),
+	"host.broadcast": roleBroadcast,
 }

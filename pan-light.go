@@ -83,6 +83,7 @@ func demoCmd() {
 }
 
 func demoHost() {
+	runCmd("./demo", "go", "build", "-o", "slave/ubuntu16.04/demo_instance_manager", "slave.go")
 	runCmd("./demo", "go", "run", "host.go")
 }
 
@@ -96,11 +97,8 @@ func demoTest() {
 }
 
 func demoIns() {
-	log.Println("building demo_instance_manager....")
-	runCmd("./demo", "go", "build", "-o", "slave/ubuntu16.04/demo_instance_manager", "slave.go")
-	log.Println("starting container...")
-	//runCmd("./demo/slave", "docker-compose", "build")
-	runCmd("./demo/slave", "docker-compose", "up", "--force-recreate")
+	cmd(qtBin("rcc"), "-binary", "pc/gui/qml/qml.qrc", "-o", "pc/gui/qml/qml.rcc").Run()
+	runCmd("demo", "go", "run", "slave-test.go")
 }
 
 func pcCmd() {

@@ -1,14 +1,23 @@
 <template>
-    <el-dialog title="实例列表" :visible.sync="visible" width="600px" @close="reject('close')" v-loading="loading">
+    <el-dialog title="实例列表" :visible.sync="visible" width="800px" @close="reject('close')" v-loading="loading">
         <el-table :data="host.slaves">
             <el-table-column prop="slaveName" label="名称" align="center"></el-table-column>
-            <el-table-column prop="visitorCount" label="在线人数" align="center"></el-table-column>
             <el-table-column prop="state" label="状态" align="center">
                 <template slot-scope="scope">
                     {{$state.slaveStateMap[scope.row.state] || '未知'}}
                 </template>
             </el-table-column>
-
+            <el-table-column prop="visitorCount" label="在线人数" align="center"></el-table-column>
+            <el-table-column prop="state" label="启动时间" align="center">
+                <template slot-scope="scope">
+                    {{scope.row.state === 'running' ? formatUnix(scope.row.startTime) : '-'}}
+                </template>
+            </el-table-column>
+            <el-table-column prop="state" label="结束时间" align="center">
+                <template slot-scope="scope">
+                    {{scope.row.state === 'running' ? formatUnix(scope.row.endTime) : '-'}}
+                </template>
+            </el-table-column>
             <el-table-column prop="op" label="操作" align="center">
                 <template slot-scope="scope">
                     <el-button type="primary"
@@ -21,6 +30,7 @@
 </template>
 
 <script>
+    import moment from 'moment'
     export default {
         data: function () {
             return {
@@ -47,8 +57,12 @@
                 this.host = host
             },
             async clickView(slave) {
-
+                this.$state.connectVnc = {host: this.hostName, slave: slave.slaveName, viewOnly: true}
+                this.resolve()
             },
+            formatUnix(t) {
+                return moment.unix(t).format('YYYY-MM-DD HH:mm:ss')
+            }
         },
         components: {}
     }

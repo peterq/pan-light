@@ -82,6 +82,13 @@ $rt.onRemote('ticket.turn', data => {
     const {order} = data
     if ($state.ticket && $state.ticket.order === order) {
         $state.ticket.inService = true
+
+        let {host, slave} = data
+        $state.connectVnc = {
+            host, slave, viewOnly: false,
+            password: $state.ticket.ticket
+        }
+
         $event.fire('operate.turn', data)
         console.log(data)
     }

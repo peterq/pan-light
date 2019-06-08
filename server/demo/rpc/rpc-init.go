@@ -3,6 +3,7 @@ package rpc
 import (
 	"fmt"
 	"github.com/kataras/iris"
+	"github.com/peterq/pan-light/server/demo/nickname"
 	"github.com/peterq/pan-light/server/realtime"
 	"github.com/pkg/errors"
 	"log"
@@ -46,6 +47,7 @@ func Init(router iris.Party, hostSecret map[string]string) {
 	manager.inited = true
 	manager.hostSecret = hostSecret
 	manager.hostMap = map[string]*roleHost{}
+	manager.slaveMap = map[string]*roleSlave{}
 	manager.waitSessionMap = map[int64]*waitState{}
 	manager.userMap = map[realtime.SessionId]*roleUser{}
 	server = &realtime.Server{
@@ -62,6 +64,8 @@ func Init(router iris.Party, hostSecret map[string]string) {
 	server.RegisterRpcHandler(userRpcMap)
 	server.RegisterEventHandler(hostEventMap)
 	server.RegisterRpcHandler(hostRpcMap)
+	server.RegisterEventHandler(slaveEventMap)
+	server.RegisterRpcHandler(slaveRpcMap)
 }
 
 func onSessionLost(ss *realtime.Session) {
@@ -117,6 +121,7 @@ func onNewSession(ss *realtime.Session) error {
 
 	if role == "user" {
 		server.RoomByName("room.all.user").Join(ss.Id())
+		ss.Data.(*roleUser).nickname = nickname.Get()
 	}
 
 	if role == "host" {
@@ -128,6 +133,7 @@ func onNewSession(ss *realtime.Session) error {
 	if role == "slave" {
 		host := ss.Data.(*roleSlave).host
 		server.RoomByName("room.host.slaves." + host.name).Join(ss.Id())
+		server.RoomByName("room.slave.all.user." + ss.Data.(*roleSlave).name).Join(ss.Id())
 	}
 
 	return nil
@@ -155,7 +161,7 @@ func beforeAcceptSession(ss *realtime.Session) (err error) {
 	if role == "slave" {
 		return slaveVerify(data, ss)
 	}
-	return errors.New("roleType 不存在")
+	return errors.New("roleType 不存在: " + role)
 }
 
 // user 会话认证
@@ -216,7 +222,7 @@ func hostVerify(data gson, ss *realtime.Session) error {
 func slaveVerify(data gson, ss *realtime.Session) error {
 	hostName := data["host_name"].(string)
 	secret := data["host_secret"].(string)
-	slaveName := data["salve_name"].(string)
+	slaveName := data["slave_name"].(string)
 	correctSecret, ok := manager.hostSecret[hostName]
 	if !ok {
 		return errors.New("host 不存在")
@@ -230,21 +236,22 @@ func slaveVerify(data gson, ss *realtime.Session) error {
 	if correctSecret != secret {
 		return errors.New("秘钥错误")
 	}
-	if strings.Index(slaveName, hostName) != 0 { // 前缀检测
+	if strings.Index(slaveName, hostName+".") != 0 { // 前缀检测
 		return errors.New("forbidden")
 	}
 	manager.slaveMapLock.RLock()
 	defer manager.slaveMapLock.RUnlock()
 	slave, ok := manager.slaveMap[slaveName]
-	slave.lock.Lock()
-	defer slave.lock.Unlock()
 	if !ok {
 		return errors.New("slave 不存在")
 	}
+	slave.lock.Lock()
+	defer slave.lock.Unlock()
 	if slave.session != nil {
 		server.RemoveSession(slave.session.Id())
 	}
 	slave.session = ss
+	ss.Data = slave
 	return nil
 }
 
@@ -265,3 +272,17 @@ func rpcFilter(ss *realtime.Session, event string) (err error) {
 	}
 	return nil
 }
+
+var roleBroadcast = realtime.EventHandleFunc(func(ss *realtime.Session, data interface{}) {
+	payload := data.(gson)
+	room := payload["room"].(string)
+	event := payload["event"].(string)
+	if ss.InRoom(room) {
+		server.RoomByName(room).Broadcast("broadcast."+ss.Data.(roleType).roleName(), gson{
+			"from":    ss.Id(),
+			"event":   event,
+			"payload": payload["payload"],
+			"room":    room,
+		}, ss.Id())
+	}
+})

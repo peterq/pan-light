@@ -74,7 +74,7 @@ func startServe() {
 	for i := 0; i < host.slaveCount; i++ {
 		host.slaves[i] = host.name + ".slave." + strconv.Itoa(i)
 	}
-	_, err := rt.Call("host.slave.register", gson{
+	_, err := rt.Call("slave.register", gson{
 		"slaves": host.slaves,
 	})
 	if err != nil {
@@ -92,6 +92,7 @@ func startServe() {
 			SlaveName:    slaveName,
 			HostName:     host.name,
 			HostPassword: host.password,
+			WsAddr:       host.wsAddr,
 		}
 		host.holderMap[slaveName] = holder
 		ctx, cancel := context.WithCancel(serveCtx)

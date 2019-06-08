@@ -9,14 +9,38 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
 
 const dockerImage = "pan-light-slave"
 
 type gson = map[string]interface{}
+
+type notifier struct {
+	cond *sync.Cond
+	lock *sync.Mutex
+}
+
+func newNotifier() notifier {
+	l := &sync.Mutex{}
+	return notifier{
+		cond: sync.NewCond(l),
+		lock: l,
+	}
+}
+
+func (n notifier) broadcast() {
+	n.cond.Broadcast()
+}
+
+func (n notifier) wait() {
+	n.lock.Lock()
+	n.cond.Wait()
+	n.lock.Unlock()
+}
 
 type Holder struct {
 	inited bool
@@ -24,11 +48,13 @@ type Holder struct {
 	SlaveName    string
 	HostName     string
 	HostPassword string
+	WsAddr       string
 
 	rt  *realtime.RealTime
 	ctx context.Context
 
-	checkUserChan chan struct{}
+	checkUserChan   chan struct{} // 用于阻塞控制获取下一个体验用户
+	slaveOkNotifier notifier
 
 	vncAddr       string
 	vncAddrLock   sync.Mutex
@@ -43,6 +69,10 @@ type Holder struct {
 	sessionId string
 }
 
+func (h *Holder) Order() int64 {
+	return h.order
+}
+
 func (h *Holder) Init(rt *realtime.RealTime, ctx context.Context) {
 	if h.inited {
 		return
@@ -53,8 +83,9 @@ func (h *Holder) Init(rt *realtime.RealTime, ctx context.Context) {
 	h.checkUserChan = make(chan struct{})
 	h.vncAddrCond = sync.NewCond(&h.vncAddrLock)
 	h.containerName = h.SlaveName
+	h.slaveOkNotifier = newNotifier()
 	for {
-		re, err := h.rt.Call("host.next.user", gson{
+		re, err := h.rt.Call("next.user", gson{
 			"slave": h.SlaveName,
 		})
 		if err != nil {
@@ -92,11 +123,20 @@ func (h *Holder) startIns() {
 	// 删除已有容器
 	defer exec.Command("docker", "rm", "-v", "-f", h.containerName).Run()
 	exec.Command("docker", "rm", "-v", "-f", h.containerName).Run()
+	e, _ := filepath.Abs("./slave/ubuntu16.04/demo_instance_manager")
+	e1, _ := filepath.Abs("./slave/ubuntu16.04/memtester")
+	//e := "./slave/ubuntu16.04/demo_instance_manager"
 	// 启动docker
 	dockerP := exec.Command("docker", "run",
-		"-m", "200m", "--memory-swap", "400m", // 200m 内存
-		"--cpu-period=100000", "--cpu-quota=20000", // 20% cpu
+		"-m", "400m", "--memory-swap", "500m", // 400m 内存
+		"--cpu-period=100000", "--cpu-quota=40000", // 40% cpu
 		"-e", "vnc_operate_pwd="+h.operatePwd, "-e", "vnc_view_pwd="+h.viewPwd, // vnc 密码
+		"-e", "host_name="+h.HostName, "-e", "host_password="+h.HostPassword, // host 密码
+		"-e", "slave_name="+h.SlaveName, "-e", "ws_addr="+h.WsAddr, // ws 地址
+		"-e", "demo_order="+strconv.FormatInt(h.order, 10), // demo order
+		"-e", "demo_user="+h.sessionId, // 用户session
+		"-v"+e+":/demo_instance_manager", // 容器名
+		"-v", e1+":/memtester",           // t
 		"--name="+h.containerName+"", // 容器名
 		dockerImage)
 	defer exec.Command("docker", "kill", h.containerName)
@@ -106,7 +146,7 @@ func (h *Holder) startIns() {
 	defer dockerP.Process.Kill()
 	h.pid = dockerP.Process.Pid
 	// 查询ip
-	time.Sleep(3 * time.Second)
+	h.slaveOkNotifier.wait()
 	bin, err := exec.Command("docker", "inspect", "--format",
 		"{{ .NetworkSettings.IPAddress }}", h.containerName).Output()
 	if err != nil {
@@ -182,4 +222,11 @@ func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error)) {
 	go WriteLoop(rw)
 	<-ctx.Done()
 	log.Println("proxy gone rw", rw)
+}
+
+// 处理 slave 发来的消息
+func (h *Holder) HandleEvent(evt string, data interface{}) {
+	if evt == "start.ok" {
+		h.slaveOkNotifier.broadcast()
+	}
 }

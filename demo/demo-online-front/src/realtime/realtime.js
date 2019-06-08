@@ -107,7 +107,7 @@ export default class Rpc {
         const data = JSON.parse(this._decrypt(evt.data))
         if (!(
             (data.type === 'event' && data.event === 'ping') ||
-            (data.type === 'call.result' && data.data === 'pong')
+            (data.type === 'call.result' && data.result === 'pong')
         )) {
             console.log('ws <-', data)
         }

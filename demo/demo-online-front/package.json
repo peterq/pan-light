@@ -11,6 +11,7 @@
     "core-js": "^2.6.5",
     "element-ui": "^2.7.2",
     "gzip-js": "^0.3.2",
+    "moment": "^2.24.0",
     "vue": "^2.6.6"
   },
   "devDependencies": {
