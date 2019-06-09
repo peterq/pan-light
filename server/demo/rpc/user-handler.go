@@ -95,6 +95,7 @@ var userRpcMap = map[string]realtime.RpcHandler{
 		server.RoomByName(roomName).Remove(ss.Id())
 		return
 	}),
+	"user.session.public.info": sessionPublicInfo,
 }
 
 var userEventMap = map[string]realtime.EventHandler{

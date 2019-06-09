@@ -8,6 +8,7 @@ var slaveRpcMap = map[string]realtime.RpcHandler{
 	"slave.hello": realtime.RpcHandleFunc(func(ss *realtime.Session, p gson) (result interface{}, err error) {
 		return
 	}),
+	"slave.session.public.info": sessionPublicInfo,
 }
 
 var slaveEventMap = map[string]realtime.EventHandler{

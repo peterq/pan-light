@@ -286,3 +286,17 @@ var roleBroadcast = realtime.EventHandleFunc(func(ss *realtime.Session, data int
 		}, ss.Id())
 	}
 })
+
+var sessionPublicInfo = realtime.RpcHandleFunc(func(ss *realtime.Session, p gson) (result interface{}, err error) {
+	sessionIds := p["sessionIds"].([]interface{})
+	infoMap := gson{}
+	for _, id := range sessionIds {
+		if ss, ok := server.SessionById(realtime.SessionId(id.(string))); ok {
+			info := ss.Data.(roleType).publicInfo()
+			info["_role"] = ss.Data.(roleType).roleName()
+			infoMap[id.(string)] = info
+		}
+	}
+	result = infoMap
+	return
+})

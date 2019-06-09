@@ -34,7 +34,9 @@ type roleUser struct {
 }
 
 func (user *roleUser) publicInfo() gson {
-	panic("implement me")
+	return gson{
+		"nickname": user.nickname,
+	}
 }
 
 func (*roleUser) roleName() string {

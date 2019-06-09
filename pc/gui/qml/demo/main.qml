@@ -4,8 +4,8 @@ import '../js/util.js' as Util
 
 Window {
     id: mainWindow
-    width: Screen.desktopAvailableWidth * 0.24
-    height: width * 0.6
+    width: Screen.desktopAvailableWidth * 0.23
+    height: width * 0.8
     x: Screen.desktopAvailableWidth - width - 10
     y: 10
     flags: Qt.WA_TranslucentBackground | Qt.WA_TransparentForMouseEvents| Qt.FramelessWindowHint
@@ -49,7 +49,7 @@ Window {
             Text {
                 text: 'pan-light 在线体验'
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: 20
+                font.pointSize: 25
                 color: 'white'
             }
             Rectangle {
@@ -60,7 +60,7 @@ Window {
             Text {
                 text: '本次体验时长剩余 :'
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: 15
+                font.pointSize: 16
                 color: 'white'
             }
             Text {
@@ -79,10 +79,13 @@ Window {
             }
             Text {
                 text: '<font color="black"">*</a> 当前操作用户: ' + nickname
+                    + '<br><font color="black"">*</a> 由于网络和远程pc的配置等原因, 部分功能无法使用'
                     + '<br><font color="black"">*</a> 为达到最佳体验效果建议下载安装体验'
-                font.pointSize: 12
+                font.pointSize: 16
                 x: 20
                 color: 'white'
+                width: parent.width - 40
+                wrapMode: Text.WrapAnywhere
             }
         }
     }
