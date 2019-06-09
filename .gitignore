@@ -9,3 +9,4 @@ gui-plugin.so
 .env
 /demo
 *.pb.go
+deploy

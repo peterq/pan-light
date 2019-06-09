@@ -295,7 +295,7 @@ func GoList(args ...string) *exec.Cmd {
 	if UseGOMOD("") {
 		if true || /*strings.Contains(strings.Join(args, "|"), "github.com/therecipe/env_"+runtime.GOOS+"_amd64") ||*/ strings.Contains(strings.Join(args, "|"), "github.com/peterq/pan-light/qt/tool-chain") {
 			//TODO: make env readonly if it can't be found inside ./vendor ...
-			cmd.Args = append(cmd.Args, "-mod=readonly")
+			//cmd.Args = append(cmd.Args, "-mod=readonly")
 		} else {
 			cmd.Args = append(cmd.Args, GOFLAGS())
 		}

@@ -103,7 +103,7 @@ func bundle(mode, target, path, name, depPath string, tagsCustom string, fast bo
 		}()
 
 		//copy default assets
-		if target != "linux" || name == "lib" {
+		if target != "linux" || name == "lib" || true {
 			utils.SaveExec(filepath.Join(depPath, fmt.Sprintf("%v.sh", name)), linux_sh(target, name))
 		}
 
