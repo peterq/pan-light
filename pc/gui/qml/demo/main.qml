@@ -4,7 +4,7 @@ import '../js/util.js' as Util
 
 Window {
     id: mainWindow
-    width: Screen.desktopAvailableWidth * 0.2
+    width: Screen.desktopAvailableWidth * 0.24
     height: width * 0.6
     x: Screen.desktopAvailableWidth - width - 10
     y: 10

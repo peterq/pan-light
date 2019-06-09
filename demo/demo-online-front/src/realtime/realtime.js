@@ -1,6 +1,37 @@
 import gzip from '../lib/gzip'
 
-export default class Rpc {
+class EventEmitter {
+
+
+    constructor() {
+        this._listener = new Map()
+    }
+
+    on(evt, cb) {
+        if (!this._listener.has(evt)) {
+            this._listener.set(evt, new Set())
+        }
+        this._listener.get(evt).add(cb)
+    }
+
+    off(evt, cb) {
+        if (!this._listener.has(evt)) {
+            return
+        }
+        this._listener.get(evt).delete(cb)
+    }
+
+    fire(evt, payload) {
+        if (!this._listener.has(evt)) {
+            return
+        }
+        this._listener.get(evt).forEach(cb => {
+            setTimeout(() => cb(payload))
+        })
+    }
+}
+
+export default class Rpc extends EventEmitter {
 
     openPromise
     sessionId
@@ -8,10 +39,10 @@ export default class Rpc {
     openDone
 
     constructor(url, promise) {
+        super()
         this.encrypt = true
         this.encryptKey = 'pan-light'
         this.url = url
-        this.eventListener = {}
         this.requestMap = {}
         this.init(promise)
     }
@@ -30,6 +61,13 @@ export default class Rpc {
         this.onRemote('rand.check', data => {
             this.wsSend({'rand.back': data + 1})
             this.openDone()
+        })
+
+        this.onRemote('room.leave', name => {
+            if (!Room.roomMap[name])
+                return
+            Room.roomMap[name].fire('leave')
+            delete Room.roomMap[name]
         })
 
         setInterval(() => this.call('ping'), 10e3)
@@ -57,22 +95,12 @@ export default class Rpc {
 
     onWsError(evt) {
         console.log('ws error', evt)
-        let cbs = this.eventListener['rt.error'] || []
-        cbs.forEach(function (cb) {
-            setTimeout(function () {
-                cb('realtime.error')
-            })
-        })
+        this.fire('rt.error', 'realtime.error')
     }
 
     onWsClose(evt) {
         console.log('ws close', evt)
-        let cbs = this.eventListener['realtime.closed'] || []
-        cbs.forEach(function (cb) {
-            setTimeout(function () {
-                cb('realtime.closed')
-            })
-        })
+        this.fire('realtime.closed', 'realtime.closed')
         setTimeout(() => {
             this.reconnnect()
         }, 5e3)
@@ -112,14 +140,10 @@ export default class Rpc {
             console.log('ws <-', data)
         }
         if (data.type === 'event') {
-            let cbs = this.eventListener['$remote.' + data.event] || []
-            cbs.forEach(function (cb) {
-                setTimeout(function () {
-                    cb(data.payload, data.room)
-                })
-            })
             if (data.room) {
                 Room.handleRoomMsg(data, this)
+            } else {
+                this.fire('$remote.' + data.event, data.payload)
             }
             return
         }
@@ -133,15 +157,6 @@ export default class Rpc {
             delete this.requestMap[id]
             return
         }
-    }
-
-    addEventListener(name, cb) {
-        this.eventListener[name] = this.eventListener[name] || []
-        this.eventListener[name].push(cb)
-    }
-
-    on(name, cb) {
-        return this.addEventListener(name, cb)
     }
 
     onRemote(name, cb) {
@@ -206,7 +221,7 @@ export default class Rpc {
 
 }
 
-class Room {
+class Room extends EventEmitter {
     name
     static roomMap = {}
 
@@ -217,39 +232,16 @@ class Room {
     }
 
     constructor(name, rt) {
+        super()
         this.name = name
-        this.eventListener = new Map()
-        ;(rt.eventListener['room.new'] || []).forEach(
-            cb => {
-                try {
-                    cb(this)
-                } catch (e) {
-                    console.error(e)
-                }
-            }
-        )
+        rt.fire('room.new', this)
     }
 
-    addEventListener(name, cb) {
-        this.eventListener[name] = this.eventListener.get(name) || new Set()
-        this.eventListener[name].add(cb)
-    }
-
-    off(name, cb) {
-        this.eventListener[name] = this.eventListener.get(name) || new Set()
-        this.eventListener[name].delete(cb)
-    }
-
-    on(name, cb) {
-        return this.addEventListener(name, cb)
+    onRemote(name, cb) {
+        return this.on('$remote.' + name, cb)
     }
 
     handleMsg(data) {
-        let cbs = this.eventListener['$remote.' + data.event] || []
-        cbs.forEach(function (cb) {
-            setTimeout(function () {
-                cb(data.payload)
-            })
-        })
+        this.fire('$remote.' + data.event, data.payload)
     }
 }

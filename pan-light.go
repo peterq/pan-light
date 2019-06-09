@@ -73,34 +73,23 @@ func serverStart() {
 func demoCmd() {
 	cmd := flag.Arg(1)
 	switch cmd {
-	case "test":
-		demoTest()
-	case "ins":
-		demoIns()
 	case "host":
 		demoHost()
+	case "build.docker.slave":
+		buildDockerSlave()
 	default:
 		flag.Usage()
 	}
 }
 
+func buildDockerSlave() {
+	runCmd("demo", "docker", "build", "-t", "pan-light-slave", "./slave/ubuntu16.04")
+}
+
 func demoHost() {
-	runCmd("./demo", "go", "build", "-o", "slave/ubuntu16.04/demo_instance_manager", "slave.go")
+	cmd(qtBin("rcc"), "-binary", "pc/gui/qml/qml.qrc", "-o", "demo/slave/ubuntu16.04/root.pan-light/lib/qml.rcc").Run()
+	runCmd("./demo", "go", "build", "-o", "./slave/ubuntu16.04/root.pan-light/demo_instance_manager", "slave.go")
 	runCmd("./demo", "go", "run", "host.go")
-}
-
-func demoTest() {
-	runCmd("./demo", "go", "build", "rtc.go")
-	c := cmd("./rtc")
-	c.Dir, _ = filepath.Abs("./demo")
-	c.Start()
-	runCmd("./demo", "cpulimit", "--pid", fmt.Sprint(c.Process.Pid), "--limit", "30")
-	c.Wait()
-}
-
-func demoIns() {
-	cmd(qtBin("rcc"), "-binary", "pc/gui/qml/qml.qrc", "-o", "pc/gui/qml/qml.rcc").Run()
-	runCmd("demo", "go", "run", "slave-test.go")
 }
 
 func pcCmd() {

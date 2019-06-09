@@ -99,6 +99,7 @@ func (h *Holder) Init(rt *realtime.RealTime, ctx context.Context) {
 		h.viewPwd = "peter.q.is.so.cool"
 		h.operatePwd = h.ticket
 		h.startIns()
+		h.rt.Emit("slave.exit", h.SlaveName)
 		h.order = -1
 	}
 }
@@ -123,9 +124,7 @@ func (h *Holder) startIns() {
 	// 删除已有容器
 	defer exec.Command("docker", "rm", "-v", "-f", h.containerName).Run()
 	exec.Command("docker", "rm", "-v", "-f", h.containerName).Run()
-	e, _ := filepath.Abs("./slave/ubuntu16.04/demo_instance_manager")
-	e1, _ := filepath.Abs("./slave/ubuntu16.04/memtester")
-	//e := "./slave/ubuntu16.04/demo_instance_manager"
+	e, _ := filepath.Abs("./slave/ubuntu16.04/root.pan-light")
 	// 启动docker
 	dockerP := exec.Command("docker", "run",
 		"-m", "400m", "--memory-swap", "500m", // 400m 内存
@@ -135,8 +134,7 @@ func (h *Holder) startIns() {
 		"-e", "slave_name="+h.SlaveName, "-e", "ws_addr="+h.WsAddr, // ws 地址
 		"-e", "demo_order="+strconv.FormatInt(h.order, 10), // demo order
 		"-e", "demo_user="+h.sessionId, // 用户session
-		"-v"+e+":/demo_instance_manager", // 容器名
-		"-v", e1+":/memtester",           // t
+		"-v"+e+":/root/pan-light",    // 开发时文件映射, 正式环境使用docker copy
 		"--name="+h.containerName+"", // 容器名
 		dockerImage)
 	defer exec.Command("docker", "kill", h.containerName)

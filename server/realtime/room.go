@@ -92,4 +92,15 @@ func (r *Room) Remove(id SessionId) {
 		return
 	}
 	r.members = append(r.members[:idx], r.members[idx+1:]...)
+	go func() {
+		if ss, ok := r.server.SessionById(id); ok {
+			ss.Emit("room.leave", r.name)
+		}
+	}()
+}
+
+func (r *Room) Members() []SessionId {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	return r.members
 }

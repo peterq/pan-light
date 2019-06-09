@@ -21,29 +21,6 @@ var hostRpcMap = map[string]realtime.RpcHandler{
 		})
 		return
 	}),
-	// 作废, 不走这个逻辑
-	/*"host.check.ticket": realtime.RpcHandleFunc(func(ss *realtime.Session, p gson) (result interface{}, err error) {
-		order := p["order"].(int64)
-		ticket := p["ticket"].(string)
-		manager.waitSessionMapLock.RLock()
-		defer manager.waitSessionMapLock.RUnlock()
-		wait, ok := manager.waitSessionMap[order]
-		if wait.ticket != ticket {
-			err = errors.New("ticket 错误")
-		}
-		if !ok {
-			err = errors.New("ticket 已失效")
-			return
-		}
-		if !wait.inService {
-			err = errors.New("当前用户还未到")
-			return
-		}
-		if wait.serviced {
-			err = errors.New("票据已被使用过")
-		}
-		return
-	}),*/
 	"host.next.user": realtime.RpcHandleFunc(func(ss *realtime.Session, p gson) (result interface{}, err error) {
 		host := ss.Data.(*roleHost)
 		slaveName := p["slave"].(string)
@@ -103,6 +80,20 @@ var hostRpcMap = map[string]realtime.RpcHandler{
 var hostEventMap = map[string]realtime.EventHandler{
 	"host": realtime.EventHandleFunc(func(ss *realtime.Session, data interface{}) {
 
+	}),
+	"host.slave.exit": realtime.EventHandleFunc(func(ss *realtime.Session, data interface{}) {
+		host := ss.Data.(*roleHost)
+		slaveName := data.(string)
+		slave := host.slaves[slaveName]
+
+		unexpected := slave.state == slaveStateRunning
+		room := server.RoomByName("room.slave.all.user." + slaveName)
+		room.Broadcast("slave.exit", gson{
+			"unexpected": unexpected,
+		})
+		for _, member := range room.Members() {
+			room.Remove(member)
+		}
 	}),
 	"host.broadcast": roleBroadcast,
 }

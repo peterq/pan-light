@@ -53,45 +53,49 @@ $rt.onRemote("host.candidate.ok", data => {
     const handler = connectionRequestMap[id]
     handler.pc.continueWithRemote(candidate)
 })
-$rt.onRemote('room.member.join', (sid, room) => {
-    $state.roomMap[room] || Vue.set($state.roomMap, room, {
-        name: room,
-        members: new Set()
-    })
-    if (sid === $rt.sessionId) {
-        // todo get members
-    } else {
-        $state.roomMap[room].members.add(sid)
-    }
-})
 
-$rt.onRemote('room.member.join', (sid, room) => {
-    $state.roomMap[room] = $state.roomMap[room] || {
-        name: room,
-        members: new Set()
-    }
-    if (sid === $rt.sessionId) {
-        // todo get members
-    } else {
-        $state.roomMap[room].members.add(sid)
-    }
-})
+$rt.on('room.new', room => {
 
-$rt.onRemote('ticket.turn', data => {
-    console.log(data, $state.ticket)
-    const {order} = data
-    if ($state.ticket && $state.ticket.order === order) {
-        $state.ticket.inService = true
+    // 全员群
+    if (room.name === 'room.all.user') {
+        room.onRemote('ticket.turn', data => {
+            console.log(data, $state.ticket)
+            const {order} = data
+            if ($state.ticket && $state.ticket.order === order) {
+                $state.ticket.inService = true
 
-        let {host, slave} = data
-        $state.connectVnc = {
-            host, slave, viewOnly: false,
-            password: $state.ticket.ticket
-        }
+                let {host, slave} = data
+                $state.connectVnc = {
+                    host, slave, viewOnly: false,
+                    password: $state.ticket.ticket
+                }
 
-        $event.fire('operate.turn', data)
-        console.log(data)
+                $event.fire('operate.turn', data)
+                console.log(data)
+            }
+        })
     }
+
+    // slave 全员群
+    if (room.name.indexOf('room.slave.all.user') === 0) {
+        room.onRemote('slave.exit', data => {
+            if (data.unexpected) {
+                $state.$alert('demo 进程意外结束', 'Whoops', {type: 'error'})
+            } else {
+                $state.$message.info('体验结束')
+            }
+            $state.connectVnc = null
+        })
+
+        room.onRemote('broadcast.slave', data => {
+            switch (data.event) {
+                case 'operator.leave':
+                    $state.$message.info('demo 操作用户已离开')
+                    break
+            }
+        })
+    }
+
 })
 
 class Host {

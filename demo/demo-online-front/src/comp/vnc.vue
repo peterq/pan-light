@@ -13,7 +13,7 @@
                        :loading="$state.loading.getTicket">退出
             </el-button>
             <span v-show="!err">{{msg}}</span>
-            <span style="color: red">{{err}}</span>
+            <span style="color: red">{{err && ("出错了: " + err)}}</span>
         </div>
         <div ref="vncContainer" style="flex: 1;"></div>
     </div>
