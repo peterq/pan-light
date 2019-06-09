@@ -95,7 +95,7 @@ func GoQtPkgPath(s ...string) (r string) {
 	if len(goQtPkgPath) == 0 {
 		goQtPkgPath = strings.TrimSpace(RunCmd(GoList("{{.Dir}}", packageName), "utils.GoQtPkgPath"))
 		fmt.Println(goQtPkgPath)
-		os.Exit(0)
+		//os.Exit(0)
 	}
 	r = goQtPkgPath
 	goQtPkgPathMutex.Unlock()

@@ -80,7 +80,7 @@ func Deploy(mode, target, path string, docker bool, ldFlags, tags string, fast b
 
 		build(mode, target, path, ldFlags, tags, name, depPath, fast, comply)
 
-		if !(fast || (utils.QT_DEBUG_QML() && target == runtime.GOOS)) || (target == "js" || target == "wasm") {
+		if !(fast || (utils.QT_DEBUG_QML() && target == runtime.GOOS)) || (target == "js" || target == "wasm") || true {
 			bundle(mode, target, path, name, depPath, tags, fast)
 		} else if fast {
 			switch target {
