@@ -77,9 +77,15 @@ func demoCmd() {
 		demoHost()
 	case "build.docker.slave":
 		buildDockerSlave()
+	case "avatar":
+		demoAvatar()
 	default:
 		flag.Usage()
 	}
+}
+
+func demoAvatar() {
+	runCmd("./server/cmd", "go", "run", "main.go", "avatar")
 }
 
 func buildDockerSlave() {

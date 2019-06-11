@@ -1,24 +1,36 @@
 package nickname
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/peterq/pan-light/server/cmd/cv"
+	"image"
+	_ "image/gif"
+	"image/jpeg"
+	_ "image/jpeg"
+	_ "image/png"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
+	"path"
 	"strings"
 	"sync"
 	"time"
 )
 
 type taskItem struct {
-	book     string
-	nickname string
-	images   []string
-	img      []byte
+	book            string
+	nickname        string
+	images          []string
+	faceCheckResult []struct {
+		img   image.Image
+		rects []image.Rectangle
+	}
 }
 
 // 搜索图像
@@ -37,12 +49,25 @@ func FetchAndSaveAvatarFromInternet() {
 	for i := 0; i < 10; i++ {
 		go faceCheckLoop(imageChan, resultChan, faceCheckGroup)
 	}
-	nicknameChan <- &taskItem{
-		book:     "飞狐外传",
-		nickname: "马春花",
-		images:   []string{},
-	}
-	close(nicknameChan)
+	go func() {
+		for book, nicknames := range nicknameMap {
+			for _, nickname := range nicknames {
+				if fileExist(fmt.Sprintf("./data/avatar/result/%s/%s.jpg", book, nickname)) {
+					continue
+				}
+				nicknameChan <- &taskItem{
+					book:     book,
+					nickname: nickname,
+					images:   []string{},
+					faceCheckResult: []struct {
+						img   image.Image
+						rects []image.Rectangle
+					}{},
+				}
+			}
+		}
+		close(nicknameChan)
+	}()
 	go func() {
 		// 处理完成关闭相关通道
 		searchGroup.Wait()
@@ -57,13 +82,54 @@ func FetchAndSaveAvatarFromInternet() {
 }
 
 func handleItemResult(item *taskItem) {
-	log.Println("result", item.nickname)
+	savePath := fmt.Sprintf("./data/avatar/result/%s/%s.jpg", item.book, item.nickname)
+	os.MkdirAll(path.Dir(savePath), os.ModePerm)
+	for _, result := range item.faceCheckResult {
+		if len(result.rects) != 1 {
+			continue
+		}
+		// rect扩大2倍
+		rect := result.rects[0]
+		clip := rect
+		clip.Min.X -= rect.Dx() / 2
+		clip.Min.Y -= rect.Dy() / 2
+		clip.Max.X += rect.Dx() / 2
+		clip.Max.Y += rect.Dy() / 2
+		if clip.Min.X < 0 {
+			clip.Min.X = 0
+		}
+		if clip.Min.Y < 0 {
+			clip.Min.Y = 0
+		}
+		if clip.Max.X > result.img.Bounds().Dx() {
+			clip.Max.X = result.img.Bounds().Dx()
+		}
+		if clip.Max.Y > result.img.Bounds().Dy() {
+			clip.Max.Y = result.img.Bounds().Dy()
+		}
+		type subImager interface {
+			SubImage(image.Rectangle) image.Image
+		}
+		subImg := result.img.(subImager).SubImage(clip)
+		buf := bytes.NewBuffer([]byte{})
+		err := jpeg.Encode(buf, subImg, nil)
+		if err != nil {
+			continue
+		}
+		err = ioutil.WriteFile(savePath, buf.Bytes(), os.ModePerm)
+		if err != nil {
+			continue
+		}
+		log.Println("result", item.nickname, "success")
+		return
+	}
+	log.Println("result", item.nickname, "fail")
 }
 
 func searchImageLoop(nicknameChan chan *taskItem, imageChan chan *taskItem, wg *sync.WaitGroup) {
 	go func() {
 		for item := range nicknameChan {
-			log.Println("search item", item.nickname)
+			log.Println("search item", item.book, item.nickname)
 			item.images = searchImage(item.book + " " + item.nickname)
 			imageChan <- item
 		}
@@ -75,19 +141,22 @@ func searchImageLoop(nicknameChan chan *taskItem, imageChan chan *taskItem, wg *
 func faceCheckLoop(imageChan chan *taskItem, resultChan chan *taskItem, wg *sync.WaitGroup) {
 	go func() {
 		for item := range imageChan {
-			log.Println("check face", item.nickname, item.images)
-			for _, img := range item.images {
-				resp, err := http.Get(img)
+			i := 1
+			for _, link := range item.images {
+				log.Println("download", link)
+				srcPath := fmt.Sprintf("./data/avatar/original/%s/%s_%d.jpg", item.book, item.nickname, i)
+				markedPath := fmt.Sprintf("./data/avatar/marked/%s/%s_%d.jpg", item.book, item.nickname, i)
+				img, err := downloadImg(srcPath, link)
 				if err != nil {
+					log.Println(err)
 					continue
 				}
-				bin, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					continue
-				}
-				item.img = bin
-				checkFace(bin)
-				break
+				rect := cv.CheckFace(srcPath, markedPath)
+				item.faceCheckResult = append(item.faceCheckResult, struct {
+					img   image.Image
+					rects []image.Rectangle
+				}{img: img, rects: rect})
+				i++
 			}
 			resultChan <- item
 		}
@@ -100,6 +169,7 @@ var searchHttpClient http.Client
 var faceHttpClient http.Client
 
 func avatarInit() {
+	parseNicknameDoc()
 	jar, _ := cookiejar.New(nil)
 	jar1, _ := cookiejar.New(nil)
 	parallel := 20
@@ -226,4 +296,35 @@ func upImg(img []byte) (link string) {
 		return
 	}
 	return data["Host"].(string) + data["Url"].(string)
+}
+
+func fileExist(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
+}
+
+func downloadImg(imgPath string, link string) (img image.Image, err error) {
+	resp, err := http.Get(link)
+	if err != nil {
+		return
+	}
+	bin, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	img, f, err := image.Decode(bytes.NewReader(bin))
+	if err != nil {
+		return
+	}
+	if f != "jpeg" {
+		buf := bytes.NewBuffer([]byte{})
+		err = jpeg.Encode(buf, img, nil)
+		if err != nil {
+			return
+		}
+		bin = buf.Bytes()
+	}
+	os.MkdirAll(path.Dir(imgPath), os.ModePerm)
+	err = ioutil.WriteFile(imgPath, bin, os.ModePerm)
+	return
 }
