@@ -5,14 +5,19 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/golang/freetype"
+	"github.com/golang/freetype/truetype"
 	"github.com/peterq/pan-light/server/cmd/cv"
 	"image"
+	"image/color"
+	"image/draw"
 	_ "image/gif"
 	"image/jpeg"
 	_ "image/jpeg"
 	_ "image/png"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -124,6 +129,7 @@ func handleItemResult(item *taskItem) {
 		return
 	}
 	log.Println("result", item.nickname, "fail")
+	textAvatar(item.nickname, savePath)
 }
 
 func searchImageLoop(nicknameChan chan *taskItem, imageChan chan *taskItem, wg *sync.WaitGroup) {
@@ -167,9 +173,15 @@ func faceCheckLoop(imageChan chan *taskItem, resultChan chan *taskItem, wg *sync
 
 var searchHttpClient http.Client
 var faceHttpClient http.Client
+var font *truetype.Font
 
 func avatarInit() {
 	parseNicknameDoc()
+	bin, err := ioutil.ReadFile("./data/font/cn.ttf")
+	if err != nil {
+		panic(err)
+	}
+	font, err = freetype.ParseFont(bin)
 	jar, _ := cookiejar.New(nil)
 	jar1, _ := cookiejar.New(nil)
 	parallel := 20
@@ -327,4 +339,90 @@ func downloadImg(imgPath string, link string) (img image.Image, err error) {
 	os.MkdirAll(path.Dir(imgPath), os.ModePerm)
 	err = ioutil.WriteFile(imgPath, bin, os.ModePerm)
 	return
+}
+
+func textAvatar(nickname, savePath string) {
+	img := image.NewRGBA(image.Rect(0, 0, 300, 300))
+	rand.Seed(time.Now().UnixNano())
+	r, g, b, _ := hls(rand.Intn(360))
+	draw.Draw(img, img.Bounds(), image.NewUniform(color.RGBA{
+		R: uint8(r),
+		G: uint8(g),
+		B: uint8(b),
+		A: 255,
+	}), image.ZP, draw.Src)
+
+	str := []rune(nickname)
+	if len(str) > 4 {
+		str = []rune{str[0]}
+	}
+	var x, y, fontSize int
+	ln1, ln2 := string(str), ""
+	if len(str) == 1 {
+		x, y, fontSize = 45, 700, img.Bounds().Dx()/3*2
+	} else if len(str) == 2 {
+		x, y, fontSize = 20, 700, img.Bounds().Dx()/2
+	} else if len(str) == 3 {
+		x, y, fontSize = 20, 700, img.Bounds().Dx()/3
+	} else {
+		ln1 = string(str[0]) + string(str[1])
+		ln2 = string(str[2]) + string(str[3])
+		x, y, fontSize = 60, 300, img.Bounds().Dx()/3
+	}
+
+	c := freetype.NewContext()
+	c.SetDPI(72)
+	c.SetFont(font)
+
+	c.SetFontSize(float64(fontSize))
+	c.SetClip(img.Bounds())
+	c.SetDst(img)
+	c.SetSrc(image.NewUniform(color.White))
+	// Draw the text.
+	pt := freetype.Pt(x, x+int(c.PointToFixed(float64(y)))>>8)
+	pt1, err := c.DrawString(ln1, pt)
+	if err != nil {
+		log.Println(err)
+	}
+	pt.Y += (pt1.X-pt.X)/2 + c.PointToFixed(20)
+	_, err = c.DrawString(ln2, pt)
+	if err != nil {
+		log.Println(err)
+	}
+
+	os.MkdirAll(path.Dir(savePath), os.ModePerm)
+	buf := bytes.NewBuffer([]byte{})
+	jpeg.Encode(buf, img, nil)
+	ioutil.WriteFile(savePath, buf.Bytes(), os.ModePerm)
+}
+
+func hls(H int) (r, g, b, a int) {
+	S, V := 255, 255
+	// Direct implementation of the graph in this image:
+	// https://en.wikipedia.org/wiki/HSL_and_HSV#/media/File:HSV-RGB-comparison.svg
+	max := V
+	min := V * (255 - S)
+
+	H %= 360
+	segment := H / 60
+	offset := H % 60
+	mid := ((max - min) * offset) / 60
+
+	//log.Println(H, max, min, mid)
+	switch segment {
+	case 0:
+		return max, min + mid, min, 0xff
+	case 1:
+		return max - mid, max, min, 0xff
+	case 2:
+		return min, max, min + mid, 0xff
+	case 3:
+		return min, max - mid, max, 0xff
+	case 4:
+		return min + mid, min, max, 0xff
+	case 5:
+		return max, min, max - mid, 0xff
+	}
+
+	return 0, 0, 0, 0xff
 }
