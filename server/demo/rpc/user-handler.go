@@ -95,21 +95,16 @@ var userRpcMap = map[string]realtime.RpcHandler{
 		server.RoomByName(roomName).Remove(ss.Id())
 		return
 	}),
+	"user.room.members": realtime.RpcHandleFunc(func(ss *realtime.Session, data gson) (result interface{}, err error) {
+		roomName := data["room"].(string)
+		if server.RoomExist(roomName) {
+			return server.RoomByName(roomName).Members(), nil
+		}
+		return nil, errors.New("room not exist")
+	}),
 	"user.session.public.info": sessionPublicInfo,
 }
 
 var userEventMap = map[string]realtime.EventHandler{
-	"user.chat.msg": realtime.EventHandleFunc(func(ss *realtime.Session, data interface{}) {
-		payload := data.(gson)
-		room := payload["room"].(string)
-		msg := payload["msg"]
-		if ss.InRoom(room) {
-			server.RoomByName(room).Broadcast("chat.msg.new", gson{
-				"from": ss.Id(),
-				"msg":  msg,
-				"room": room,
-			}, ss.Id())
-		}
-	}),
 	"user.broadcast": roleBroadcast,
 }

@@ -1,4 +1,4 @@
-const dataTemplate = {
+export const dataTemplate = {
     ticket: {
         order: 1,
         ticket: '23',
@@ -7,20 +7,34 @@ const dataTemplate = {
     roomMap: {
         'room.user.all': {
             name: 'room.user.all',
-            members: ['234']
+            members: [],
+            messages: [],
         }
     },
     connectVnc: {
         host: '',
         slave: '',
         viewOnly: true
+    },
+    userSessionInfo: {
+        _role: 'user',
+        nickname: '',
+        avatar: '',
+        sessionId: ''
+    },
+    deppClone(key) {
+        return JSON.parse(JSON.stringify(this[key]))
     }
 }
 
-function data() {
+function initialData() {
     return {
+        connected: false,
         loading: {
             getTicket: false,
+        },
+        userSessionInfo: {
+            self: {...dataTemplate.userSessionInfo},
         },
         ticket: null, // tpl: ticket
         roomMap: {}, // tpl roomMap
@@ -37,12 +51,20 @@ function data() {
 
 export default {
     data() {
-        return data()
+        return initialData()
     },
     created() {
         window.debugObj.$state = this
         setInterval(() => {
             this.timestamp++
         }, 100)
+    },
+    methods: {
+        resetData() {
+            let data = initialData()
+            for (let k in data) {
+                this[k] = data[k]
+            }
+        }
     }
 }

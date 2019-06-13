@@ -178,6 +178,13 @@ func (s *Server) RoomByName(name string) *Room {
 	return room
 }
 
+func (s *Server) RoomExist(name string) bool {
+	s.roomMapLock.Lock()
+	defer s.roomMapLock.Unlock()
+	_, ok := s.roomMap[name]
+	return ok
+}
+
 func (s *Server) handleWsConn(conn *websocket.Conn) {
 	log.Println("new ws conn", conn.RemoteAddr())
 	var err error

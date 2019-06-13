@@ -31,6 +31,29 @@ class EventEmitter {
     }
 }
 
+function ch2Unicdoe(str) {
+    if (!str) {
+        return
+    }
+    let unicode = ''
+    for (let i = 0; i < str.length; i++) {
+        let temp = str.charAt(i)
+        if (isChinese(temp)) {
+            unicode += '\\u' + temp.charCodeAt(0).toString(16)
+        }
+        else {
+            unicode += temp
+        }
+    }
+    return unicode
+}
+
+
+// 判断字符是否为汉字，
+function isChinese(s) {
+    return /[\u4e00-\u9fa5]/.test(s)
+}
+
 export default class Rpc extends EventEmitter {
 
     openPromise
@@ -127,6 +150,7 @@ export default class Rpc extends EventEmitter {
         if (!(data.type === 'call' && data.method === 'user.ping'))
             console.log('ws ->', data)
         let str = JSON.stringify(data)
+        str = ch2Unicdoe(str)
         let send = this._encrypt(str)
         this.ws.send(send)
     }
@@ -179,6 +203,23 @@ export default class Rpc extends EventEmitter {
             id
         })
         return promise
+    }
+
+    emit(event, payload = {}) {
+        event = 'user.' + event
+        this.wsSend({
+            type: 'event',
+            event,
+            payload,
+        })
+    }
+
+    broadcast(room, event, payload) {
+        this.emit('broadcast', {
+            room,
+            event,
+            payload
+        })
     }
 
     getRoom(name) {
@@ -235,6 +276,9 @@ class Room extends EventEmitter {
         super()
         this.name = name
         rt.fire('room.new', this)
+        this.rt = function () {
+            return rt
+        }
     }
 
     onRemote(name, cb) {
@@ -243,5 +287,9 @@ class Room extends EventEmitter {
 
     handleMsg(data) {
         this.fire('$remote.' + data.event, data.payload)
+    }
+
+    broadcast(event, payload) {
+        this.rt().broadcast(this.name, event, payload)
     }
 }

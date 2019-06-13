@@ -83,6 +83,11 @@ func (r *Room) Remove(id SessionId) {
 		return
 	}
 	go r.Broadcast("room.member.remove", id)
+	go func() {
+		if ss, ok := r.server.SessionById(id); ok {
+			ss.Emit("room.leave", r.name)
+		}
+	}()
 	if idx == len(r.members)-1 {
 		r.members = r.members[:idx]
 		return
@@ -92,11 +97,6 @@ func (r *Room) Remove(id SessionId) {
 		return
 	}
 	r.members = append(r.members[:idx], r.members[idx+1:]...)
-	go func() {
-		if ss, ok := r.server.SessionById(id); ok {
-			ss.Emit("room.leave", r.name)
-		}
-	}()
 }
 
 func (r *Room) Members() []SessionId {

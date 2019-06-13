@@ -1,12 +1,16 @@
 package nickname
 
 import (
+	"fmt"
 	"math/rand"
+	"regexp"
 	"strings"
+	"sync"
+	"time"
 )
 
-var nicknames []string
-var idx = 0
+var nicknameMap = map[string][]string{} // 数据格式 {book_name: [person]}
+
 var doc = `
 《飞狐外传》人物（共有112人） 
 马行空 马春花 徐铮 商宝震 何思豪 阎基 田归农 苗人凤 南仁通 补锅匠 脚夫 车夫 蒋调侯 店伴 钟兆文 钟兆英 钟兆能 南兰 苗若兰 商老太 平四 胡斐 张总管 王剑英 王剑杰 陈禹 古若般 殷仲翔 福康安 赵半山 孙刚峰 吕小妹 钟四嫂 易吉钟小二 钟阿四 胖商人 瘦商人 凤南天 凤七 俞朝奉 蛇皮张 邝宝官 凤一鸣 大汉 孙伏虎 尉迟连 杨宾 中年武师 程灵素同桌后生 袁紫衣 刘鹤真 崔百胜 曹猛 蓝秦 王仲萍 张飞雄 慕容景岳 姜铁山 薛鹊 王铁匠 姜小铁 田青文 张管家 聂钺 上官 褚轰 汪铁鹗 周铁鹤 曾铁鸥 秦耐之 姬晓峰 张九 任通武 相国夫人 蔡威 汤沛 无青子 海兰弼 大智禅师 欧阳公政 西灵道人 文醉翁 周隆 郭玉堂 齐伯涛 陈高波 安提督 宗雄 桑飞虹 倪不大 倪不小 常赫志 常伯志 上官铁生 哈赤大师 心砚 石双英 刘之余 童怀道 李廷豹 石万嗔 木文察 陈家洛 无尘道长 德布 李沅芷 余鱼同 司徒雷 谢不当 黄希节 
@@ -38,35 +42,46 @@ var doc = `
 《鸳鸯刀》人物（共有15人） 
 任飞燕 刘於义 杨夫人 花剑影 林玉龙 周威信 卓天雄 逍遥子 袁夫人 袁冠南 常长风 盖一鸣 萧半和 萧中慧(杨中慧) 书僮
 `
+var books = []string{}
+
+func parseNicknameDoc() {
+	bookReg := regexp.MustCompile(`《(.*)》`)
+	lns := strings.Split(strings.Trim(doc, "\n"), "\n")
+	bookName := "book"
+	for _, ln := range lns {
+		find := bookReg.FindStringSubmatch(ln)
+		if len(find) == 2 {
+			bookName = find[1]
+			books = append(books, bookName)
+		} else {
+			names := strings.Split(strings.Trim(ln, " "), " ")
+			if old, ok := nicknameMap[bookName]; ok {
+				nicknameMap[bookName] = append(old, names...)
+			} else {
+				nicknameMap[bookName] = names
+			}
+		}
+	}
+}
+
+var l = new(sync.Mutex)
+var bookIdx, nicknameIdx = 0, 0
 
 func init() {
-	lns := strings.Split(doc, "\n")
-	for i, ln := range lns {
-		if i%2 == 0 {
-			continue
-		}
-		names := strings.Split(ln, " ")
-		nicknames = append(nicknames, names...)
-	}
-	idx = rand.Intn(len(nicknames))
+	rand.Seed(time.Now().UnixNano())
+	parseNicknameDoc()
+	bookIdx = rand.Intn(len(books))
 }
 
-func Get() string {
-	idx++
-	if idx >= len(nicknames) {
-		idx = 0
+func Get() (string, string) {
+	l.Lock()
+	defer l.Unlock()
+	if nicknameIdx >= len(nicknameMap[books[bookIdx]]) {
+		nicknameIdx = 0
+		bookIdx = (bookIdx + 1) % len(books)
 	}
-	return nicknames[idx]
+	book := books[bookIdx]
+	nickname := nicknameMap[book][nicknameIdx]
+	nicknameIdx++
+	return nickname, fmt.Sprintf("/demo/avatar/%s/%s.jpg", book, nickname)
 }
-
-var a = `
-GET / HTTP/1.1
-Host: sale.haogu.127.0.0.1.xip.io
-Connection: keep-alive
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
-Accept-Encoding: gzip, deflate
-Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
-Cookie: pigcms_sessionid=ec43cd5c99f9cc21b9d4bebf439b9a16
-`

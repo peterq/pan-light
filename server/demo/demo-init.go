@@ -7,7 +7,7 @@ import (
 
 func Init(router iris.Party, conf map[interface{}]interface{}) {
 	// 静态页
-	router.StaticWeb("/", "../static/noVNC")
+	router.StaticWeb("/", "./static/demo")
 	hosts := map[string]string{}
 	for _, host := range conf["hosts"].([]interface{}) {
 		hosts[host.(map[interface{}]interface{})["name"].(string)] = host.(map[interface{}]interface{})["password"].(string)

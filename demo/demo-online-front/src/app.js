@@ -1,7 +1,7 @@
 import {newPeerConnection} from "./realtime/webRtc"
 import RealTime from "./realtime/realtime"
 import Vue from "vue"
-import State from "./util/state"
+import State, {dataTemplate} from "./util/state"
 import {registerProxyChannelResolver} from "./lib/vnc/core/RtcWebSocket"
 import whatJpg from './assets/what.jpeg'
 
@@ -54,26 +54,103 @@ $rt.onRemote("host.candidate.ok", data => {
     handler.pc.continueWithRemote(candidate)
 })
 
+function roomHandleUserBroadCast(room, data) {
+    if (data.event === 'chat') {
+        room.messages = room.messages.concat([{
+            id: +new Date,
+            type: 'chat',
+            msg: data.payload,
+            from: data.from
+        }])
+    }
+}
+
+function roomHandleUserTicketTurn(room, data) {
+
+    console.log(data, $state.ticket)
+    const {order} = data
+    if ($state.ticket && $state.ticket.order === order) {
+        $state.ticket.inService = true
+
+        let {host, slave} = data
+        $state.connectVnc = {
+            host, slave, viewOnly: false,
+            password: $state.ticket.ticket
+        }
+
+        $event.fire('operate.turn', data)
+        console.log(data)
+    }
+    room.messages = room.messages.concat([{
+        id: +new Date,
+        type: 'system',
+        evt: 'turn',
+        sessionId: data.sessionId,
+        ticket: data
+    }])
+
+}
+
 $rt.on('room.new', room => {
 
-    // 全员群
-    if (room.name === 'room.all.user') {
-        room.onRemote('ticket.turn', data => {
-            console.log(data, $state.ticket)
-            const {order} = data
-            if ($state.ticket && $state.ticket.order === order) {
-                $state.ticket.inService = true
-
-                let {host, slave} = data
-                $state.connectVnc = {
-                    host, slave, viewOnly: false,
-                    password: $state.ticket.ticket
-                }
-
-                $event.fire('operate.turn', data)
-                console.log(data)
+    async function getSessionInfo(ids) {
+        let newOnes = []
+        ids.forEach(id => {
+            if (!$state.userSessionInfo[id]) {
+                newOnes.push(id)
+                Vue.set($state.userSessionInfo, id, dataTemplate.deppClone('userSessionInfo'))
             }
         })
+        let infoMap = await $rt.call('session.public.info', {sessionIds: newOnes})
+        for (let id in infoMap) {
+            $state.userSessionInfo[id] = infoMap[id]
+        }
+    }
+
+    room.messages = []
+    room.members = []
+    room.sendMsg = function (msg) {
+        room.broadcast('chat', msg)
+        room.messages = room.messages.concat([{
+            id: +new Date,
+            type: 'chat',
+            msg,
+            from: $state.userSessionInfo.self.sessionId
+        }])
+    }
+
+    $rt.call('room.members', {room: room.name})
+        .then(members => room.members = members)
+        .then(() => {
+            getSessionInfo(room.members)
+        })
+    room.on('leave', () => {
+        Vue.delete($state.roomMap, room.name)
+    })
+    room.onRemote('room.member.join', sessionId => {
+        getSessionInfo([sessionId])
+        room.messages = room.messages.concat([{
+            id: +new Date,
+            type: 'system',
+            evt: 'join',
+            sessionId
+        }])
+        room.members = room.members.concat([sessionId])
+    })
+    room.onRemote('room.member.remove', sessionId => {
+        room.members = room.members.filter(id => id !== sessionId)
+        room.messages = room.messages.concat([{
+            id: +new Date,
+            type: 'system',
+            evt: 'leave',
+            sessionId
+        }])
+    })
+    room.onRemote('broadcast.user', data => roomHandleUserBroadCast(room, data))
+    Vue.set($state.roomMap, room.name, room)
+    // 全员群
+    if (room.name === 'room.all.user') {
+        room.onRemote('ticket.turn', data => roomHandleUserTicketTurn(room, data))
     }
 
     // slave 全员群
@@ -96,6 +173,13 @@ $rt.on('room.new', room => {
         })
     }
 
+})
+
+$rt.onRemote('session.new', async session => {
+    $state.resetData()
+    let infoMap = await $rt.call('session.public.info', {sessionIds: [session.id]})
+    $state.userSessionInfo.self = {...infoMap[session.id], sessionId: session.id}
+    $state.connected = true
 })
 
 class Host {
@@ -315,8 +399,10 @@ async function canStart() {
         var element = new Image()
         Object.defineProperty(element, 'id', {
             get: function () {
-                fuckDebug()
-                location.reload()
+                setTimeout(() => {
+                    fuckDebug()
+                    location.reload()
+                })
                 return 0
             }
         })

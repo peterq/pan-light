@@ -3,13 +3,18 @@
         <el-header>
             pan-light 在线体验
         </el-header>
-        <el-container>
+        <el-container class="down-con">
             <el-main style="min-width: 800px">
                 <vnc style="flex: 1;" v-if="vncShow"
                      :config="connectVnc"></vnc>
                 <host-list v-else></host-list>
             </el-main>
-            <el-aside width="400px">Aside</el-aside>
+            <el-aside width="400px">
+                <div v-if="!$state.connected" style="height: 100%; display: flex; justify-content: center; align-items: center">
+                    <p>聊天室初始化中...</p>
+                </div>
+                <chat-main v-else style="height: 100%"></chat-main>
+            </el-aside>
         </el-container>
     </el-container>
 </template>
@@ -18,6 +23,7 @@
     import vnc from './vnc'
     import hostList from './hostList'
     import {$state} from "../app"
+    import chatMain from './chat/chat-main'
 
     export default {
         data() {
@@ -43,7 +49,7 @@
         watch: {
 
         },
-        components: {vnc, hostList}
+        components: {vnc, hostList, chatMain}
     }
 </script>
 
@@ -57,6 +63,9 @@
         color: #333;
         text-align: center;
         line-height: 60px;
+    }
+    .down-con {
+        height: calc(100vh - 60px);
     }
 </style>
 

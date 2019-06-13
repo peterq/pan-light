@@ -121,7 +121,7 @@ func onNewSession(ss *realtime.Session) error {
 
 	if role == "user" {
 		server.RoomByName("room.all.user").Join(ss.Id())
-		ss.Data.(*roleUser).nickname = nickname.Get()
+		ss.Data.(*roleUser).nickname, ss.Data.(*roleUser).avatar = nickname.Get()
 	}
 
 	if role == "host" {

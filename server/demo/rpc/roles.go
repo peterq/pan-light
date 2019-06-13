@@ -29,6 +29,7 @@ type roleUser struct {
 	session *realtime.Session
 
 	nickname string // 随机分配花名
+	avatar   string // 随机分配花名
 
 	waitState *waitState
 }
@@ -36,6 +37,7 @@ type roleUser struct {
 func (user *roleUser) publicInfo() gson {
 	return gson{
 		"nickname": user.nickname,
+		"avatar":   user.avatar,
 	}
 }
 
