@@ -7,6 +7,7 @@ import "./layout"
 import "./login"
 import "./videoPlayer"
 import "./widget"
+import "./comps"
 Window {
     id: mainWindow
     visible: true
@@ -14,11 +15,20 @@ Window {
     height: 680
     minimumHeight: 600
     minimumWidth: 900
-    title: "hello peterq2"
+    title: "pan-light"
     signal customerEvent(string event, var data)
     flags: Qt.WA_TranslucentBackground | Qt.WA_TransparentForMouseEvents| Qt.FramelessWindowHint
     color: 'transparent'
     visibility: Window.Windowed
+
+    DataSaver {
+        $key: 'window.main'
+        property alias x: mainWindow.x
+        property alias y: mainWindow.y
+        property alias width: mainWindow.width
+        property alias height: mainWindow.height
+    }
+
     Component {
         id: layoutComp
         Layout {}

@@ -4,6 +4,9 @@ import "../js/util.js" as Util
 
 Item {
     id: root
+
+    signal sumSpeed(var data)
+
     HeaderBar {
         id: headerBar
     }

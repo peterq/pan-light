@@ -22,6 +22,16 @@ Item {
     signal taskEvent(string event, var data)
 
     property string speed: ''
+    property int speedInt: 0
+
+    Connections {
+        target: App.appState.transferComp
+        onSumSpeed: {
+            if (isFinish)
+                return
+            data.speed += speedInt
+        }
+    }
 
     DataSaver {
         $key: 'download-item-' + root.downloadId
@@ -65,6 +75,7 @@ Item {
         interval: 1100
         onTriggered: {
             speed = ''
+            speedInt = 0
         }
     }
 
@@ -72,6 +83,7 @@ Item {
         // 更新下载速度
         if (event === 'task.speed') {
             speed = Util.humanSize(data.speed) + '/s'
+            speedInt = data.speed
             speedClearTimer.restart()
             progress = data.progress
             return
@@ -134,7 +146,8 @@ Item {
             visible: !isFinish && meta.useVip
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: fileNameText.left
-            anchors.leftMargin: 10 + Math.min(fileNameText.width, fileNameText.implicitWidth)
+            anchors.leftMargin: 10 + Math.min(fileNameText.width,
+                                              fileNameText.implicitWidth)
         }
 
         MouseArea {
@@ -152,7 +165,7 @@ Item {
             w: 500
             h: 200
             title: '确认删除'
-            onClickConfirm: function() {
+            onClickConfirm: function () {
                 result = checkBox.checked
                 return true
             }

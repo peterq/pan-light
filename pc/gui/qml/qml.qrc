@@ -163,5 +163,6 @@
         <file>assets/images/icons/min.svg</file>
         <file>assets/images/icons/more-down.svg</file>
         <file>widget/Resize.qml</file>
+        <file>assets/images/icons/baidu-cloud.svg</file>
     </qresource>
 </RCC>

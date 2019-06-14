@@ -72,7 +72,12 @@ var hideDesktopWidget
            ins = comp.createObject(null)
            return
        }
-       ins.visbal = true
+       ins.visible = true
+    }
+    hideDesktopWidget = function () {
+        if (ins) {
+            ins.visible = false
+        }
     }
 
 })()
