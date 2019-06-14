@@ -27,9 +27,6 @@ Rectangle {
         id: qqLoginComp
         QQ {}
     }
-
-
-
     ColumnLayout {
         anchors.centerIn: parent
         spacing: 20

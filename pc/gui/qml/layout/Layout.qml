@@ -6,6 +6,7 @@ Item {
     property var tabs: ['我的网盘', '传输列表', '探索']
     property var colors: ['blue', 'red', 'green']
     property string activeTab: '传输列表'
+    anchors.fill: parent
     Header {
         id: header
         tabs: mainLayout.tabs

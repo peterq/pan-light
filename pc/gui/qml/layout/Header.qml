@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import "../comps"
+import "../widget"
 Rectangle {
     id: root
     color: "#EEEEF6"
@@ -8,6 +9,9 @@ Rectangle {
     property alias tabs: tabBtns.btns
     property alias activeTab: tabBtns.activeTab
     signal activeChange(string tab)
+    MoveWindow{
+        anchors.fill: parent
+    }
     // 下边界
     Rectangle {
         color: "#D7D7DE"
