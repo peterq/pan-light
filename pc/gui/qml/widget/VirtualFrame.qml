@@ -82,7 +82,11 @@ Item {
                 color: 'red'
                 width: 20
                 onClicked: {
-                    G.root.visible = false
+                    if (!App.appState.transferComp) {
+                        Qt.quit()
+                    } else {
+                        G.root.visible = false
+                    }
                 }
             }
         }

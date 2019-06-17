@@ -340,15 +340,16 @@ var playVideo = (function(){
         if (!ins || !ins.playVideo) {
             ins = comp.createObject(G.root)
         }
-        (useVip ?
+        var linkPromise = (useVip ?
              getFileLinkVip(meta) :
              getFileLink(meta))
         .then(function(link){
             var agentLink = videoAgentLink(meta, useVip)
             console.log('play link', agentLink, link)
-            ins.playVideo(meta.server_filename, agentLink)
+            return agentLink
         })
-
+        linkPromise.loadingLinkText = '正在解析播放链接'
+        ins.playVideo(meta.server_filename, linkPromise)
     }
 })()
 
