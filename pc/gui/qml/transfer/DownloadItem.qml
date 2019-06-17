@@ -13,16 +13,54 @@ Item {
     property string downloadId: meta.downloadId
     property var meta
     property int idx
+    property var listComp
     property string resumeData: ''
     property bool isNewAdd: true
     property string downloadState: ''
     property int progress: 0
     property string errString: ''
+    property bool isQueued: false
 
     signal taskEvent(string event, var data)
+    signal doStart
+    signal doPause
+
+    onDoStart: {
+        if (!startBtn.enabled)
+            return
+        isQueued = true
+        listComp.enqueue(downloadId)
+    }
+
+    onDoPause: {
+        if (!pauseBtn.enabled)
+            return
+        if (isQueued) {
+            listComp.dequeue(downloadId)
+            isQueued = false
+        } else {
+            pause()
+        }
+        listComp.checkQueue()
+    }
 
     property string speed: ''
     property int speedInt: 0
+
+    function pause() {
+        Util.callGoSync('download.pause', {
+                            "downloadId": downloadId
+                        })
+        updateState()
+    }
+
+    function start() {
+        isQueued = false
+        Util.callGoSync('download.start', {
+                            "downloadId": downloadId
+                        })
+        updateState()
+    }
 
     Connections {
         target: App.appState.transferComp
@@ -189,32 +227,33 @@ Item {
             Text {
                 text: downloadState
             }
+            Text {
+                text: '等待中...'
+                color: 'orange'
+                visible: isQueued
+            }
             IconButton {
+                id: startBtn
                 iconType: 'start'
                 title: '开始'
                 color: enabled ? '#409EFF' : 'gray'
                 lighter: 1.1
                 visible: !isFinish
-                enabled: downloadState === 'wait.start'
+                enabled: !isQueued && downloadState === 'wait.start'
                 onClicked: {
-                    Util.callGoSync('download.start', {
-                                        "downloadId": downloadId
-                                    })
-                    updateState()
+                    doStart()
                 }
             }
             IconButton {
+                id: pauseBtn
                 iconType: 'pause'
                 title: '暂停'
                 color: enabled ? '#409EFF' : 'gray'
                 lighter: 1.1
                 visible: !isFinish
-                enabled: downloadState === 'downloading'
+                enabled: downloadState === 'downloading' || isQueued
                 onClicked: {
-                    Util.callGoSync('download.pause', {
-                                        "downloadId": downloadId
-                                    })
-                    updateState()
+                    doPause()
                 }
             }
 

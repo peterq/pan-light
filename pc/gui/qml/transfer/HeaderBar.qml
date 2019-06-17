@@ -73,12 +73,19 @@ Item {
         spacing: 10
         Button {
             text: '全部开始'
+            onClicked: {
+                App.appState.downloadingListComp.startAll()
+            }
         }
         Button {
             text: '全部暂停'
+            onClicked: {
+                App.appState.downloadingListComp.pauseAll()
+            }
         }
         Button {
             text: '全部取消'
+            visible: false
         }
     }
 }

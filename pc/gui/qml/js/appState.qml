@@ -22,6 +22,7 @@ Item {
     property var downloadingList: []
     property var completedList: []
     property var transferComp: null
+    property var downloadingListComp: null
     property var floatWindow: null
     property alias settings: settings
 
@@ -37,6 +38,7 @@ Item {
         $key: 'app-settings'
         property string defaultDownloadPath: ''
         property string lastDownloadPath: ''
+        property int maxParallelTaskNumber: 1
     }
 
     onPathChanged: {

@@ -23,6 +23,7 @@ Rectangle {
             meta: listModel.get(index)
             isFinish: root.isFinish
             idx: index
+            listComp: root
             Connections {
                 target: root
                 onCheckFid: {
@@ -48,14 +49,19 @@ Rectangle {
                 var id = evt.taskId
                 for (var i = 0; i < listModel.count; i++) {
                     if (listModel.get(i).downloadId === id) {
-                        listView.currentIndex = i
-                        listView.currentItem.taskEvent(evt.type, evt.data)
+                        childAt(i).taskEvent(evt.type, evt.data)
                         return
                     }
                 }
                 console.log('-------- task id not found', JSON.stringify(evt))
             })
+            appState.downloadingListComp = root
         }
+    }
+
+    function childAt(idx) {
+        listView.currentIndex = idx
+        return listView.currentItem
     }
 
     function list() {
@@ -80,5 +86,50 @@ Rectangle {
 
     function remove(idx) {
         updateList(Util.listModelRemove(listModel, idx))
+    }
+
+    property var queue: []
+    function enqueue(downloadId) {
+        queue.unshift(downloadId)
+        checkQueue()
+    }
+
+    function dequeue(downloadId) {
+        var idx = queue.indexOf(downloadId)
+        if (idx !== -1) {
+            queue.splice(idx, 1)
+        }
+    }
+
+    function checkQueue() {
+        var downloadingCnt = 0
+        for (var i = 0; i < listModel.count; i++) {
+            if (childAt(i).downloadState === 'downloading') {
+                downloadingCnt++
+            }
+        }
+        var left = appState.settings.maxParallelTaskNumber - downloadingCnt
+        for (i = 0; i < left; i++) {
+            if (queue.length === 0)
+                return
+            var downloadId = queue.pop()
+            for (i = 0; i < listModel.count; i++) {
+                if (childAt(i).downloadId === downloadId) {
+                    childAt(i).start()
+                }
+            }
+        }
+    }
+
+    function startAll() {
+        for (var i = 0; i < listModel.count; i++) {
+            childAt(i).doStart()
+        }
+    }
+
+    function pauseAll() {
+        for (var i = 0; i < listModel.count; i++) {
+            childAt(i).doPause()
+        }
     }
 }
