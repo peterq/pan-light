@@ -3,6 +3,7 @@ package functions
 import (
 	"github.com/peterq/pan-light/pc/dep"
 	"github.com/peterq/pan-light/pc/storage"
+	"os"
 )
 
 func init() {
@@ -23,6 +24,11 @@ var baseSyncRoutes = map[string]syncHandler{
 	// 取数据
 	"storage.get": func(p map[string]interface{}) (result interface{}) {
 		return storage.UserStorageGet(p["k"].(string))
+	},
+	// 重启
+	"reboot": func(p map[string]interface{}) (result interface{}) {
+		os.Exit(2)
+		return
 	},
 }
 

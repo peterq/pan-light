@@ -22,6 +22,7 @@ Item {
     property var downloadingList: []
     property var completedList: []
     property var transferComp: null
+    property var floatWindow: null
     property alias settings: settings
 
     DataSaver {

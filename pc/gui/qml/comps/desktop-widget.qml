@@ -21,10 +21,15 @@ Window {
            | Qt.WindowStaysOnTopHint | Qt.X11BypassWindowManagerHint
     color: 'transparent'
 
+    Component.onCompleted: {
+        App.appState.floatWindow = root
+    }
+
     DataSaver {
         $key: 'window.float'
         property alias x: root.x
         property alias y: root.y
+        property alias visible: root.visible
     }
 
     Rectangle {

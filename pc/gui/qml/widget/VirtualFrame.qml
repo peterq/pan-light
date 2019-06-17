@@ -1,9 +1,11 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
+import QtQuick.Controls 1.4
 import "../comps"
 import "../js/global.js" as G
-
+import "../js/util.js" as Util
+import "../js/app.js" as App
 Item {
     property Component content
     property int shadeWidth: isMax ? 0 : 10
@@ -44,6 +46,9 @@ Item {
                 iconType: 'more-down'
                 title: '更多'
                 width: 20
+                onClicked: {
+                    moreMenu.popup()
+                }
             }
             IconButton {
                 iconType: 'min'
@@ -112,5 +117,39 @@ Item {
     }
     Component.onCompleted: {
         mainWindow = G.root
+    }
+
+    // 右键菜单
+    Menu {
+        id: moreMenu
+        MenuItem {
+            text: (App.appState.floatWindow.visible ?  '隐藏' : '显示') + '悬浮窗'
+            onTriggered: {
+                App.appState.floatWindow.visible = !App.appState.floatWindow.visible
+            }
+        }
+        MenuItem {
+            text: '设置'
+            onTriggered: {
+            }
+        }
+        MenuItem {
+            text: '关于'
+            onTriggered: {
+            }
+        }
+        MenuItem {
+            text: '问题反馈'
+            onTriggered: {
+            }
+        }
+        MenuItem {
+            text: '重启'
+            onTriggered: Util.callGoSync("reboot")
+        }
+        MenuItem {
+            text: '退出程序'
+            onTriggered: Qt.quit()
+        }
     }
 }
