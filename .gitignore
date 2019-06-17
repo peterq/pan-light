@@ -1,12 +1,12 @@
 *.pro.user
 .idea
 pc/vendor
-moc*
+pc/gui/comp/moc*
 *.autosave
-rcc*
+pc/gui/qml/rcc*
 qml.rcc
 gui-plugin.so
 .env
 /demo
 *.pb.go
-deploy
+pc/deploy
