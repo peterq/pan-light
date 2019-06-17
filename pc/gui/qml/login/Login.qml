@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import "../js/util.js" as Util
+import "../widget"
 import "../comps"
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.2
@@ -11,6 +12,18 @@ Rectangle {
         Util.event.on('init.not-login', function () {
             visible = true
         })
+    }
+    Rectangle {
+        color: '#ccc'
+        width: parent.width
+        height: 30
+        MoveWindow {
+            anchors.fill: parent
+        }
+        Text {
+            anchors.centerIn: parent
+            text: 'pan-light 登录'
+        }
     }
     Loader {
         id: loginLoader

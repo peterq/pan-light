@@ -145,6 +145,7 @@ Item {
 
     Component.onCompleted: {
         console.log(Util.callGoSync('time'))
+        Util.openDesktopWidget()
         Util.callGoAsync('wait', {time: 1})
             .then(function(data) {
                 console.log('reslove', data)

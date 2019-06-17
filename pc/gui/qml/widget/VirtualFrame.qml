@@ -45,6 +45,7 @@ Item {
             IconButton {
                 iconType: 'more-down'
                 title: '更多'
+                visible: !!App.appState.transferComp
                 width: 20
                 onClicked: {
                     moreMenu.popup()
