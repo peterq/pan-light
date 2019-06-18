@@ -172,25 +172,28 @@ func (task *Task) start() (err error) {
 		return errors.New("当前状态不能开始任务")
 	}
 	task.updateState(STARTING)
-	err = task.init(false)
-	if err != nil {
-		task.lastErr = err
-		task.updateState(ERRORED)
-		return errors.Wrap(err, "任务初始化出错")
-	}
-	task.updateState(DOWNLOADING)
-	task.speedCoroutineContext, task.cancelSpeedCoroutine = context.WithCancel(context.Background())
-	go task.speedCalculateCoroutine()
-	for i := 0; i < task.coroutineNumber; i++ {
-		task.workers[i] = &worker{
-			id:   i,
-			task: task,
+	go func() error {
+		err = task.init(false)
+		if err != nil {
+			task.lastErr = err
+			task.updateState(ERRORED)
+			return errors.Wrap(err, "任务初始化出错")
 		}
-		go func(w *worker) {
-			w.work()
-			task.onWorkerExit(w)
-		}(task.workers[i])
-	}
+		task.updateState(DOWNLOADING)
+		task.speedCoroutineContext, task.cancelSpeedCoroutine = context.WithCancel(context.Background())
+		go task.speedCalculateCoroutine()
+		for i := 0; i < task.coroutineNumber; i++ {
+			task.workers[i] = &worker{
+				id:   i,
+				task: task,
+			}
+			go func(w *worker) {
+				w.work()
+				task.onWorkerExit(w)
+			}(task.workers[i])
+		}
+		return err
+	}()
 	return nil
 }
 
