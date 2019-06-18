@@ -48,9 +48,9 @@ type Task struct {
 	lastErr       error     // 保存上次错误
 	link          string    // 链接地址
 	finalLink     string    // redirect 之后的地址
-	downloadCount int64
-	speedCount    int64
-	speed         int64
+	downloadCount int64     // 下载总进度计数器
+	speedCount    int64     // 用来计算下载速度的计数器, 需要原子操作
+	speed         int64     // 上一秒下载平均速度
 
 	fileLength        int64      // 文件总大小
 	undistributed     []*segment // 尚未分配的片段
@@ -83,11 +83,13 @@ func (task *Task) pause() error {
 }
 
 // 初始化生成下载状态
-func (task *Task) init() (err error) {
+func (task *Task) init(isResume bool) (err error) {
+	// 文件id -> 下载链接
 	task.link, err = task.linkResolver(task.fileId)
 	if err != nil {
 		return errors.Wrap(err, "获取下载链接错误")
 	}
+	// 获取redirect之后的链接
 	req, err := http.NewRequest("GET", task.link, nil)
 	if err != nil {
 		return errors.Wrap(err, "无法创建request")
@@ -98,6 +100,7 @@ func (task *Task) init() (err error) {
 		return errors.Wrap(err, "获取最终链接错误")
 	}
 	req.URL, _ = url.Parse(task.finalLink)
+	// 判断是否支持断点续传
 	var supportRange bool
 	task.fileLength, _, supportRange, err = downloadFileInfo(req)
 	if err != nil {
@@ -106,21 +109,36 @@ func (task *Task) init() (err error) {
 	if !supportRange {
 		return errors.New("该文件不支持并行下载")
 	}
+	// 打开本地文件
 	task.fileHandle, err = os.OpenFile(task.savePath, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return errors.Wrap(err, "打开本地文件错误")
 	}
-	task.undistributed = append(task.undistributed, &segment{
-		start:  0,
-		len:    task.fileLength,
-		finish: 0,
-	})
-	task.downloadCount = 0
-	for _, seg := range task.wroteToDisk {
-		removeSegment(task.undistributed, seg)
-		task.downloadCount += seg.len
-	}
+	// 初始化worker map
 	task.workers = map[int]*worker{}
+	if isResume {
+		// 0 ~ file length 全部标记为未下载
+		task.undistributed = append(task.undistributed, &segment{
+			start:  0,
+			len:    task.fileLength,
+			finish: 0,
+		})
+		// 从未下载中去除已经下载的片段
+		task.downloadCount = 0
+		for _, seg := range task.wroteToDisk {
+			task.undistributed = removeSegment(task.undistributed, seg)
+			task.downloadCount += seg.len
+		}
+	} else {
+		// 新添加的任务
+		if task.undistributed == nil {
+			task.undistributed = append(task.undistributed, &segment{
+				start:  0,
+				len:    task.fileLength,
+				finish: 0,
+			})
+		}
+	}
 	return nil
 }
 
@@ -154,7 +172,7 @@ func (task *Task) start() (err error) {
 		return errors.New("当前状态不能开始任务")
 	}
 	task.updateState(STARTING)
-	err = task.init()
+	err = task.init(false)
 	if err != nil {
 		task.lastErr = err
 		task.updateState(ERRORED)
@@ -221,12 +239,13 @@ func (task *Task) writeToDisk(from int64, buffer *bytes.Buffer) (err error) {
 		len:    l,
 		finish: l,
 	})
-	task.capture()
+	task.capture(false)
 	return
 }
 
-func (task *Task) capture() {
-	if time.Now().Sub(task.lastCaptureTime) < time.Second {
+// 调用此函数请先锁住task.wroteToDisk
+func (task *Task) capture(force bool) {
+	if time.Now().Sub(task.lastCaptureTime) < time.Second && !force {
 		return
 	}
 	task.lastCaptureTime = time.Now()
@@ -254,6 +273,7 @@ func (task *Task) capture() {
 func (task *Task) downloadSegmentError(seg *segment) {
 	task.undistributedLock.Lock()
 	defer task.undistributedLock.Unlock()
+	seg.start += seg.finish
 	seg.finish = 0
 	task.undistributed = putBackSegment(task.undistributed, seg)
 	log.Println("下载片段错误", seg)
@@ -310,6 +330,15 @@ func (task *Task) onAllWorkerExit() {
 		os.Remove(task.savePath)
 		log.Println("delete", task.savePath)
 	}
+	task.wroteToDiskLock.Lock()
+	defer task.wroteToDiskLock.Unlock()
+	task.capture(true)
+	l := int64(0)
+	for _, s := range task.wroteToDisk {
+		l += s.len
+	}
+	task.downloadCount = l
+
 }
 
 // 通知事件给外部
@@ -362,7 +391,7 @@ func (task *Task) resume(str string) (err error) {
 		})
 	}
 	go func() {
-		err := task.init()
+		err := task.init(true)
 		if err != nil {
 			task.lastErr = err
 			task.updateState(ERRORED)

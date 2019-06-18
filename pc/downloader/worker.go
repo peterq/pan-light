@@ -1,7 +1,6 @@
 package downloader
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"github.com/pkg/errors"
@@ -108,19 +107,22 @@ ReadStream:
 			bufLen := int64(buf.Len())
 			if bufLen > 0 {
 				err = w.task.writeToDisk(seg.start+seg.finish, buf)
+				if err == nil {
+					seg.finish += bufLen
+				}
 			} else {
 				err = errors.New("canceled")
 			}
 			break ReadStream
 		}
 		if l > 0 { // 有数据, 写入缓存
-			func() { // 投毒检测
-				s := make([]byte, 1024)
-				if bytes.Equal(bin[:l], s[:l]) {
-					log.Println("检测到投毒", seg)
-					log.Println(resp.StatusCode, resp.Header)
-				}
-			}()
+			//func() { // 投毒检测
+			//	s := make([]byte, 1024)
+			//	if bytes.Equal(bin[:l], s[:l]) {
+			//		log.Println("检测到投毒", seg)
+			//		log.Println(resp.StatusCode, resp.Header)
+			//	}
+			//}()
 			buf.Write(bin[:l])
 			w.task.addDownloadCount(int64(l))
 			if buf.Len() == buf.Cap() || err == io.EOF { // 缓存满了, 或者流尾, 写入磁盘
