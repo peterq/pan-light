@@ -17,6 +17,10 @@ var baseSyncRoutes = map[string]syncHandler{
 	"env.internal_server_url": func(p map[string]interface{}) interface{} {
 		return dep.Env.InternalServerUrl
 	},
+	// 版本
+	"env.version": func(p map[string]interface{}) interface{} {
+		return dep.Env.VersionString
+	},
 	// 存数据
 	"storage.set": func(p map[string]interface{}) (result interface{}) {
 		storage.UserStorageSet(p["k"].(string), p["v"].(string))

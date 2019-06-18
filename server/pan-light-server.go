@@ -12,5 +12,5 @@ func main() {
 	app.Get("/", func(ctx context.Context) {
 		ctx.Write([]byte("Hello pan-light"))
 	})
-	app.Run(iris.Addr(":8081"))
+	app.Run(iris.Addr("127.0.0.1:8081"))
 }

@@ -5,6 +5,7 @@ package storage;
 message globalData {
     map<string, state> userStateMap = 1;
     string currentUser = 2;
+    int64 internalServerPort = 3;
 }
 
 message state {

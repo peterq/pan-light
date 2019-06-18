@@ -3,10 +3,11 @@ package pan_api
 import (
 	"fmt"
 	"github.com/peterq/pan-light/pc/dep"
+	"github.com/peterq/pan-light/pc/storage"
 	"io"
 	"log"
+	"net"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -21,12 +22,6 @@ type headChecker struct {
 }
 
 func (c headChecker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ua := r.Header.Get("User-Agent")
-	if strings.Index(ua, dep.Env.ElectronSecretUA) < 0 && false {
-		w.WriteHeader(404)
-		w.Write([]byte("hello, pan-light " + dep.Env.VersionString))
-		return
-	}
 	c.real.ServeHTTP(w, r)
 }
 
@@ -46,16 +41,22 @@ func startAgentServer() {
 		dep.Fatal("exit by api")
 	})
 
-	if dep.Env.Dev {
-		_, err := http.Get("http://127.0.0.1:" + fmt.Sprint(dep.Env.ListenPort) + "/exit")
+	if dep.Env.Dev && storage.Global.InternalServerPort > 0 {
+		_, err := http.Get("http://127.0.0.1:" + fmt.Sprint(storage.Global.InternalServerPort) + "/exit")
 		if err != nil {
 			time.Sleep(time.Second)
 		}
 	}
 
 	log.Println("Listening...")
-	dep.Env.InternalServerUrl = "http://127.0.0.1:" + fmt.Sprint(dep.Env.ListenPort)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", dep.Env.ListenPort), headChecker{real: mux})
+	listener, err := net.Listen("tcp", ":0")
+	if err != nil {
+		dep.Fatal(err.Error())
+	}
+	storage.Global.InternalServerPort = int64(listener.Addr().(*net.TCPAddr).Port)
+	log.Println("Using port:", storage.Global.InternalServerPort)
+	dep.Env.InternalServerUrl = "http://127.0.0.1:" + fmt.Sprint(storage.Global.InternalServerPort)
+	err = http.Serve(listener, headChecker{real: mux})
 	if err != nil {
 		dep.Fatal(err.Error())
 	}

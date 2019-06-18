@@ -72,7 +72,7 @@ Item {
                         MenuItem {
                             text: '关于'
                             onTriggered: {
-
+                                Util.openAbout()
                             }
                         }
                         MenuItem {

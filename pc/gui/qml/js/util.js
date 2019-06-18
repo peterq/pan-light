@@ -422,3 +422,14 @@ var openSetting = (function () {
         return ins
     }
 })()
+
+var openAbout = (function () {
+    var comp = loadComponent(function(){},'../pages/about-window.qml')
+    var ins
+    return function(){
+        if (!ins || !ins.visible) {
+            ins = comp.createObject(G.root)
+        }
+        return ins
+    }
+})()
