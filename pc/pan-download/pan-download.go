@@ -20,9 +20,9 @@ var useVipMap = map[downloader.TaskId]bool{}
 
 func init() {
 	dep.OnInit(func() {
-		parallel := 1
+		parallel := 1024
 		manager = &downloader.Manager{
-			CoroutineNumber:       parallel,
+			CoroutineNumber:       32,
 			SegmentSize:           1024 * 1024 * 2,
 			WroteToDiskBufferSize: 1024 * 512,
 			LinkResolver:          pan_api.Link,
@@ -41,6 +41,10 @@ func init() {
 		}()
 		//go test()
 	})
+}
+
+func Manager() *downloader.Manager {
+	return manager
 }
 
 func handleDownloadEvent(event *downloader.DownloadEvent) {

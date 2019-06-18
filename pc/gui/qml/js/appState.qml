@@ -39,6 +39,13 @@ Item {
         property string defaultDownloadPath: ''
         property string lastDownloadPath: ''
         property int maxParallelTaskNumber: 1
+        property int maxParallelCorutineNumber: 512
+
+        Component.onCompleted: {
+            Util.callGoSync('config', {
+                                "maxParallelCorutineNumber": maxParallelCorutineNumber
+                            })
+        }
     }
 
     onPathChanged: {

@@ -411,3 +411,14 @@ function humanSize(size) {
     }
     return size.toFixed(2) + unit[i]
 }
+
+var openSetting = (function () {
+    var comp = loadComponent(function(){},'../pages/setting-window.qml')
+    var ins
+    return function(){
+        if (!ins || !ins.visible) {
+            ins = comp.createObject(G.root)
+        }
+        return ins
+    }
+})()

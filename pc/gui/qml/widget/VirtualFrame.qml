@@ -6,6 +6,7 @@ import "../comps"
 import "../js/global.js" as G
 import "../js/util.js" as Util
 import "../js/app.js" as App
+
 Item {
     property Component content
     property int shadeWidth: isMax ? 0 : 10
@@ -13,7 +14,6 @@ Item {
     property var mainWindow
     width: parent.width
     height: parent.height
-
 
     Resize {
         width: contentContainer.width + 2 * maWidth
@@ -42,13 +42,54 @@ Item {
             anchors.rightMargin: 5
             y: 5
             spacing: 10
-            IconButton {
-                iconType: 'more-down'
-                title: '更多'
-                visible: !!App.appState.transferComp
-                width: 20
-                onClicked: {
-                    moreMenu.popup()
+            Loader {
+                sourceComponent: App.appState.transferComp ? downMoreBtnComp : null
+            }
+            Component {
+                id: downMoreBtnComp
+                IconButton {
+                    iconType: 'more-down'
+                    title: '更多'
+                    width: 20
+                    onClicked: {
+                        moreMenu.popup()
+                    }
+                    // 更多菜单
+                    Menu {
+                        id: moreMenu
+                        MenuItem {
+                            text: (App.appState.floatWindow.visible ? '隐藏' : '显示') + '悬浮窗'
+                            onTriggered: {
+                                App.appState.floatWindow.visible = !App.appState.floatWindow.visible
+                            }
+                        }
+                        MenuItem {
+                            text: '设置'
+                            onTriggered: {
+                                Util.openSetting()
+                            }
+                        }
+                        MenuItem {
+                            text: '关于'
+                            onTriggered: {
+
+                            }
+                        }
+                        MenuItem {
+                            text: '问题反馈'
+                            onTriggered: {
+
+                            }
+                        }
+                        MenuItem {
+                            text: '重启'
+                            onTriggered: Util.callGoSync("reboot")
+                        }
+                        MenuItem {
+                            text: '退出程序'
+                            onTriggered: Qt.quit()
+                        }
+                    }
                 }
             }
             IconButton {
@@ -92,14 +133,6 @@ Item {
         }
     }
 
-    //    DropShadow {
-    //            anchors.fill: contentContainer
-    //            radius: shadeWidth
-    //            samples: shadeWidth
-    //            spread: 0.1
-    //            color: "#80000000"
-    //            source: contentContainer
-    //    }
     DropShadow {
         anchors.fill: contentContainer
         horizontalOffset: -5
@@ -122,39 +155,5 @@ Item {
     }
     Component.onCompleted: {
         mainWindow = G.root
-    }
-
-    // 右键菜单
-    Menu {
-        id: moreMenu
-        MenuItem {
-            text: (App.appState.floatWindow.visible ?  '隐藏' : '显示') + '悬浮窗'
-            onTriggered: {
-                App.appState.floatWindow.visible = !App.appState.floatWindow.visible
-            }
-        }
-        MenuItem {
-            text: '设置'
-            onTriggered: {
-            }
-        }
-        MenuItem {
-            text: '关于'
-            onTriggered: {
-            }
-        }
-        MenuItem {
-            text: '问题反馈'
-            onTriggered: {
-            }
-        }
-        MenuItem {
-            text: '重启'
-            onTriggered: Util.callGoSync("reboot")
-        }
-        MenuItem {
-            text: '退出程序'
-            onTriggered: Qt.quit()
-        }
     }
 }

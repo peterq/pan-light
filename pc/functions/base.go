@@ -2,6 +2,7 @@ package functions
 
 import (
 	"github.com/peterq/pan-light/pc/dep"
+	"github.com/peterq/pan-light/pc/pan-download"
 	"github.com/peterq/pan-light/pc/storage"
 	"os"
 )
@@ -27,8 +28,15 @@ var baseSyncRoutes = map[string]syncHandler{
 	},
 	// 重启
 	"reboot": func(p map[string]interface{}) (result interface{}) {
+		dep.DoClose()
 		os.Exit(2)
 		return
+	},
+	// config
+	"config": func(p map[string]interface{}) (result interface{}) {
+		maxParallelCorutineNumber := int(p["maxParallelCorutineNumber"].(float64))
+		pan_download.Manager().CoroutineNumber = maxParallelCorutineNumber
+		return true
 	},
 }
 
