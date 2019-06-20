@@ -12,6 +12,10 @@ Util.event.once('init.api.ok', function (loginSession) {
     appState.loginSession = loginSession
     enterPath('/')
     console.log('app.js ', JSON.stringify(appState.loginSession))
+    Util.callGoAsync("api.login")
+        .then(function (token) {
+            console.log('登录 pan-light server 成功')
+        })
 })
 
 // 历史记录后退

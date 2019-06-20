@@ -3,6 +3,7 @@ package pan_api
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/peterq/pan-light/pc/storage"
 )
 
 type LoginSessionStruct struct {
@@ -13,9 +14,11 @@ type LoginSessionStruct struct {
 	Sign      string
 	Timestamp string
 	Bdstoken  string
+	Bduss     string
 }
 
 var LoginSession *LoginSessionStruct
+var bduss string
 
 func handleLoginSession(rawJson *tJson) {
 	LoginSession = new(LoginSessionStruct)
@@ -26,6 +29,8 @@ func handleLoginSession(rawJson *tJson) {
 	LoginSession.Sign = sign(raw["sign3"].(string), raw["sign1"].(string))
 	LoginSession.Timestamp = fmt.Sprint(int(raw["timestamp"].(float64)))
 	LoginSession.Bdstoken = raw["bdstoken"].(string)
+	LoginSession.Bduss = bduss
+	storage.UserState.Uk = fmt.Sprint(int64(raw["uk"].(float64)))
 }
 func sign(j, r string) string {
 	a := [256]int{}

@@ -56,7 +56,7 @@ Window {
             Text {
                 text: ['<b>pan-light&nbsp;&nbsp;&nbsp;' + window.version + '</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="'
                     + window.userAgreementLink + '" >查看用户协议</a>',
-                    '作&nbsp;&nbsp;&nbsp;&nbsp;者&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PeterQ&lt;<a href="mailto://' + window.email
+                    '作&nbsp;&nbsp;&nbsp;&nbsp;者&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PeterQ&lt;<a href="mailto:' + window.email
                     + '" >' + window.email
                     + '</a>&gt;', 'Git Repo&nbsp;&nbsp;' + '<a href="' + window.gitRepoUrl
                     + '" >' + window.gitRepoUrl + '</a>'].join(

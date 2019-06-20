@@ -13,8 +13,8 @@ func init() {
 
 type syncHandler func(p map[string]interface{}) (result interface{})
 
-type asyncHandler func(map[string]interface{},
-	func(interface{}), func(interface{}), func(interface{}), chan interface{})
+type asyncHandler func(p map[string]interface{},
+	resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{})
 
 func syncMap(r map[string]syncHandler) {
 	r1 := map[string]func(map[string]interface{}) interface{}{}

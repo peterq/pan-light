@@ -1,10 +1,12 @@
 package dep
 
 import (
+	"math/rand"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 type tEnv struct {
@@ -19,6 +21,7 @@ type tEnv struct {
 }
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
 	Env.Platform = runtime.GOOS
 	switch Env.Platform {
 	case "linux", "darwin":

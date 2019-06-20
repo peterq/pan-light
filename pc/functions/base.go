@@ -2,8 +2,11 @@ package functions
 
 import (
 	"github.com/peterq/pan-light/pc/dep"
+	"github.com/peterq/pan-light/pc/pan-api"
 	"github.com/peterq/pan-light/pc/pan-download"
+	"github.com/peterq/pan-light/pc/server-api"
 	"github.com/peterq/pan-light/pc/storage"
+	"log"
 	"os"
 )
 
@@ -44,4 +47,41 @@ var baseSyncRoutes = map[string]syncHandler{
 	},
 }
 
-var baseAsyncRoutes = map[string]asyncHandler{}
+var baseAsyncRoutes = map[string]asyncHandler{
+	"api.login": func(p map[string]interface{}, resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{}) {
+		data, err := server_api.Call("login-token", gson{
+			"uk": storage.UserState.Uk,
+		})
+		if err != nil {
+			reject(err)
+			return
+		}
+		token := data.(gson)["token"]
+		filename := data.(gson)["filename"].(string)
+		if err != nil {
+			reject(err)
+			return
+		}
+		fid, serverPath, err := pan_api.UploadText(token.(string), "auth."+filename)
+		if err != nil {
+			reject(err)
+			return
+		}
+		log.Println(serverPath, filename)
+		defer pan_api.DeleteFile(serverPath)
+		link, secret, err := pan_api.ShareFile(fid, "")
+		log.Println(link, secret, err)
+		jwt, err := server_api.Call("login", gson{
+			"link":   link,
+			"secret": secret,
+			"token":  token,
+		})
+		storage.UserState.Token = jwt.(string)
+		if err != nil {
+			reject(err)
+			return
+		}
+		log.Println(jwt)
+		resolve(jwt)
+	},
+}

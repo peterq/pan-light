@@ -18,6 +18,7 @@ message state {
     repeated cookies panCookie = 3;
     map<string, string> userStorage = 4;
     string username = 5;
+    string uk = 6;
 }
 
 message cookies {
