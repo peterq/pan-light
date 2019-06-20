@@ -11,12 +11,12 @@ type gson = map[string]interface{}
 var UserDao = &userDao{}
 
 type UserModel struct {
-	Uk           string // 百度 uk
-	MarkUsername string // 脱敏 用户名
-	Username     string `json:"username,omitempty"` // 用户名
-	Avatar       string
-	IsVip        bool
-	IsSuperVip   bool
+	Uk           string `json:"uk" bson:"uk"`                       // 百度 uk
+	MarkUsername string `json:"mark_username" bson:"mark_username"` // 脱敏 用户名
+	Username     string `json:"username" bson:"username,omitempty"` // 用户名
+	Avatar       string `json:"avatar" bson:"avatar"`
+	IsVip        bool   `json:"is_vip" bson:"is_vip"`
+	IsSuperVip   bool   `json:"is_super_vip" bson:"is_super_vip"`
 }
 
 type userDao struct{}
