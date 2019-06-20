@@ -99,3 +99,7 @@ func ParseToken(token string) (claim jwt.MapClaims, err error) {
 	}
 	return
 }
+
+func CotextLoginInfo(ctx context.Context) *PcLoginInfo {
+	return ctx.Values().Get(conf.CtxPcLogin).(*PcLoginInfo)
+}

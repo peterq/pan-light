@@ -73,6 +73,6 @@ func handleLogin(ctx context.Context, param map[string]interface{}) (result inte
 }
 
 func handleFeedBack(ctx context.Context, param map[string]interface{}) (result interface{}, err error) {
-	result = ctx.Values().Get(conf.CtxPcLogin).(*middleware.PcLoginInfo).User()
+	result = middleware.CotextLoginInfo(ctx).User()
 	return
 }
