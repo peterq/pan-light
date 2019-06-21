@@ -45,6 +45,13 @@ var baseSyncRoutes = map[string]syncHandler{
 		pan_download.Manager().CoroutineNumber = maxParallelCorutineNumber
 		return true
 	},
+	// 退出登录
+	"logout": func(p map[string]interface{}) (result interface{}) {
+		storage.Global.CurrentUser = "default"
+		dep.DoClose()
+		os.Exit(2)
+		return
+	},
 }
 
 var baseAsyncRoutes = map[string]asyncHandler{

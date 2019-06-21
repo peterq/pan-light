@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.2
 
 Rectangle {
+    id: root
     anchors.fill: parent
     visible: false
     Component.onCompleted: {
@@ -30,15 +31,18 @@ Rectangle {
     }
     Component {
         id: wxLoginComp
-        Wx {}
+        Wx {
+        }
     }
     Component {
         id: baiduLoginComp
-        Baidu {}
+        Baidu {
+        }
     }
     Component {
         id: qqLoginComp
-        QQ {}
+        QQ {
+        }
     }
     ColumnLayout {
         anchors.centerIn: parent
@@ -47,7 +51,6 @@ Rectangle {
             Layout.alignment: Qt.AlignCenter
             text: '请选择一种方式登录你的百度网盘'
         }
-
 
         RowLayout {
             Layout.alignment: Qt.AlignCenter
@@ -78,22 +81,39 @@ Rectangle {
                 sourceComponent: loginMethodComp
             }
         }
+
+        Button {
+            text: 'cookie login'
+            onClicked: {
+                Util.prompt({
+                                "title": '请输入 cookie',
+                                "msg": '你可以在浏览器中登录百度账号, 然后复制cookie到这里',
+                                "content": ''
+                            })
+                .then(function(cookie) {
+                    return Util.callGoAsync('login.cookie', {cookie: cookie})
+                })
+                .then(function () {
+                    Util.event.fire('login.success', 'cookie')
+                    root.visible = false
+                })
+            }
+        }
     }
 
     function showLogin(type) {
-        if (loginLoader.sourceComponent) return
+        if (loginLoader.sourceComponent)
+            return
         var compMap = {
-            'wx': wxLoginComp,
-            'baidu': baiduLoginComp,
-            'qq': qqLoginComp
+            "wx": wxLoginComp,
+            "baidu": baiduLoginComp,
+            "qq": qqLoginComp
         }
         loginLoader.sourceComponent = compMap[type]
-        loginLoader.item.start()
-        .then(function(){
+        loginLoader.item.start().then(function () {
             Util.event.fire('login.success', type)
             visible = false
-        })
-        .finally(function(){
+        }).finally(function () {
             console.log('login finish')
             loginLoader.sourceComponent = null
         })

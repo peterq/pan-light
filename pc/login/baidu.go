@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -104,4 +105,25 @@ OnErr:
 	}
 	err = errors.New(body)
 	goto OnErr
+}
+
+func BaiduCookieLogin(cookieStr string) error {
+	var cookies []*http.Cookie
+	parts := strings.Split(strings.TrimSpace(cookieStr), ";")
+	for i := 0; i < len(parts); i++ {
+		parts[i] = strings.TrimSpace(parts[i])
+		if len(parts[i]) == 0 {
+			continue
+		}
+		name, val := parts[i], ""
+		if j := strings.Index(name, "="); j >= 0 {
+			name, val = name[:j], name[j+1:]
+		}
+		cookies = append(cookies, &http.Cookie{Name: name, Value: val})
+	}
+
+	u, _ := url.Parse("https://pan.baidu.com")
+	cookieJar.SetCookies(u, cookies)
+	log.Println(cookieJar.Cookies(u))
+	return handleLoginSuccess()
 }

@@ -54,6 +54,7 @@ func doInit() {
 	} else {
 		firstStart()
 	}
+	Global.UserStateMap["default"] = firstLogin("default")
 	UserState = Global.UserStateMap[Global.CurrentUser]
 }
 

@@ -309,7 +309,7 @@ var showMenu = (function () {
 })()
 
 function isVideo(f){
-    var ext = ['mp4', 'avi', 'rmvb', 'mkv', 'mov']
+    var ext = ['mp4', 'avi', 'rmvb', 'mkv', 'mov', 'wmv']
     var e = f.split('.').pop().toLowerCase()
     return ext.indexOf(e) >= 0
 }

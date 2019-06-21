@@ -62,7 +62,7 @@ func readHtml(reader io.Reader) string {
 type tJson map[string]interface{}
 type tBin []byte
 
-func handleLoginSuccess() {
+func handleLoginSuccess() (err error) {
 	link := "https://pan.baidu.com/disk/home"
 	u, _ := url.Parse(link)
 	log.Println("登录成功", cookieJar.Cookies(u))
@@ -78,12 +78,16 @@ func handleLoginSuccess() {
 	body := string(bin)
 	reg := regexp.MustCompile(`var context=(.*);\n`)
 	find := reg.FindStringSubmatch(body)
+	if len(find) != 2 {
+		return errors.New("未找到context")
+	}
 	raw := tJson{}
 	err = json.Unmarshal([]byte(find[1]), &raw)
 	if err != nil {
 		log.Println(body)
 		return
 	}
+	log.Println(raw["username"])
 	storage.OnLogin(raw["username"].(string))
 	log.Println(req.Cookies())
 	var cookies []*storage.Cookies
@@ -95,4 +99,5 @@ func handleLoginSuccess() {
 	}
 	storage.UserState.PanCookie = cookies
 	log.Println("global pan cookie", storage.UserState.PanCookie)
+	return
 }

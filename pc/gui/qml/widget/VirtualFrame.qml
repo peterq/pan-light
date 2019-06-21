@@ -64,6 +64,12 @@ Item {
                             }
                         }
                         MenuItem {
+                            text: '登出账号'
+                            onTriggered: {
+                                Util.callGoSync('logout')
+                            }
+                        }
+                        MenuItem {
                             text: '设置'
                             onTriggered: {
                                 Util.openSetting()

@@ -137,4 +137,13 @@ var loginAsyncRoutes = map[string]asyncHandler{
 		}
 		login.BaiduLogin(option)
 	},
+	"login.cookie": func(p map[string]interface{}, resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{}) {
+		cookie := p["cookie"].(string)
+		err := login.BaiduCookieLogin(cookie)
+		if err != nil {
+			reject(err)
+		} else {
+			resolve("ok")
+		}
+	},
 }

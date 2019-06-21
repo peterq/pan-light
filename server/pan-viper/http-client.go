@@ -5,7 +5,6 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"log"
-	"math"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -22,12 +21,10 @@ func makeHttpClient(bduss string) http.Client {
 	u, _ := url.Parse("https://pan.baidu.com")
 	jar.SetCookies(u, []*http.Cookie{
 		{
-			Name:     "BDUSS",
-			Value:    bduss,
-			Path:     "/",
-			HttpOnly: false,
-			MaxAge:   math.MaxInt32,
-			Domain:   "*.baidu.com",
+			Name:   "BDUSS",
+			Value:  bduss,
+			Path:   "/",
+			Domain: ".baidu.com",
 		},
 	})
 	httpClient := http.Client{
