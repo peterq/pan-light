@@ -15,7 +15,7 @@ import (
 type gson = map[string]interface{}
 
 func handleLoginToken(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
-	uk := param["uk"].(string)
+	uk := param.Get("uk").String()
 	filename := artisan.Md5bin([]byte(fmt.Sprint(time.Now().UnixNano())))
 	filename = filename[:8]
 	token, e := middleware.NewJwtToken(time.Minute*5, map[string]interface{}{
@@ -33,9 +33,9 @@ func handleLoginToken(ctx context.Context, param artisan.JsonMap) (result interf
 }
 
 func handleLogin(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
-	link := param["link"].(string)
-	secret := param["secret"].(string)
-	token := param["token"].(string)
+	link := param.Get("link").String()
+	secret := param.Get("secret").String()
+	token := param.Get("token").String()
 
 	claim, e := middleware.ParseToken(token)
 	if e != nil {
