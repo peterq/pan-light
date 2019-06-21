@@ -10,10 +10,10 @@ import (
 	"time"
 )
 
-func ApiHandler(handler func(ctx context.Context, param map[string]interface{}) (result interface{}, err error)) func(ctx context.Context) {
+func ApiHandler(handler func(ctx context.Context, param JsonMap) (result interface{}, err error)) func(ctx context.Context) {
 
 	return func(ctx context.Context) {
-		var param map[string]interface{}
+		var param JsonMap
 		var result interface{}
 
 		err := ctx.ReadJSON(&param)
@@ -128,4 +128,69 @@ func Throttle(options ...ThrottleOption) func(ctx context.Context) {
 		}
 		ctx.Next()
 	}
+}
+
+type JsonMap map[string]interface{}
+type JsonValue struct {
+	name string
+	data interface{}
+}
+
+func (m JsonMap) Get(keys ...string) JsonValue {
+	if len(keys) == 1 {
+		keys = strings.Split(keys[0], ".")
+	}
+	if len(keys) == 1 {
+		return JsonValue{
+			name: keys[0],
+			data: m[keys[0]],
+		}
+	}
+	parent := m.Get(keys[:len(keys)-1]...).Map()
+	return JsonValue{
+		name: strings.Join(keys, "."),
+		data: parent[keys[len(keys)-1]],
+	}
+}
+
+func (v JsonValue) Map() JsonMap {
+	if m, ok := v.data.(map[string]interface{}); ok {
+		return m
+	}
+	panic(NewError(fmt.Sprintf("%s needs to be map, %T given", v.name, v.data), -1, nil))
+}
+
+func (v JsonValue) String(ignore ...interface{}) string {
+	if m, ok := v.data.(string); ok {
+		return m
+	}
+	panic(NewError(fmt.Sprintf("%s needs to be string, %T given", v.name, v.data), -1, nil))
+}
+
+func (v JsonValue) Int() int {
+	if m, ok := v.data.(float64); ok {
+		return int(m)
+	}
+	panic(NewError(fmt.Sprintf("%s needs to be int, %T given", v.name, v.data), -1, nil))
+}
+
+func (v JsonValue) Float() float64 {
+	if m, ok := v.data.(float64); ok {
+		return m
+	}
+	panic(NewError(fmt.Sprintf("%s needs to be float, %T given", v.name, v.data), -1, nil))
+}
+
+func (v JsonValue) Array() []JsonValue {
+	if m, ok := v.data.([]interface{}); ok {
+		arr := make([]JsonValue, len(m))
+		for idx, value := range m {
+			arr[idx] = JsonValue{
+				name: v.name + " index of " + fmt.Sprint(idx),
+				data: value,
+			}
+		}
+		return arr
+	}
+	panic(NewError(fmt.Sprintf("%s needs to be array, %T given", v.name, v.data), -1, nil))
 }

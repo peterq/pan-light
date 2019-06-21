@@ -14,7 +14,7 @@ import (
 
 type gson = map[string]interface{}
 
-func handleLoginToken(ctx context.Context, param map[string]interface{}) (result interface{}, err error) {
+func handleLoginToken(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
 	uk := param["uk"].(string)
 	filename := artisan.Md5bin([]byte(fmt.Sprint(time.Now().UnixNano())))
 	filename = filename[:8]
@@ -32,7 +32,7 @@ func handleLoginToken(ctx context.Context, param map[string]interface{}) (result
 	return
 }
 
-func handleLogin(ctx context.Context, param map[string]interface{}) (result interface{}, err error) {
+func handleLogin(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
 	link := param["link"].(string)
 	secret := param["secret"].(string)
 	token := param["token"].(string)
@@ -72,7 +72,14 @@ func handleLogin(ctx context.Context, param map[string]interface{}) (result inte
 	return
 }
 
-func handleFeedBack(ctx context.Context, param map[string]interface{}) (result interface{}, err error) {
-	result = middleware.CotextLoginInfo(ctx).User()
+func handleFeedBack(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
+	content := param.Get("content").String()
+	err = dao.FeedbackDao.Insert(dao.FeedbackModel{
+		Uk:      middleware.CotextLoginInfo(ctx).Uk(),
+		Content: content,
+	})
+	if err != nil {
+		err = artisan.NewError("database error", -1, nil)
+	}
 	return
 }
