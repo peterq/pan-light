@@ -47,7 +47,28 @@ var baseSyncRoutes = map[string]syncHandler{
 	},
 	// 退出登录
 	"logout": func(p map[string]interface{}) (result interface{}) {
+		if p["remove"].(bool) {
+			storage.UserState.Logout = true
+		}
 		storage.Global.CurrentUser = "default"
+		dep.DoClose()
+		os.Exit(2)
+		return
+	},
+	// 账号列表
+	"account.list": func(p map[string]interface{}) (result interface{}) {
+		var accounts []string
+		for key, v := range storage.Global.UserStateMap {
+			if v.Logout || key == "default" || key == storage.UserState.Username {
+				continue
+			}
+			accounts = append(accounts, key)
+		}
+		return accounts
+	},
+	// 切换账号
+	"account.change": func(p map[string]interface{}) (result interface{}) {
+		storage.Global.CurrentUser = p["username"].(string)
 		dep.DoClose()
 		os.Exit(2)
 		return

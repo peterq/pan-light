@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"strings"
 	"time"
@@ -108,6 +109,8 @@ OnErr:
 }
 
 func BaiduCookieLogin(cookieStr string) error {
+	cookieJar, _ = cookiejar.New(nil)
+	httpClient.Jar = cookieJar
 	var cookies []*http.Cookie
 	parts := strings.Split(strings.TrimSpace(cookieStr), ";")
 	for i := 0; i < len(parts); i++ {

@@ -66,7 +66,38 @@ Item {
                         MenuItem {
                             text: '登出账号'
                             onTriggered: {
-                                Util.callGoSync('logout')
+                                Util.callGoSync('logout', {remove: true})
+                            }
+                        }
+                        Menu {
+                            id: changeAccount
+                            property var accounts: []
+                            title: '切换账号'
+                            MenuItem {
+                                text: '登录新账号'
+                                onTriggered: {
+                                    Util.callGoSync('logout', {remove: false})
+                                }
+                            }
+                            MenuSeparator{}
+                            Component {
+                                id: accountMenuComp
+                                MenuItem {
+                                    onTriggered: {
+                                        Util.callGoSync("account.change", {
+                                                            "username": text
+                                                        })
+                                    }
+                                }
+                            }
+                            Component.onCompleted: {
+                                accounts = Util.callGoSync('account.list')
+                                accounts.forEach(function (item, idx) {
+                                    var ins = accountMenuComp.createObject(changeAccount, {
+                                                                        "text": item
+                                                                    })
+                                    items.push(ins)
+                                })
                             }
                         }
                         MenuItem {

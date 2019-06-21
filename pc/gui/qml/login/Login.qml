@@ -3,7 +3,7 @@ import "../js/util.js" as Util
 import "../widget"
 import "../comps"
 import QtQuick.Layouts 1.1
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.4
 
 Rectangle {
     id: root
@@ -47,9 +47,44 @@ Rectangle {
     ColumnLayout {
         anchors.centerIn: parent
         spacing: 20
+        ComboBox {
+            Layout.alignment: Layout.Center
+            model: []
+            visible: false
+            displayText: '选择账号'
+            Component.objectName: {
+                model = Util.callGoSync('account.list')
+                if (model.length > 0)
+                    visible = true
+            }
+            onActivated: {
+                Util.callGoSync("account.change", {
+                                    "username": model[index]
+                                })
+            }
+        }
         Text {
             Layout.alignment: Qt.AlignCenter
             text: '请选择一种方式登录你的百度网盘'
+            property int clickNum: 0
+            Timer {
+                id: timerClickNum
+                interval: 400
+                onTriggered: {
+                    parent.clickNum = 0
+                }
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    parent.clickNum++
+                    if (parent.clickNum > 3) {
+                        parent.clickNum = 0
+                        btnCookieLogin.visible = !btnCookieLogin.visible
+                    }
+                    timerClickNum.restart()
+                }
+            }
         }
 
         RowLayout {
@@ -83,6 +118,8 @@ Rectangle {
         }
 
         Button {
+            id: btnCookieLogin
+            visible: false
             text: 'cookie login'
             onClicked: {
                 Util.prompt({
@@ -98,6 +135,7 @@ Rectangle {
                     root.visible = false
                 })
             }
+            Layout.alignment: Layout.Center
         }
     }
 
