@@ -51,6 +51,11 @@ func pcAuthRoutes(r router.Party) {
 
 	post("share", artisan.ThrottleOption{
 		Duration: time.Hour,
-		Number:   500,
+		Number:   5,
 	}, handleShareToSquare)
+
+	post("share/list", artisan.ThrottleOption{
+		Duration: time.Second * 5,
+		Number:   5,
+	}, handleShareList)
 }

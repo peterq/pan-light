@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/kataras/iris/context"
+	"github.com/kataras/iris/core/errors"
 	"github.com/peterq/pan-light/server/artisan"
 	"github.com/peterq/pan-light/server/conf"
 	"github.com/peterq/pan-light/server/dao"
@@ -160,5 +161,26 @@ func handleShareToSquare(ctx context.Context, param artisan.JsonMap) (result int
 		return
 	}
 	result = share
+	return
+}
+
+func handleShareList(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
+	offset := param.Get("offset").Int()
+	pageSize := param.Get("pageSize").Int()
+	listType := param.Get("type").String()
+	if pageSize < 1 || pageSize > 20 || offset < 0 {
+		return nil, errors.New("param invalid")
+	}
+	if offset > 300 {
+		return []gson{}, nil
+	}
+	if _, ok := map[string]bool{
+		"newest":   true,
+		"hottest":  true,
+		"official": true,
+	}[listType]; !ok {
+		return nil, errors.New("type invalid")
+	}
+	result, err = dao.FileShareDao.List(pageSize, offset, listType)
 	return
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
+	"github.com/peterq/pan-light/server/artisan/cache"
 	"github.com/peterq/pan-light/server/conf"
 	"github.com/peterq/pan-light/server/pc-api/middleware"
 	"runtime/debug"
@@ -90,7 +91,7 @@ func (o ThrottleOption) hit(ctx context.Context) time.Duration {
 	stateKey := "throttle-" + key
 
 	var state throttleState
-	RedisGet(stateKey, &state)
+	cache.RedisGet(stateKey, &state)
 	// 计算现有数量
 	speed := float64(o.Number) / float64(o.Duration/time.Second) // 每秒流失的水
 	du := time.Duration(time.Now().UnixNano() - state.Time)
@@ -104,7 +105,7 @@ func (o ThrottleOption) hit(ctx context.Context) time.Duration {
 	}
 	state.Time = time.Now().UnixNano()
 	state.Water = water
-	err := RedisSet(stateKey, state, o.Duration)
+	err := cache.RedisSet(stateKey, state, o.Duration)
 	if err != nil {
 		panic(err)
 	}
@@ -126,6 +127,10 @@ func Throttle(options ...ThrottleOption) func(ctx context.Context) {
 		}
 	}
 	return func(ctx context.Context) {
+		if conf.Conf.Debug {
+			ctx.Next()
+			return
+		}
 		for _, option := range options {
 			ban := option.hit(ctx)
 			if ban > 0 {

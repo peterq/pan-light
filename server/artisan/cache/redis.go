@@ -1,4 +1,4 @@
-package artisan
+package cache
 
 import (
 	"encoding/json"

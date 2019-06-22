@@ -20,6 +20,7 @@ var urlMap = map[string]string{
 	"feedback":      "/api/pc/feedback",
 	"refresh-token": "/api/pc/refresh-token",
 	"share":         "/api/pc/share",
+	"share-list":    "/api/pc/share/list",
 }
 var httpClient = http.Client{
 	//Timeout: 15 * time.Second,
