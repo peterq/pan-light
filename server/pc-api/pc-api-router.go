@@ -19,7 +19,7 @@ func Init(app *iris.Application) {
 		Duration: time.Second * 5,
 		Number:   20,
 		GetKey: func(ctx context.Context) string {
-			return "pc.api." + middleware.CotextLoginInfo(ctx).Uk()
+			return "pc.api." + middleware.ContextLoginInfo(ctx).Uk()
 		},
 	}))
 	pcAuthRoutes(pc)
@@ -27,8 +27,25 @@ func Init(app *iris.Application) {
 
 // 需要登录的api
 func pcAuthRoutes(r router.Party) {
-	r.Post("feedback", artisan.Throttle(artisan.ThrottleOption{
+
+	post := func(path string, handlers ...interface{}) {
+		var hs []context.Handler
+		for _, h := range handlers {
+			if fn, ok := h.(func(ctx context.Context, param artisan.JsonMap) (result interface{}, err error)); ok {
+				hs = append(hs, artisan.ApiHandler(fn))
+			} else if o, ok := h.(artisan.ThrottleOption); ok {
+				hs = append(hs, artisan.Throttle(o))
+			} else {
+				hs = append(hs, h.(context.Handler))
+			}
+		}
+		r.Post(path, hs...)
+	}
+
+	post("feedback", artisan.ThrottleOption{
 		Duration: time.Hour,
 		Number:   5,
-	}), artisan.ApiHandler(handleFeedBack))
+	}, handleFeedBack)
+
+	post("refresh-token", handleRefreshToken)
 }

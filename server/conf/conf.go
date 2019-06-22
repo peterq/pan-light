@@ -9,6 +9,7 @@ import (
 )
 
 type conf struct {
+	Debug      bool
 	AppSecret  string
 	MongodbUri string
 	Database   string
@@ -27,6 +28,7 @@ func init() {
 	}
 	IrisConf = iris.YAML(confFile)
 	Conf = &conf{
+		Debug:      getConf("debug").(bool),
 		AppSecret:  getConf("app-secret").(string),
 		MongodbUri: getConf("mongodb-uri").(string),
 		Database:   getConf("database").(string),

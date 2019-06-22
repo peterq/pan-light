@@ -95,10 +95,13 @@ var baseAsyncRoutes = map[string]asyncHandler{
 			reject(err)
 			return
 		}
-		log.Println(serverPath, filename)
 		defer pan_api.DeleteFile(serverPath)
 		link, secret, err := pan_api.ShareFile(fid, "")
 		log.Println(link, secret, err)
+		if err != nil {
+			reject(err)
+			return
+		}
 		jwt, err := server_api.Call("login", gson{
 			"link":   link,
 			"secret": secret,

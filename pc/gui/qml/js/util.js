@@ -446,5 +446,6 @@ var openFeedback = (function () {
 })()
 
 function api(name, param) {
+    param = param || {}
     return callGoAsync('api.call', {name: name, param: param})
 }

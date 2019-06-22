@@ -338,7 +338,6 @@ func UploadText(content string, path string) (fid, serverPath string, err error)
 	if err != nil {
 		return
 	}
-	log.Println(data)
 	fid = fmt.Sprint(int64(data["fs_id"].(float64)))
 	serverPath = data["path"].(string)
 	return

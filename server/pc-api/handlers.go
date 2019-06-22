@@ -2,6 +2,7 @@ package pc_api
 
 import (
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/kataras/iris/context"
 	"github.com/peterq/pan-light/server/artisan"
 	"github.com/peterq/pan-light/server/conf"
@@ -72,10 +73,24 @@ func handleLogin(ctx context.Context, param artisan.JsonMap) (result interface{}
 	return
 }
 
+func handleRefreshToken(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
+	token := middleware.PcJwtHandler.Get(ctx)
+	claims := token.Claims.(jwt.MapClaims)
+	if claims.VerifyExpiresAt(time.Now().Add(time.Hour*24*5).Unix(), true) {
+		result, err = middleware.NewJwtToken(time.Hour*24*30, gson{
+			"type": conf.JwtPcLogin,
+			"uk":   middleware.ContextLoginInfo(ctx).Uk(),
+		})
+		return
+	}
+	result = token.Raw
+	return
+}
+
 func handleFeedBack(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
 	content := param.Get("content").String()
 	err = dao.FeedbackDao.Insert(dao.FeedbackModel{
-		Uk:      middleware.CotextLoginInfo(ctx).Uk(),
+		Uk:      middleware.ContextLoginInfo(ctx).Uk(),
 		Content: content,
 	})
 	if err != nil {

@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
+	"github.com/peterq/pan-light/server/conf"
 	"github.com/peterq/pan-light/server/pc-api/middleware"
+	"runtime/debug"
 	"strings"
 	"time"
 )
@@ -54,7 +56,11 @@ func ApiRecover(ctx context.Context) {
 			if appErr, ok = err.(AppError); !ok {
 				ctx.StatusCode(iris.StatusInternalServerError)
 				appErr = NewError("internal server error", 500, err)
-				ctx.Application().Logger().Error(err)
+				if conf.Conf.Debug {
+					ctx.Application().Logger().Error(err, string(debug.Stack()))
+				} else {
+					ctx.Application().Logger().Error(err)
+				}
 			}
 
 			ctx.JSON(map[string]interface{}{
@@ -112,7 +118,7 @@ func Throttle(options ...ThrottleOption) func(ctx context.Context) {
 			options[i].GetKey = func(ctx context.Context) string {
 				return strings.Join([]string{
 					ctx.GetCurrentRoute().Name(),
-					middleware.CotextLoginInfo(ctx).Uk(),
+					middleware.ContextLoginInfo(ctx).Uk(),
 					fmt.Sprint(option.Duration),
 					fmt.Sprint(option.Number),
 				}, ".")
