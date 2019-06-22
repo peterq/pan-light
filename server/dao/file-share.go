@@ -11,6 +11,7 @@ type FileShareModel struct {
 	Md5      string
 	SliceMd5 string `bson:"slice_md5"`
 	FileSize int64  `bson:"file_size"`
+	ShareAt  int64  `bson:"share_at"`
 	ExpireAt int64  `bson:"expire_at"`
 }
 

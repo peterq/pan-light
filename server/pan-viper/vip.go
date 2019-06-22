@@ -60,7 +60,7 @@ func (v *Vip) loginSession() *loginSession {
 }
 
 func (v *Vip) init() {
-	v.http = makeHttpClient(v.cookieRaw)
+	v.http, v.bduss = makeHttpClient(v.cookieRaw)
 	go v.CreateSession()
 }
 
@@ -184,6 +184,38 @@ func (v *Vip) LoadShareFilenameAndUk(link, secret string) (uk, filename string, 
 	return
 }
 
+func (v *Vip) DeleteFile(serverPath string) (err error) {
+	ss := v.loginSession()
+	data, err := v.request("POST", "https://pan.baidu.com/api/filemanager", gson{
+		"opera":      "delete",
+		"async":      2,
+		"onnest":     "fail",
+		"channel":    "chunlei",
+		"web":        1,
+		"app_id":     250528,
+		"bdstoken":   ss.Bdstoken,
+		"logid":      time.Now().UnixNano(),
+		"clienttype": 0,
+	}, gson{
+		"filelist": fmt.Sprintf("[\"%s\"]", serverPath),
+	})
+	if err != nil {
+		return
+	}
+	data, err = v.request("POST", "https://pan.baidu.com/share/taskquery", gson{
+		"taskid":     int64(data["taskid"].(float64)),
+		"channel":    "chunlei",
+		"web":        "1",
+		"app_id":     "250528",
+		"bdstoken":   ss.Bdstoken,
+		"logid":      time.Now().UnixNano(),
+		"clienttype": "0",
+	}, gson{
+		"filelist": fmt.Sprintf("[\"%s\"]", serverPath),
+	})
+	return
+}
+
 func (v *Vip) SaveFileByMd5(md5, sliceMd5, path string, contentLength int64) (fid string, fileSize int64, err error) {
 	ss := v.loginSession()
 	data, err := v.request("POST", "https://pan.baidu.com/api/rapidupload", gson{
@@ -205,6 +237,13 @@ func (v *Vip) SaveFileByMd5(md5, sliceMd5, path string, contentLength int64) (fi
 	if _, ok := data["errno"]; !ok {
 		log.Println(data)
 		err = errors.New("极速上传失败")
+	}
+	info := data["info"].(gson)
+	fid = fmt.Sprint(int64(info["fs_id"].(float64)))
+	fileSize = int64(info["size"].(float64))
+	serverPath := info["path"].(string)
+	if serverPath[len(serverPath)-1] == ')' {
+		go v.DeleteFile(serverPath)
 	}
 	return
 }

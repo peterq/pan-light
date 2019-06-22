@@ -37,6 +37,7 @@ func (d *vipSaveFileDao) GetByMd5(md5 string) (data VipSaveFileModel, err error)
 		{
 			"$match": bson.M{
 				"deleted_at": 0,
+				"md5":        md5,
 			},
 		},
 		{

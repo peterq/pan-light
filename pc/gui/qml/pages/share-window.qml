@@ -108,7 +108,7 @@ Window {
                 })
                 .then(function() {
                     topIndicator.success('分享成功')
-                    return Util.sleep(1500)
+                    return Util.sleep(1000)
                 })
                 .then(function(){
                     window.visible = false

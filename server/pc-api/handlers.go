@@ -10,7 +10,6 @@ import (
 	"github.com/peterq/pan-light/server/pan-viper"
 	"github.com/peterq/pan-light/server/pc-api/middleware"
 	"gopkg.in/mgo.v2"
-	"log"
 	"strings"
 	"time"
 )
@@ -114,7 +113,6 @@ func handleShareToSquare(ctx context.Context, param artisan.JsonMap) (result int
 		err = artisan.NewError("database error", -1, err)
 		return
 	}
-	log.Println(data, err)
 	// 没有存储过, 使用秒传进行存储
 	if err == mgo.ErrNotFound {
 		data = dao.VipSaveFileModel{
@@ -150,9 +148,10 @@ func handleShareToSquare(ctx context.Context, param artisan.JsonMap) (result int
 	share := dao.FileShareModel{
 		Uk:       middleware.ContextLoginInfo(ctx).Uk(),
 		Title:    title,
-		Md5:      md5,
-		SliceMd5: sliceMd5,
+		Md5:      data.Md5,
+		SliceMd5: data.SliceMd5,
 		FileSize: data.FileSize,
+		ShareAt:  time.Now().Unix(),
 		ExpireAt: time.Now().Add(time.Hour * 24 * time.Duration(duration)).Unix(),
 	}
 	dao.FileShareDao.Insert(share)

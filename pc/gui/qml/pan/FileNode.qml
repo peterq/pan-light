@@ -9,9 +9,9 @@ Item {
     property int idx
     property var menus: []
     property bool hover: fileItemMa.containsMouse
+    property bool isSmallFile: !meta.isdir && meta.size < 256 * 1024
     height: 50
     width: root.width
-
 
     function handlePressEnter() {
         if (meta.isdir)
@@ -88,66 +88,66 @@ Item {
         anchors.bottom: parent.bottom
     }
     Component.onCompleted: {
-        if (!fileItem.meta.isdir) {
-            fileItem.menus = [{
-                                  "name": '直接下载',
-                                  "cb": function () {
-                                      fileItem.clickDownload()
-                                  }
-                              }, {
-                                  "name": 'vip通道下载',
-                                  "cb": function () {
-                                      fileItem.clickDownloadViaVip()
-                                  }
-                              }, {
-                                  "name": '分享到资源广场',
-                                  "cb": function () {
-                                      fileItem.clickShare()
-                                  }
-                              }]
-            if (Util.isVideo(fileItem.meta.server_filename)) {
-                fileItem.menus = fileItem.menus.concat([{
-                                                            "name": '播放',
-                                                            "cb": function () {
-                                                                Util.playVideo(
-                                                                            fileItem.meta,
-                                                                            false)
-                                                            }
-                                                        }, {
-                                                            "name": 'vip通道播放',
-                                                            "cb": function () {
-                                                                Util.playVideo(
-                                                                            fileItem.meta,
-                                                                            true)
-                                                            }
-                                                        }])
-            }
-        } else {
-            fileItem.menus.push({
-                                    "name": '进入',
-                                    "cb": function () {
-                                        App.enterPath(fileItem.meta.path)
-                                    }
-                                })
-            fileItem.menus.push({
-                                    "name": '添加至快捷导航',
-                                    "cb": function () {
-                                        var p = App.prompt('请输入快捷方式名称',
-                                                           function (str) {
-                                                               if (str === '')
-                                                                   return '请输入名称'
-                                                               return true
-                                                           },
-                                                           fileItem.meta.server_filename)
-                                        p.then(function (name) {
-                                            App.addPathCollection({
-                                                                      "name": name,
-                                                                      "path": fileItem.meta.path
-                                                                  })
-                                        })
-                                    }
-                                })
+        var dirMenu = [{
+                           "name": '进入',
+                           "cb": function () {
+                               App.enterPath(fileItem.meta.path)
+                           }
+                       }, {
+                           "name": '添加至快捷导航',
+                           "cb": function () {
+                               var p = App.prompt('请输入快捷方式名称', function (str) {
+                                   if (str === '')
+                                       return '请输入名称'
+                                   return true
+                               }, fileItem.meta.server_filename)
+                               p.then(function (name) {
+                                   App.addPathCollection({
+                                                             "name": name,
+                                                             "path": fileItem.meta.path
+                                                         })
+                               })
+                           }
+                       }]
+        if (fileItem.meta.isdir) {
+            fileItem.menus = dirMenu
+            return
         }
+
+        var fileMenu = [{
+                            "name": '直接下载',
+                            "cb": function () {
+                                fileItem.clickDownload()
+                            }
+                        }, {
+                            "name": 'vip通道下载',
+                            "cb": function () {
+                                fileItem.clickDownloadViaVip()
+                            },
+                            "hide": isSmallFile
+                        }, {
+                            "name": '分享到资源广场',
+                            "cb": function () {
+                                fileItem.clickShare()
+                            },
+                            "hide": isSmallFile
+                        }, {
+                            "name": '播放',
+                            "cb": function () {
+                                Util.playVideo(fileItem.meta, false)
+                            },
+                            "hide": !Util.isVideo(fileItem.meta.server_filename)
+                        }, {
+                            "name": 'vip通道播放',
+                            "cb": function () {
+                                Util.playVideo(fileItem.meta, true)
+                            },
+                            "hide": isSmallFile || !Util.isVideo(
+                                        fileItem.meta.server_filename)
+                        }]
+        fileItem.menus = fileMenu.filter(function (v) {
+            return !v.hide
+        })
     }
     function clickDownload() {
         console.log('down')
