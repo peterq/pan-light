@@ -63,6 +63,25 @@ Item {
                                 App.appState.floatWindow.visible = !App.appState.floatWindow.visible
                             }
                         }
+
+                        MenuItem {
+                            text: '设置'
+                            onTriggered: {
+                                Util.openSetting()
+                            }
+                        }
+                        MenuItem {
+                            text: '关于'
+                            onTriggered: {
+                                Util.openAbout()
+                            }
+                        }
+                        MenuItem {
+                            text: '问题反馈'
+                            onTriggered: {
+                                Util.openFeedback()
+                            }
+                        }
                         MenuItem {
                             text: '登出账号'
                             onTriggered: {
@@ -101,25 +120,7 @@ Item {
                             }
                         }
                         MenuItem {
-                            text: '设置'
-                            onTriggered: {
-                                Util.openSetting()
-                            }
-                        }
-                        MenuItem {
-                            text: '关于'
-                            onTriggered: {
-                                Util.openAbout()
-                            }
-                        }
-                        MenuItem {
-                            text: '问题反馈'
-                            onTriggered: {
-
-                            }
-                        }
-                        MenuItem {
-                            text: '重启'
+                            text: '重启程序'
                             onTriggered: Util.callGoSync("reboot")
                         }
                         MenuItem {

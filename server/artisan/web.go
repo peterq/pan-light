@@ -51,9 +51,10 @@ func ApiRecover(ctx context.Context) {
 			}
 
 			// 转换为 app error
-			if appErr, ok = e.(AppError); !ok {
+			if appErr, ok = err.(AppError); !ok {
 				ctx.StatusCode(iris.StatusInternalServerError)
 				appErr = NewError("internal server error", 500, err)
+				ctx.Application().Logger().Error(err)
 			}
 
 			ctx.JSON(map[string]interface{}{

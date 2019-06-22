@@ -104,12 +104,28 @@ var baseAsyncRoutes = map[string]asyncHandler{
 			"secret": secret,
 			"token":  token,
 		})
-		storage.UserState.Token = jwt.(string)
 		if err != nil {
 			reject(err)
 			return
 		}
+		storage.UserState.Token = jwt.(string)
 		log.Println(jwt)
 		resolve(jwt)
+	},
+
+	"api.call": func(p map[string]interface{}, resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{}) {
+		data, err := server_api.Call(p["name"].(string), p["param"].(gson))
+		if err != nil {
+			if data == nil {
+				data = gson{
+					"success": false,
+					"message": err.Error(),
+					"code":    -1,
+				}
+			}
+			reject(data)
+			return
+		}
+		resolve(data)
 	},
 }

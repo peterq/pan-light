@@ -166,5 +166,7 @@
         <file>assets/images/icons/baidu-cloud.svg</file>
         <file>pages/setting-window.qml</file>
         <file>pages/about-window.qml</file>
+        <file>pages/feedback-window.qml</file>
+        <file>widget/TopIndicator.qml</file>
     </qresource>
 </RCC>

@@ -433,3 +433,18 @@ var openAbout = (function () {
         return ins
     }
 })()
+
+var openFeedback = (function () {
+    var comp = loadComponent(function(){},'../pages/feedback-window.qml')
+    var ins
+    return function(){
+        if (!ins || !ins.visible) {
+            ins = comp.createObject(G.root)
+        }
+        return ins
+    }
+})()
+
+function api(name, param) {
+    return callGoAsync('api.call', {name: name, param: param})
+}

@@ -3,10 +3,10 @@ package server_api
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/peterq/pan-light/pc/dep"
 	"github.com/peterq/pan-light/pc/storage"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 )
@@ -16,6 +16,7 @@ type gson = map[string]interface{}
 var urlMap = map[string]string{
 	"login-token": "/api/pc/login-token",
 	"login":       "/api/pc/login",
+	"feedback":    "/api/pc/feedback",
 }
 var httpClient = http.Client{
 	//Timeout: 15 * time.Second,
@@ -46,6 +47,8 @@ func Call(name string, param map[string]interface{}) (result interface{}, err er
 			return ret, errors.New(fmt.Sprint("api error(", ret["code"], "): ", ret["message"]))
 		}
 		result = ret["result"]
+	} else {
+		err = errors.Wrap(err, "json resp invalid")
 	}
 	return
 }
