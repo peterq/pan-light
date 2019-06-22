@@ -9,6 +9,8 @@ import (
 	"github.com/peterq/pan-light/server/dao"
 	"github.com/peterq/pan-light/server/pan-viper"
 	"github.com/peterq/pan-light/server/pc-api/middleware"
+	"gopkg.in/mgo.v2"
+	"log"
 	"strings"
 	"time"
 )
@@ -94,7 +96,70 @@ func handleFeedBack(ctx context.Context, param artisan.JsonMap) (result interfac
 		Content: content,
 	})
 	if err != nil {
-		err = artisan.NewError("database error", -1, nil)
+		err = artisan.NewError("database error", -1, err)
 	}
+	return
+}
+
+func handleShareToSquare(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
+	md5 := param.Get("md5").String()
+	sliceMd5 := param.Get("sliceMd5").String()
+	title := param.Get("title").String()
+	duration := param.Get("duration").Int()
+	fileSize := param.Get("fileSize").Int64()
+
+	// 查找该文件是否被vip账号存储过
+	data, err := dao.VipSaveFileDao.GetByMd5(md5)
+	if err != nil && err != mgo.ErrNotFound {
+		err = artisan.NewError("database error", -1, err)
+		return
+	}
+	log.Println(data, err)
+	// 没有存储过, 使用秒传进行存储
+	if err == mgo.ErrNotFound {
+		data = dao.VipSaveFileModel{
+			Username:  "",
+			Md5:       md5,
+			SliceMd5:  sliceMd5,
+			FileSize:  0,
+			Fid:       "",
+			AddAt:     time.Now().Unix(),
+			HitAt:     time.Now().Unix(),
+			DeletedAt: 0,
+		}
+		viper := pan_viper.GetVip()
+		data.Username = viper.Username()
+		data.Fid, data.FileSize, err = viper.SaveFileByMd5(md5, sliceMd5, data.GetSavePath(), fileSize)
+		if err != nil {
+			err = artisan.NewError("vip账号转存文件错误", -1, err)
+			return
+		}
+		err = dao.VipSaveFileDao.Insert(data)
+		if err != nil {
+			err = artisan.NewError("database error", -1, err)
+			return
+		}
+	} else { // 存储过, 更新命中时间戳
+		err = dao.VipSaveFileDao.Hit(data)
+		if err != nil {
+			err = artisan.NewError("database error", -1, err)
+			return
+		}
+	}
+	// 写入分享表
+	share := dao.FileShareModel{
+		Uk:       middleware.ContextLoginInfo(ctx).Uk(),
+		Title:    title,
+		Md5:      md5,
+		SliceMd5: sliceMd5,
+		FileSize: data.FileSize,
+		ExpireAt: time.Now().Add(time.Hour * 24 * time.Duration(duration)).Unix(),
+	}
+	dao.FileShareDao.Insert(share)
+	if err != nil {
+		err = artisan.NewError("database error", -1, err)
+		return
+	}
+	result = share
 	return
 }

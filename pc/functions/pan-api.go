@@ -3,6 +3,7 @@ package functions
 import (
 	"fmt"
 	"github.com/peterq/pan-light/pc/pan-api"
+	"github.com/peterq/pan-light/pc/pan-download"
 )
 
 func init() {
@@ -47,5 +48,13 @@ var panApiAsyncRoutes = map[string]asyncHandler{
 		} else {
 			resolve(result)
 		}
+	},
+	"pan.rapid.md5": func(p map[string]interface{}, resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{}) {
+		sliceMd5, err := pan_download.RapidUploadMd5(fmt.Sprint(int(p["fid"].(float64))))
+		if err != nil {
+			reject(err)
+			return
+		}
+		resolve(sliceMd5)
 	},
 }

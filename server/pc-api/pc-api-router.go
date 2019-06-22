@@ -48,4 +48,9 @@ func pcAuthRoutes(r router.Party) {
 	}, handleFeedBack)
 
 	post("refresh-token", handleRefreshToken)
+
+	post("share", artisan.ThrottleOption{
+		Duration: time.Hour,
+		Number:   500,
+	}, handleShareToSquare)
 }

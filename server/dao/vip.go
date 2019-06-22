@@ -3,11 +3,13 @@ package dao
 import (
 	"github.com/peterq/pan-light/server/conf"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type VipModel struct {
 	Username string
-	Bduss    string
+	Cookie   string
+	Enabled  bool
 }
 
 type vipDao struct{}
@@ -20,7 +22,9 @@ func (d *vipDao) GetAll() (data []VipModel, err error) {
 	s := conf.MongodbSession.Clone()
 	defer s.Refresh()
 	collection := d.collection(s)
-	err = collection.Find(nil).All(&data)
+	err = collection.Find(bson.M{
+		"enabled": true,
+	}).All(&data)
 	return
 }
 

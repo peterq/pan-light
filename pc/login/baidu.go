@@ -122,7 +122,7 @@ func BaiduCookieLogin(cookieStr string) error {
 		if j := strings.Index(name, "="); j >= 0 {
 			name, val = name[:j], name[j+1:]
 		}
-		cookies = append(cookies, &http.Cookie{Name: name, Value: val})
+		cookies = append(cookies, &http.Cookie{Name: name, Value: val, Domain: ".baidu.com"})
 	}
 
 	u, _ := url.Parse("https://pan.baidu.com")

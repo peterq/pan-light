@@ -99,6 +99,11 @@ Item {
                                   "cb": function () {
                                       fileItem.clickDownloadViaVip()
                                   }
+                              }, {
+                                  "name": '分享到资源广场',
+                                  "cb": function () {
+                                      fileItem.clickShare()
+                                  }
                               }]
             if (Util.isVideo(fileItem.meta.server_filename)) {
                 fileItem.menus = fileItem.menus.concat([{
@@ -151,5 +156,8 @@ Item {
     function clickDownloadViaVip() {
         console.log('vip down')
         App.appState.transferComp.addDownload(fileItem.meta, true)
+    }
+    function clickShare() {
+        Util.openShare(fileItem.meta)
     }
 }

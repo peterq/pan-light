@@ -5,6 +5,7 @@ const (
 	CollectionVipSaveFile        = "vip_save_file"
 	CollectionUser               = "user"
 	CollectionFeedback           = "feedback"
+	CollectionFileShare          = "file_share"
 )
 
 const (

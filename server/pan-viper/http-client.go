@@ -16,17 +16,23 @@ type gson = map[string]interface{}
 
 const baiduUa = "netdisk;4.6.2.0;PC;PC-Windows;10.0.10240;WindowsBaiduYunGuanJia"
 
-func makeHttpClient(bduss string) http.Client {
+func makeHttpClient(cookieStr string) http.Client {
 	jar, _ := cookiejar.New(nil)
 	u, _ := url.Parse("https://pan.baidu.com")
-	jar.SetCookies(u, []*http.Cookie{
-		{
-			Name:   "BDUSS",
-			Value:  bduss,
-			Path:   "/",
-			Domain: ".baidu.com",
-		},
-	})
+	var cookies []*http.Cookie
+	parts := strings.Split(strings.TrimSpace(cookieStr), ";")
+	for i := 0; i < len(parts); i++ {
+		parts[i] = strings.TrimSpace(parts[i])
+		if len(parts[i]) == 0 {
+			continue
+		}
+		name, val := parts[i], ""
+		if j := strings.Index(name, "="); j >= 0 {
+			name, val = name[:j], name[j+1:]
+		}
+		cookies = append(cookies, &http.Cookie{Name: name, Value: val, Domain: ".baidu.com"})
+	}
+	jar.SetCookies(u, cookies)
 	httpClient := http.Client{
 		Transport: nil,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {

@@ -6,6 +6,8 @@ import (
 	"github.com/peterq/pan-light/pc/dep"
 	"github.com/peterq/pan-light/pc/downloader"
 	"github.com/peterq/pan-light/pc/pan-api"
+	"github.com/peterq/pan-light/pc/util"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -73,6 +75,37 @@ func DownloadFile(fid, savePath string, useVip bool) (taskId downloader.TaskId, 
 	if err == nil {
 		useVipMap[taskId] = true
 	}
+	return
+}
+
+func RapidUploadMd5(fid string) (sliceMd5 string, err error) {
+	link, err := pan_api.Link(fid)
+	if err != nil {
+		err = errors.Wrap(err, "解析直链错误")
+		return
+	}
+	req, err := http.NewRequest("GET", link, nil)
+	if err != nil {
+		errors.Wrap(err, "无法创建request")
+		return
+	}
+	requestDecorator(req)
+	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", 0, 256*1024-1))
+	resp, err := manager.HttpClient.Do(req)
+	if err != nil {
+		err = errors.Wrap(err, "访问直链错误")
+		return
+	}
+	defer resp.Body.Close()
+	bin, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		err = errors.Wrap(err, "获取前256k内容错误")
+		return
+	}
+	if len(bin) != 256*1024 {
+		err = errors.New("文件内容小于256k")
+	}
+	sliceMd5 = util.Md5bin(bin)
 	return
 }
 

@@ -168,5 +168,6 @@
         <file>pages/about-window.qml</file>
         <file>pages/feedback-window.qml</file>
         <file>widget/TopIndicator.qml</file>
+        <file>pages/share-window.qml</file>
     </qresource>
 </RCC>

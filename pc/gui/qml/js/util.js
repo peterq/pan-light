@@ -445,6 +445,17 @@ var openFeedback = (function () {
     }
 })()
 
+var openShare = (function () {
+    var comp = loadComponent(function(){},'../pages/share-window.qml')
+    var ins
+    return function(meta){
+        if (!ins || !ins.visible) {
+            ins = comp.createObject(G.root, {meta: meta})
+        }
+        return ins
+    }
+})()
+
 function api(name, param) {
     param = param || {}
     return callGoAsync('api.call', {name: name, param: param})

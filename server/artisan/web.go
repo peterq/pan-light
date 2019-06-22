@@ -181,6 +181,13 @@ func (v JsonValue) Int() int {
 	panic(NewError(fmt.Sprintf("%s needs to be int, %T given", v.name, v.data), -1, nil))
 }
 
+func (v JsonValue) Int64() int64 {
+	if m, ok := v.data.(float64); ok {
+		return int64(m)
+	}
+	panic(NewError(fmt.Sprintf("%s needs to be int, %T given", v.name, v.data), -1, nil))
+}
+
 func (v JsonValue) Float() float64 {
 	if m, ok := v.data.(float64); ok {
 		return m

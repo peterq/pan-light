@@ -8,13 +8,15 @@ Rectangle {
     property alias duration: hideTimer.interval
 
     width: parent.width
-    height: 40
+    height: 10 + msgText.implicitHeight
     y: -height
 
     Text {
         id: msgText
         text: ''
         color: 'white'
+        width: parent.width - 20
+        wrapMode: Text.WrapAnywhere
         anchors.centerIn: parent
     }
 
