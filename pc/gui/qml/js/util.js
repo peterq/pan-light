@@ -316,21 +316,21 @@ function isVideo(f){
 
 var videoAgentLink = (function(){
     var server
-    return function(meta) {
+    return function(fid) {
         if (!server) {
             server =  callGoSync('env.internal_server_url')
             console.log('internal url', JSON.stringify(server))
         }
-        return server + '/videoAgent?fid=' + meta.fs_id
+        return server + '/videoAgent?fid=' + fid
     }
 })()
 
 function getFileLink(meta) {
-    return callGoAsync('pan.link', {fid: meta.fs_id})
+    return callGoAsync('pan.link', {fid: 'direct.' + meta.fs_id})
 }
 
 function getFileLinkVip(meta) {
-    return callGoAsync('pan.link.vip', {fid: meta.fs_id})
+    return callGoAsync('pan.link', {fid: 'vip.' + meta.fs_id})
 }
 
 var playVideo = (function(){
@@ -340,11 +340,10 @@ var playVideo = (function(){
         if (!ins || !ins.playVideo) {
             ins = comp.createObject(G.root)
         }
-        var linkPromise = (useVip ?
-             getFileLinkVip(meta) :
-             getFileLink(meta))
+        var fid = (useVip ? 'vip.' : 'direct.') + meta.fs_id
+        var linkPromise = callGoAsync('pan.link', {fid: fid})
         .then(function(link){
-            var agentLink = videoAgentLink(meta, useVip)
+            var agentLink = videoAgentLink(fid)
             console.log('play link', agentLink, link)
             return agentLink
         })

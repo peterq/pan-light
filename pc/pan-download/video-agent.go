@@ -1,10 +1,10 @@
-package pan_api
+package pan_download
 
 import (
 	"fmt"
 	"github.com/peterq/pan-light/pc/dep"
+	"github.com/peterq/pan-light/pc/pan-api"
 	"github.com/peterq/pan-light/pc/storage"
-	"io"
 	"log"
 	"net"
 	"net/http"
@@ -63,41 +63,11 @@ func startAgentServer() {
 }
 
 func videoAgent(writer http.ResponseWriter, request *http.Request) {
-	if ca, ok := linkCacheMap[request.URL.Query().Get("fid")]; ok {
-		lt := ca.direct
-
-		myReq := newRequest("GET", lt.link)
-
-		for k, vs := range request.Header {
-			if k == "Referer" {
-				continue
-			}
-			for _, h := range vs {
-				//log.Println(k, h)
-				myReq.Header.Add(k, h)
-			}
-		}
-		//log.Println("-----------------")
-		myReq.Header.Set("user-agent", BaiduUA)
-
-		resp, err := httpClient.Do(myReq)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		for k, vs := range resp.Header {
-			if k == "Content-Disposition" {
-				continue
-			}
-			for _, h := range vs {
-				//log.Println(k, h)
-				writer.Header().Add(k, h)
-			}
-			writer.Header().Set("Connection", "close")
-		}
-		writer.WriteHeader(resp.StatusCode)
-		io.Copy(writer, resp.Body)
-	} else {
+	link, err := LinkResolver(request.URL.Query().Get("fid"))
+	if err != nil {
 		writer.WriteHeader(500)
+		log.Println(err)
+		return
 	}
+	pan_api.VideoProxy(writer, request, link)
 }

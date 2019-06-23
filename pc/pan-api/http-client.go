@@ -4,6 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"time"
@@ -37,23 +38,41 @@ func readHtml(reader io.Reader) string {
 	return string(html)
 }
 
+func VideoProxy(writer http.ResponseWriter, request *http.Request, targetLink string) {
+	myReq := newRequest("GET", targetLink)
+
+	for k, vs := range request.Header {
+		if k == "Referer" {
+			continue
+		}
+		for _, h := range vs {
+			//log.Println(k, h)
+			myReq.Header.Add(k, h)
+		}
+	}
+	//log.Println("-----------------")
+	myReq.Header.Set("user-agent", BaiduUA)
+
+	resp, err := httpClient.Do(myReq)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	for k, vs := range resp.Header {
+		if k == "Content-Disposition" {
+			continue
+		}
+		for _, h := range vs {
+			//log.Println(k, h)
+			writer.Header().Add(k, h)
+		}
+		writer.Header().Set("Connection", "close")
+	}
+	writer.WriteHeader(resp.StatusCode)
+	io.Copy(writer, resp.Body)
+}
+
 var BaiduUA = "netdisk;4.6.2.0;PC;PC-Windows;10.0.10240;WindowsBaiduYunGuanJia"
 
 type tBin []byte
 type tJson map[string]interface{}
-
-type linkTime struct {
-	link string
-	time time.Time
-}
-
-func (l *linkTime) expired() bool {
-	return false
-}
-
-type fidLinks struct {
-	direct *linkTime
-	vip    *linkTime
-}
-
-var linkCacheMap = map[string]fidLinks{}

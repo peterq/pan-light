@@ -172,15 +172,7 @@ func ListDir(path string) (list interface{}, err error) {
 }
 
 // 链接解析
-func Link(fid string) (link string, err error) {
-
-	if c, ok := linkCacheMap[fid]; !ok {
-		linkCacheMap[fid] = fidLinks{}
-	} else {
-		if c.direct != nil && !c.direct.expired() {
-			return c.direct.link, nil
-		}
-	}
+func LinkDirect(fid string) (link string, err error) {
 
 	req := newRequest("GET", "dlink")
 	params := map[string]interface{}{
@@ -217,17 +209,6 @@ func Link(fid string) (link string, err error) {
 	}
 	link = data["dlink"].([]interface{})[0].(map[string]interface{})["dlink"].(string)
 	link = getRedirectedLink(link)
-	linkCacheMap[fid] = fidLinks{
-		direct: &linkTime{
-			link: link,
-			time: time.Now(),
-		},
-	}
-	return
-}
-
-// vip 转存解析
-func linkByVip() (link string, err error) {
 	return
 }
 

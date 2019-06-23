@@ -28,7 +28,7 @@ func init() {
 			CoroutineNumber:       32,
 			SegmentSize:           1024 * 1024 * 2,
 			WroteToDiskBufferSize: 1024 * 512,
-			LinkResolver:          linkResolver,
+			LinkResolver:          LinkResolver,
 			HttpClient: &http.Client{
 				Transport: &http.Transport{
 					MaxIdleConns:    parallel,
@@ -50,8 +50,31 @@ func Manager() *downloader.Manager {
 	return manager
 }
 
-func linkResolver(fileId string) (link string, err error) {
-	log.Println(fileId)
+type linkTime struct {
+	link string
+	time time.Time
+}
+
+func (l *linkTime) expired() bool {
+	return time.Now().Sub(l.time) > time.Hour
+}
+
+var linkCacheMap = map[string]linkTime{}
+
+func LinkResolver(fileId string) (link string, err error) {
+	if c, ok := linkCacheMap[fileId]; ok {
+		if !c.expired() {
+			return c.link, nil
+		}
+	}
+	defer func() {
+		if err == nil && link != "" {
+			linkCacheMap[fileId] = linkTime{
+				link: link,
+				time: time.Now(),
+			}
+		}
+	}()
 	defer func() {
 		if e := recover(); e != nil {
 			err = errors.New("链接解析严重错误: " + fmt.Sprint(e))
@@ -62,7 +85,7 @@ func linkResolver(fileId string) (link string, err error) {
 	case "vip":
 		return vipLink(args[1])
 	case "direct":
-		return pan_api.Link(args[1])
+		return pan_api.LinkDirect(args[1])
 	case "share":
 		fileSize, _ := strconv.ParseInt(args[3], 10, 64)
 		return VipLinkByMd5(args[1], args[2], fileSize)
@@ -108,7 +131,7 @@ func DownloadFile(fid, savePath string) (taskId downloader.TaskId, err error) {
 }
 
 func RapidUploadMd5(fid string) (md5, sliceMd5 string, fileSize int64, err error) {
-	link, err := pan_api.Link(fid)
+	link, err := pan_api.LinkDirect(fid)
 	if err != nil {
 		err = errors.Wrap(err, "解析直链错误")
 		return

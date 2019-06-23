@@ -287,7 +287,6 @@ func (v *Vip) getRedirectedLink(link string) string {
 		log.Println(err)
 	}
 	end := resp.Request.URL.String()
-	log.Println(end)
 	resp.Body.Close()
 	return end
 }
