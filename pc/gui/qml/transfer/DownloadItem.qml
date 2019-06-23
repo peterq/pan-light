@@ -88,7 +88,6 @@ Item {
             var res = Util.callGoSync('download.resume', {
                                           "downloadId": downloadId,
                                           "bin": resumeData,
-                                          "useVip": meta.useVip
                                       })
         } else {
             isNewAdd = false

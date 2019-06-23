@@ -21,6 +21,7 @@ var urlMap = map[string]string{
 	"refresh-token": "/api/pc/refresh-token",
 	"share":         "/api/pc/share",
 	"share-list":    "/api/pc/share/list",
+	"link-md5":      "/api/pc/link/md5",
 }
 var httpClient = http.Client{
 	//Timeout: 15 * time.Second,

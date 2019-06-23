@@ -50,7 +50,7 @@ var panApiAsyncRoutes = map[string]asyncHandler{
 		}
 	},
 	"pan.rapid.md5": func(p map[string]interface{}, resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{}) {
-		sliceMd5, err := pan_download.RapidUploadMd5(fmt.Sprint(int(p["fid"].(float64))))
+		_, sliceMd5, _, err := pan_download.RapidUploadMd5(fmt.Sprint(int(p["fid"].(float64))))
 		if err != nil {
 			reject(err)
 			return

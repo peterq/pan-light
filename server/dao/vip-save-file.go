@@ -20,7 +20,7 @@ type VipSaveFileModel struct {
 }
 
 func (f *VipSaveFileModel) GetSavePath() string {
-	return "/pan-light-save/" + f.Md5[:2] + "/" + f.Md5[2:4]
+	return "/pan-light-save/" + f.Md5[:2] + "/" + f.Md5[2:4] + "/" + f.Md5
 }
 
 type vipSaveFileDao struct{}

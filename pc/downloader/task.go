@@ -253,7 +253,7 @@ func (task *Task) capture(force bool) {
 	}
 	task.lastCaptureTime = time.Now()
 	c := &internal.TaskCapture{
-		Fid:       string(task.fileId),
+		Fid:       task.fileId,
 		SavePath:  task.savePath,
 		Completed: []*internal.FinishSeg{},
 		Length:    task.fileLength,

@@ -56,15 +56,16 @@ Item {
         }).then(function (savePath) {
             savePath = savePath.toString()
             savePath = savePath.replace('file://', '')
+            var newFid = (useVip ? 'vip' : 'direct') + '.' + meta.fs_id
             var id = Util.callGoSync('download.new', {
-                                       "fid": meta.fs_id + '',
+                                       "fid": newFid,
                                        "savePath": savePath,
-                                       "useVip": !!useVip
                                    })
             var obj = JSON.parse(JSON.stringify(meta))
             obj.downloadId = id
             var sep = Qt.platform.os == "windows" ? '\\' : '/'
             var t = String.prototype.split.call(savePath, sep)
+            obj.newFid = newFid
             obj.saveName = t.pop()
             obj.savePath = savePath
             obj.useVip = !!useVip

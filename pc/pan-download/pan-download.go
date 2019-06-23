@@ -6,6 +6,7 @@ import (
 	"github.com/peterq/pan-light/pc/dep"
 	"github.com/peterq/pan-light/pc/downloader"
 	"github.com/peterq/pan-light/pc/pan-api"
+	"github.com/peterq/pan-light/pc/server-api"
 	"github.com/peterq/pan-light/pc/util"
 	"github.com/pkg/errors"
 	"io/ioutil"
@@ -13,12 +14,12 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 )
 
 var manager *downloader.Manager
-
-var useVipMap = map[downloader.TaskId]bool{}
 
 func init() {
 	dep.OnInit(func() {
@@ -27,7 +28,7 @@ func init() {
 			CoroutineNumber:       32,
 			SegmentSize:           1024 * 1024 * 2,
 			WroteToDiskBufferSize: 1024 * 512,
-			LinkResolver:          pan_api.Link,
+			LinkResolver:          linkResolver,
 			HttpClient: &http.Client{
 				Transport: &http.Transport{
 					MaxIdleConns:    parallel,
@@ -49,6 +50,37 @@ func Manager() *downloader.Manager {
 	return manager
 }
 
+func linkResolver(fileId string) (link string, err error) {
+	log.Println(fileId)
+	defer func() {
+		if e := recover(); e != nil {
+			err = errors.New("链接解析严重错误: " + fmt.Sprint(e))
+		}
+	}()
+	args := strings.Split(fileId, ".")
+	switch args[0] {
+	case "vip":
+		return vipLink(args[1])
+	case "direct":
+		return pan_api.Link(args[1])
+	case "share":
+		fileSize, _ := strconv.ParseInt(args[3], 10, 64)
+		return VipLinkByMd5(args[1], args[2], fileSize)
+	default:
+		err = errors.New("unknown download method: " + args[0])
+	}
+	return
+}
+
+func vipLink(fileId string) (link string, err error) {
+	md5, sliceMd5, fileSize, err := RapidUploadMd5(fileId)
+	if err != nil {
+		err = errors.Wrap(err, "获取文件md5错误")
+		return
+	}
+	return VipLinkByMd5(md5, sliceMd5, fileSize)
+}
+
 func handleDownloadEvent(event *downloader.DownloadEvent) {
 	dep.NotifyQml("task.event", map[string]interface{}{
 		"type":   event.Event,
@@ -61,24 +93,21 @@ func test() {
 	//fileCompare()
 	//return
 	time.Sleep(3 * time.Second)
-	id, err := DownloadFile("730136432970379", "./yx.mp4", false)
+	id, err := DownloadFile("direct.730136432970379", "./yx.mp4")
 	//id, err := DownloadFile("835313540804", "./project.mp4")
 	log.Println(id, err)
 }
 
-func DownloadFile(fid, savePath string, useVip bool) (taskId downloader.TaskId, err error) {
+func DownloadFile(fid, savePath string) (taskId downloader.TaskId, err error) {
 	savePath, err = filepath.Abs(savePath)
 	if err != nil {
 		return
 	}
 	taskId, err = manager.NewTask(fid, savePath, requestDecorator)
-	if err == nil {
-		useVipMap[taskId] = true
-	}
 	return
 }
 
-func RapidUploadMd5(fid string) (sliceMd5 string, err error) {
+func RapidUploadMd5(fid string) (md5, sliceMd5 string, fileSize int64, err error) {
 	link, err := pan_api.Link(fid)
 	if err != nil {
 		err = errors.Wrap(err, "解析直链错误")
@@ -96,6 +125,15 @@ func RapidUploadMd5(fid string) (sliceMd5 string, err error) {
 		err = errors.Wrap(err, "访问直链错误")
 		return
 	}
+	md5 = resp.Header.Get("Content-Md5")
+	s := resp.Header.Get("Content-Range")
+	s = strings.Trim(s, "]")
+	s = strings.Split(s, "/")[1]
+	fileSize, err = strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		err = errors.Wrap(err, "获取文件大小失败")
+		return
+	}
 	defer resp.Body.Close()
 	bin, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -109,15 +147,26 @@ func RapidUploadMd5(fid string) (sliceMd5 string, err error) {
 	return
 }
 
+func VipLinkByMd5(md5, sliceMd5 string, fileSize int64) (link string, err error) {
+	result, err := server_api.Call("link-md5", map[string]interface{}{
+		"md5":      md5,
+		"sliceMd5": sliceMd5,
+		"fileSize": fileSize,
+	})
+	if err != nil {
+		err = errors.Wrap(err, "调用vip链接接口错误")
+		return
+	}
+	link = result.(string)
+	return
+}
+
 func requestDecorator(request *http.Request) *http.Request {
 	request.Header.Set("User-Agent", pan_api.BaiduUA)
 	return request
 }
 
 func Resume(id string, bin string, useVip bool) error {
-	if useVip {
-		useVipMap[downloader.TaskId(id)] = true
-	}
 	return manager.Resume(map[downloader.TaskId]string{
 		downloader.TaskId(id): bin,
 	}, requestDecorator)

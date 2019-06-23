@@ -58,4 +58,9 @@ func pcAuthRoutes(r router.Party) {
 		Duration: time.Second * 5,
 		Number:   5,
 	}, handleShareList)
+
+	post("link/md5", artisan.ThrottleOption{
+		Duration: time.Second * 5,
+		Number:   5,
+	}, handleLinkMd5)
 }

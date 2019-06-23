@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/kataras/iris/context"
-	"github.com/kataras/iris/core/errors"
 	"github.com/peterq/pan-light/server/artisan"
+	"github.com/peterq/pan-light/server/artisan/cache"
 	"github.com/peterq/pan-light/server/conf"
 	"github.com/peterq/pan-light/server/dao"
 	"github.com/peterq/pan-light/server/pan-viper"
 	"github.com/peterq/pan-light/server/pc-api/middleware"
+	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"strings"
 	"time"
@@ -101,15 +102,9 @@ func handleFeedBack(ctx context.Context, param artisan.JsonMap) (result interfac
 	return
 }
 
-func handleShareToSquare(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
-	md5 := param.Get("md5").String()
-	sliceMd5 := param.Get("sliceMd5").String()
-	title := param.Get("title").String()
-	duration := param.Get("duration").Int()
-	fileSize := param.Get("fileSize").Int64()
-
+func getOrSaveByFile(md5, sliceMd5 string, fileSize int64) (data dao.VipSaveFileModel, err error) {
 	// 查找该文件是否被vip账号存储过
-	data, err := dao.VipSaveFileDao.GetByMd5(md5)
+	data, err = dao.VipSaveFileDao.GetByMd5(md5)
 	if err != nil && err != mgo.ErrNotFound {
 		err = artisan.NewError("database error", -1, err)
 		return
@@ -144,6 +139,20 @@ func handleShareToSquare(ctx context.Context, param artisan.JsonMap) (result int
 			err = artisan.NewError("database error", -1, err)
 			return
 		}
+	}
+	return
+}
+
+func handleShareToSquare(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
+	md5 := param.Get("md5").String()
+	sliceMd5 := param.Get("sliceMd5").String()
+	title := param.Get("title").String()
+	duration := param.Get("duration").Int()
+	fileSize := param.Get("fileSize").Int64()
+
+	data, err := getOrSaveByFile(md5, sliceMd5, fileSize)
+	if err != nil {
+		return
 	}
 	// 写入分享表
 	share := dao.FileShareModel{
@@ -185,5 +194,36 @@ func handleShareList(ctx context.Context, param artisan.JsonMap) (result interfa
 	if result.([]gson) == nil {
 		result = []gson{}
 	}
+	return
+}
+
+func handleLinkMd5(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
+	md5 := param.Get("md5").String()
+	sliceMd5 := param.Get("sliceMd5").String()
+	fileSize := param.Get("fileSize").Int64()
+
+	cacheKey := "cache-vip-link-" + md5
+	err = cache.RedisGet(cacheKey, &result)
+	if err == nil {
+		return
+	}
+
+	data, err := getOrSaveByFile(md5, sliceMd5, fileSize)
+	if err != nil {
+		return
+	}
+
+	vip := pan_viper.GetVipByUsername(data.Username)
+	if vip == nil {
+		err = errors.New("获取vip账户失败")
+		return
+	}
+	link, err := vip.LinkByFid(data.Fid)
+	if err != nil {
+		err = errors.Wrap(err, "获取vip链接错误")
+		return
+	}
+	result = link
+	cache.RedisSet(cacheKey, link, time.Hour)
 	return
 }

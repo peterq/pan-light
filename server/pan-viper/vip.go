@@ -249,9 +249,47 @@ func (v *Vip) SaveFileByMd5(md5, sliceMd5, path string, contentLength int64) (fi
 	fileSize = int64(info["size"].(float64))
 	serverPath := info["path"].(string)
 	if serverPath[len(serverPath)-1] == ')' {
-		go v.DeleteFile(serverPath)
+		go v.DeleteFile(path)
 	}
 	return
+}
+
+func (v *Vip) LinkByFid(fid string) (link string, err error) {
+	log.Println(fid)
+	ss := v.loginSession()
+
+	data, err := v.request("GET", "https://pan.baidu.com/api/download", gson{
+		"sign":       ss.Sign,
+		"timestamp":  ss.Timestamp,
+		"fidlist":    "[" + fid + "]",
+		"type":       "dlink",
+		"channel":    "chunlei",
+		"web":        1,
+		"app_id":     "250528",
+		"bdstoken":   ss.Bdstoken,
+		"logid":      time.Now().UnixNano(),
+		"clienttype": 0,
+	}, nil)
+	if err != nil {
+		err = errors.Wrap(err, "")
+		return
+	}
+	log.Println(data)
+	link = data["dlink"].([]interface{})[0].(map[string]interface{})["dlink"].(string)
+	link = v.getRedirectedLink(link)
+	return
+}
+
+func (v *Vip) getRedirectedLink(link string) string {
+	req := newRequest("GET", link)
+	resp, err := v.http.Do(req)
+	if err != nil {
+		log.Println(err)
+	}
+	end := resp.Request.URL.String()
+	log.Println(end)
+	resp.Body.Close()
+	return end
 }
 
 func (v *Vip) inputSharePwd(link, secret string) (err error) {
