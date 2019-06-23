@@ -19,7 +19,7 @@ Window {
     width: 550
     height: 300
 
-    property bool submitting: flase
+    property bool submitting: false
     property var sliceMd5Promise
     property var meta
     property var timeMap: {

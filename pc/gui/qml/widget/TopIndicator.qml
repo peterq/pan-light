@@ -6,9 +6,10 @@ Rectangle {
     property color failColor: 'red'
     property color warningColor: 'orange'
     property alias duration: hideTimer.interval
+    property int padding: 20
 
     width: parent.width
-    height: 10 + msgText.implicitHeight
+    height: padding + msgText.implicitHeight
     y: -height
 
     Text {

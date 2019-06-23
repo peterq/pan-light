@@ -460,3 +460,14 @@ function api(name, param) {
     param = param || {}
     return callGoAsync('api.call', {name: name, param: param})
 }
+
+function digital(i) {
+  return i < 10 ? '0' + i: i
+}
+
+function unixTime(t) {
+    var d = new Date(t * 1000)
+    var date = [d.getFullYear(),d.getMonth()+1, d.getDate()].map(digital).join('-')
+    var time = [d.getHours(), d.getMinutes(), d.getSeconds()].map(digital).join(':')
+    return date + ' ' + time
+}
