@@ -4,6 +4,7 @@ import (
 	"github.com/peterq/pan-light/server/artisan/cache"
 	"github.com/peterq/pan-light/server/conf"
 	"gopkg.in/mgo.v2"
+	"math"
 	"time"
 )
 
@@ -46,17 +47,20 @@ func (d *fileShareDao) List(count, offset int, order string) (data []gson, err e
 		"expire_at": gson{
 			"$gt": time.Now().Unix(),
 		},
-		"share_at": gson{
-			"$gt": offset,
-		},
 	}
 	if order == "official" {
 		condition["official"] = true
+	}
+	if offset == 0 {
+		offset = math.MaxInt32
 	}
 	collection := d.collection(s)
 	err = collection.Pipe([]gson{
 		{"$match": condition},
 		{"$sort": sort},
+		{"$match": gson{"share_at": gson{
+			"$lt": offset,
+		}}},
 		{"$limit": count},
 		{
 			"$lookup": gson{

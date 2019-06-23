@@ -165,13 +165,13 @@ func handleShareToSquare(ctx context.Context, param artisan.JsonMap) (result int
 }
 
 func handleShareList(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
-	offset := param.Get("offset").Int()
+	offset := param.Get("offset").Int64()
 	pageSize := param.Get("pageSize").Int()
 	listType := param.Get("type").String()
 	if pageSize < 1 || pageSize > 20 || offset < 0 {
 		return nil, errors.New("param invalid")
 	}
-	if offset > 300 {
+	if offset != 0 && offset < time.Now().Add(-time.Hour*24*365).Unix() {
 		return []gson{}, nil
 	}
 	if _, ok := map[string]bool{
@@ -181,6 +181,9 @@ func handleShareList(ctx context.Context, param artisan.JsonMap) (result interfa
 	}[listType]; !ok {
 		return nil, errors.New("type invalid")
 	}
-	result, err = dao.FileShareDao.List(pageSize, offset, listType)
+	result, err = dao.FileShareDao.List(pageSize, int(offset), listType)
+	if result.([]gson) == nil {
+		result = []gson{}
+	}
 	return
 }

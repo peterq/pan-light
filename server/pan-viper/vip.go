@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/kataras/iris"
+	"github.com/peterq/pan-light/server/artisan"
 	"github.com/peterq/pan-light/server/dao"
 	"github.com/pkg/errors"
 	"io/ioutil"
@@ -42,6 +42,7 @@ type loginSession struct {
 	Timestamp string
 	Bdstoken  string
 	Bduss     string
+	createAt  time.Time
 }
 
 type Vip struct {
@@ -71,10 +72,14 @@ func (v *Vip) Username() string {
 func (v *Vip) CreateSession() (err error) {
 	defer func() {
 		if err != nil {
-			(&iris.Application{}).Logger().Error(v.username, "vip创建session错误", err)
+			artisan.App.Logger().Error(v.username, "vip创建session错误", err)
+			go v.CreateSession()
 		}
 	}()
 	old := v.loginSession()
+	if old != nil && time.Now().Sub(old.createAt) < time.Second {
+		return
+	}
 	v.loginSessionLock.Lock()
 	defer v.loginSessionLock.Unlock()
 	// 高并发下防止重复更新session
@@ -116,6 +121,7 @@ func (v *Vip) CreateSession() (err error) {
 	s.Timestamp = fmt.Sprint(int(raw["timestamp"].(float64)))
 	s.Bdstoken = raw["bdstoken"].(string)
 	s.Bduss = v.bduss
+	s.createAt = time.Now()
 	v._loginSession = &s
 	log.Println(v.username, "完成loginSession")
 	return

@@ -10,7 +10,7 @@ import (
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	app := iris.New()
+	app := artisan.NewApp()
 	app.Get("/", func(ctx context.Context) {
 		ctx.Write([]byte("Hello pan-light"))
 	})

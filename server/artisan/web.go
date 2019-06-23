@@ -213,3 +213,10 @@ func (v JsonValue) Array() []JsonValue {
 	}
 	panic(NewError(fmt.Sprintf("%s needs to be array, %T given", v.name, v.data), -1, nil))
 }
+
+var App *iris.Application
+
+func NewApp() *iris.Application {
+	App = iris.New()
+	return App
+}
