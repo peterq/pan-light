@@ -227,3 +227,9 @@ func handleLinkMd5(ctx context.Context, param artisan.JsonMap) (result interface
 	cache.RedisSet(cacheKey, link, time.Hour)
 	return
 }
+
+func handleHitShare(ctx context.Context, param artisan.JsonMap) (result interface{}, err error) {
+	id := param.Get("id").String()
+	err = dao.FileShareDao.Hit(middleware.ContextLoginInfo(ctx).Uk(), id)
+	return
+}

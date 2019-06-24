@@ -75,8 +75,6 @@ Item {
                 width: tabWidth * tabs.length + 2 * padding
                 height: parent.height * 0.7
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.left: taskLeft.right
-                anchors.leftMargin: 30
                 x: 10
                 Rectangle {
                     anchors.fill: parent

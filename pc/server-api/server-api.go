@@ -21,6 +21,7 @@ var urlMap = map[string]string{
 	"refresh-token": "/api/pc/refresh-token",
 	"share":         "/api/pc/share",
 	"share-list":    "/api/pc/share/list",
+	"share-hit":     "/api/pc/share/hit",
 	"link-md5":      "/api/pc/link/md5",
 }
 var httpClient = http.Client{
