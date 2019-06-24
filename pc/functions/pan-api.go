@@ -49,6 +49,7 @@ var panApiAsyncRoutes = map[string]asyncHandler{
 			resolve(result)
 		}
 	},
+	// 获取极速上传的md5
 	"pan.rapid.md5": func(p map[string]interface{}, resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{}) {
 		_, sliceMd5, _, err := pan_download.RapidUploadMd5(fmt.Sprint(int(p["fid"].(float64))))
 		if err != nil {
@@ -56,5 +57,18 @@ var panApiAsyncRoutes = map[string]asyncHandler{
 			return
 		}
 		resolve(sliceMd5)
+	},
+	// 通过md5转存文件
+	"pan.save.md5": func(p map[string]interface{}, resolve func(interface{}), reject func(interface{}), progress func(interface{}), qmlMsg chan interface{}) {
+		md5 := p["md5"].(string)
+		sliceMd5 := p["sliceMd5"].(string)
+		path := p["path"].(string)
+		fileSize := int64(p["fileSize"].(float64))
+		serverPath, _, _, err := pan_api.SaveFileByMd5(md5, sliceMd5, path, fileSize)
+		if err != nil {
+			reject(err)
+			return
+		}
+		resolve(serverPath)
 	},
 }

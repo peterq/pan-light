@@ -240,9 +240,13 @@ func (v *Vip) SaveFileByMd5(md5, sliceMd5, path string, contentLength int64) (fi
 		"target_path":    filepath.Dir(path),
 		"local_mtime":    1533345687,
 	})
+	if err != nil {
+		err = errors.Wrap(err, "极速上传到vip账号失败")
+		return
+	}
 	if _, ok := data["errno"]; !ok {
 		log.Println(data)
-		err = errors.New("极速上传失败")
+		err = errors.New("极速上传到vip账号失败")
 	}
 	info := data["info"].(gson)
 	fid = fmt.Sprint(int64(info["fs_id"].(float64)))

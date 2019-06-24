@@ -5,9 +5,9 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/peterq/pan-light/pc/storage"
+	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"log"
@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -416,5 +417,39 @@ func DeleteFile(serverPath string) (err error) {
 		"filelist": fmt.Sprintf("[\"%s\"]", serverPath),
 	})
 	log.Println(data, err)
+	return
+}
+
+// md5转存
+func SaveFileByMd5(md5, sliceMd5, path string, contentLength int64) (serverPath, fid string, fileSize int64, err error) {
+	data, err := request("POST", "https://pan.baidu.com/api/rapidupload", gson{
+		"rtype":      1,
+		"channel":    "chunlei",
+		"web":        1,
+		"app_id":     250528,
+		"bdstoken":   LoginSession.Bdstoken,
+		"logid":      time.Now().UnixNano(),
+		"clienttype": 0,
+	}, gson{
+		"path":           path,
+		"content-length": contentLength,
+		"content-md5":    md5,
+		"slice-md5":      sliceMd5,
+		"target_path":    filepath.Dir(path),
+		"local_mtime":    1533345687,
+	})
+	if err != nil {
+		err = errors.Wrap(err, "极速上传失败")
+		return
+	}
+	if _, ok := data["errno"]; !ok {
+		log.Println(data)
+		err = errors.New("极速上传失败")
+		return
+	}
+	info := data["info"].(gson)
+	fid = fmt.Sprint(int64(info["fs_id"].(float64)))
+	fileSize = int64(info["size"].(float64))
+	serverPath = info["path"].(string)
 	return
 }

@@ -87,7 +87,7 @@ Item {
             console.log('恢复任务', downloadId)
             var res = Util.callGoSync('download.resume', {
                                           "downloadId": downloadId,
-                                          "bin": resumeData,
+                                          "bin": resumeData
                                       })
         } else {
             isNewAdd = false
@@ -144,11 +144,6 @@ Item {
         }
     }
 
-    function getMenus() {
-        root.meta.path = ''
-        return []
-    }
-
     Rectangle {
         height: parent.height
         width: Math.min(progress / meta.size, 1) * parent.width
@@ -192,8 +187,7 @@ Item {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: {
-                if (mouse.button === Qt.RightButton)
-                    Util.showMenu(getMenus())
+
             }
         }
 

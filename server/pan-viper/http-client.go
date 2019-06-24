@@ -41,7 +41,6 @@ func makeHttpClient(cookieStr string) (http.Client, string) {
 		Transport: nil,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			req.Header.Del("Referer")
-			log.Println(req.URL)
 			if len(via) >= 10 {
 				return errors.New("stopped after 10 redirects")
 			}

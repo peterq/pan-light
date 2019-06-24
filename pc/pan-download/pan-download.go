@@ -80,6 +80,7 @@ func LinkResolver(fileId string) (link string, err error) {
 			err = errors.New("链接解析严重错误: " + fmt.Sprint(e))
 		}
 	}()
+	log.Println("resolve", fileId)
 	args := strings.Split(fileId, ".")
 	switch args[0] {
 	case "vip":

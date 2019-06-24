@@ -4,6 +4,7 @@ import (
 	"github.com/peterq/pan-light/server/conf"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type VipSaveFileModel struct {
 }
 
 func (f *VipSaveFileModel) GetSavePath() string {
+	log.Printf("%#v", f)
 	return "/pan-light-save/" + f.Md5[:2] + "/" + f.Md5[2:4] + "/" + f.Md5
 }
 

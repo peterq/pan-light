@@ -53,6 +53,12 @@ Rectangle {
 
     function fail(msg) {
         color = failColor
+        msg = msg || 'unspecifed error'
+        if (typeof msg !== 'string') {
+            if (msg.message) msg= msg.message
+            else if (msg.toString()) msg = msg.toString()
+            else msg = JSON.stringify(msg)
+        }
         show(msg)
     }
 

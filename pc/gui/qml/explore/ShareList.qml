@@ -9,7 +9,7 @@ Rectangle {
 
     color: '#eee'
 
-    property int pageSize: 1
+    property int pageSize: 10
     property int offset: 0
     property var loadPromise
     property string type: 'newest'

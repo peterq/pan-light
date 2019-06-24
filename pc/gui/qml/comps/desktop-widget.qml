@@ -25,6 +25,15 @@ Window {
         App.appState.floatWindow = root
     }
 
+    onVisibleChanged: {
+        if (visible) {
+            if (x < 0) x = 100
+            if (y < 0) y = 100
+            x = Math.min(x, Screen.desktopAvailableWidth - width)
+            y = Math.min(y, Screen.desktopAvailableHeight - height)
+        }
+    }
+
     DataSaver {
         $key: 'window.float'
         property alias x: root.x

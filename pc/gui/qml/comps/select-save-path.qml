@@ -21,7 +21,7 @@ FileDialog {
         resolve(file)
     }
     onRejected: {
-        reject()
+        reject('用户取消选择保存路径')
     }
     Component.onCompleted: {
         currentFile = folder +  (Qt.platform.os == "windows" ? '\\' : '/') + fileName

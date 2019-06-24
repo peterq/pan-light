@@ -333,9 +333,16 @@ function getFileLinkVip(meta) {
     return callGoAsync('pan.link', {fid: 'vip.' + meta.fs_id})
 }
 
+var playVideoByLink
 var playVideo = (function(){
     var comp = loadComponent(function(){},'../videoPlayer/MPlayer.qml')
     var ins
+    playVideoByLink = function(name, link) {
+        if (!ins || !ins.playVideo) {
+            ins = comp.createObject(G.root)
+        }
+        ins.playVideo(name, link)
+    }
     return function(meta, useVip){
         if (!ins || !ins.playVideo) {
             ins = comp.createObject(G.root)
@@ -470,3 +477,4 @@ function unixTime(t) {
     var time = [d.getHours(), d.getMinutes(), d.getSeconds()].map(digital).join(':')
     return date + ' ' + time
 }
+
