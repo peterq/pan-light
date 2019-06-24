@@ -13,15 +13,63 @@ Item {
     property string downloadId: meta.downloadId
     property var meta
     property int idx
+    property var listComp
     property string resumeData: ''
     property bool isNewAdd: true
     property string downloadState: ''
     property int progress: 0
     property string errString: ''
+    property bool isQueued: false
 
     signal taskEvent(string event, var data)
+    signal doStart
+    signal doPause
+
+    onDoStart: {
+        if (!startBtn.enabled)
+            return
+        isQueued = true
+        listComp.enqueue(downloadId)
+    }
+
+    onDoPause: {
+        if (!pauseBtn.enabled)
+            return
+        if (isQueued) {
+            listComp.dequeue(downloadId)
+            isQueued = false
+        } else {
+            pause()
+        }
+        listComp.checkQueue()
+    }
 
     property string speed: ''
+    property int speedInt: 0
+
+    function pause() {
+        Util.callGoSync('download.pause', {
+                            "downloadId": downloadId
+                        })
+        updateState()
+    }
+
+    function start() {
+        isQueued = false
+        Util.callGoSync('download.start', {
+                            "downloadId": downloadId
+                        })
+        updateState()
+    }
+
+    Connections {
+        target: App.appState.transferComp
+        onSumSpeed: {
+            if (isFinish)
+                return
+            data.speed += speedInt
+        }
+    }
 
     DataSaver {
         $key: 'download-item-' + root.downloadId
@@ -39,8 +87,7 @@ Item {
             console.log('恢复任务', downloadId)
             var res = Util.callGoSync('download.resume', {
                                           "downloadId": downloadId,
-                                          "bin": resumeData,
-                                          "useVip": meta.useVip
+                                          "bin": resumeData
                                       })
         } else {
             isNewAdd = false
@@ -65,6 +112,7 @@ Item {
         interval: 1100
         onTriggered: {
             speed = ''
+            speedInt = 0
         }
     }
 
@@ -72,6 +120,7 @@ Item {
         // 更新下载速度
         if (event === 'task.speed') {
             speed = Util.humanSize(data.speed) + '/s'
+            speedInt = data.speed
             speedClearTimer.restart()
             progress = data.progress
             return
@@ -93,11 +142,6 @@ Item {
                 App.appState.transferComp.itemCompleted(idx)
             return
         }
-    }
-
-    function getMenus() {
-        root.meta.path = ''
-        return []
     }
 
     Rectangle {
@@ -134,7 +178,8 @@ Item {
             visible: !isFinish && meta.useVip
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: fileNameText.left
-            anchors.leftMargin: 10 + Math.min(fileNameText.width, fileNameText.implicitWidth)
+            anchors.leftMargin: 10 + Math.min(fileNameText.width,
+                                              fileNameText.implicitWidth)
         }
 
         MouseArea {
@@ -142,8 +187,7 @@ Item {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: {
-                if (mouse.button === Qt.RightButton)
-                    Util.showMenu(getMenus())
+
             }
         }
 
@@ -152,7 +196,7 @@ Item {
             w: 500
             h: 200
             title: '确认删除'
-            onClickConfirm: function() {
+            onClickConfirm: function () {
                 result = checkBox.checked
                 return true
             }
@@ -176,32 +220,33 @@ Item {
             Text {
                 text: downloadState
             }
+            Text {
+                text: '等待中...'
+                color: 'orange'
+                visible: isQueued
+            }
             IconButton {
+                id: startBtn
                 iconType: 'start'
                 title: '开始'
                 color: enabled ? '#409EFF' : 'gray'
                 lighter: 1.1
                 visible: !isFinish
-                enabled: downloadState === 'wait.start'
+                enabled: !isQueued && downloadState === 'wait.start'
                 onClicked: {
-                    Util.callGoSync('download.start', {
-                                        "downloadId": downloadId
-                                    })
-                    updateState()
+                    doStart()
                 }
             }
             IconButton {
+                id: pauseBtn
                 iconType: 'pause'
                 title: '暂停'
                 color: enabled ? '#409EFF' : 'gray'
                 lighter: 1.1
                 visible: !isFinish
-                enabled: downloadState === 'downloading'
+                enabled: downloadState === 'downloading' || isQueued
                 onClicked: {
-                    Util.callGoSync('download.pause', {
-                                        "downloadId": downloadId
-                                    })
-                    updateState()
+                    doPause()
                 }
             }
 

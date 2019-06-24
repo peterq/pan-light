@@ -5,6 +5,7 @@ package storage;
 message globalData {
     map<string, state> userStateMap = 1;
     string currentUser = 2;
+    int64 internalServerPort = 3;
 }
 
 message state {
@@ -17,6 +18,8 @@ message state {
     repeated cookies panCookie = 3;
     map<string, string> userStorage = 4;
     string username = 5;
+    string uk = 6;
+    bool logout = 7;
 }
 
 message cookies {

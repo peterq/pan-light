@@ -156,5 +156,22 @@
         <file>assets/images/icons/folder.svg</file>
         <file>comps/PromiseDialog.qml</file>
         <file>assets/images/icons/vip.svg</file>
+        <file>widget/VirtualFrame.qml</file>
+        <file>widget/MoveWindow.qml</file>
+        <file>assets/images/icons/close.svg</file>
+        <file>assets/images/icons/max.svg</file>
+        <file>assets/images/icons/normal-size.svg</file>
+        <file>assets/images/icons/min.svg</file>
+        <file>assets/images/icons/more-down.svg</file>
+        <file>widget/Resize.qml</file>
+        <file>assets/images/icons/baidu-cloud.svg</file>
+        <file>pages/setting-window.qml</file>
+        <file>pages/about-window.qml</file>
+        <file>pages/feedback-window.qml</file>
+        <file>widget/TopIndicator.qml</file>
+        <file>pages/share-window.qml</file>
+        <file>explore/ShareList.qml</file>
+        <file>explore/ShareItem.qml</file>
+        <file>explore/Tag.qml</file>
     </qresource>
 </RCC>

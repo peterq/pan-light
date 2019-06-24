@@ -41,6 +41,8 @@ func firstLogin(username string) *State {
 		PanCookie:   []*Cookies{},
 		UserStorage: map[string]string{},
 		Username:    username,
+		Uk:          "",
+		Logout:      false,
 	}
 }
 
@@ -54,6 +56,7 @@ func doInit() {
 	} else {
 		firstStart()
 	}
+	Global.UserStateMap["default"] = firstLogin("default")
 	UserState = Global.UserStateMap[Global.CurrentUser]
 }
 
@@ -69,6 +72,7 @@ func OnLogin(username string) {
 		UserState = firstLogin(username)
 		Global.UserStateMap[username] = UserState
 	}
+	UserState.Logout = false
 }
 
 func writeToDiskTask() {

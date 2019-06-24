@@ -2,165 +2,206 @@ import QtQuick 2.9
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.4 as Controls
 import Qt.labs.platform 1.0
-import '../js/util.js' as Util
+import QtGraphicalEffects 1.0
+import "../js/util.js" as Util
+import "../js/global.js" as G
+import "../js/app.js" as App
 
-
-//包含系统托盘的导包
 Window {
-    id: mainWindow
-    //大小根据屏幕计算，宽高比为6:14
+    id: root
     visible: true
-    minimumHeight: 50
-    minimumWidth: 120
-    width: Screen.desktopAvailableWidth / 14
-    height: width * 3 / 7
-    title: qsTr("tiny monitor")
-    x: 100
+    width: contentContainer.width + 20
+    height: contentContainer.height + 20
+    title: 'pan-light float'
+    x: Screen.desktopAvailableWidth - width
     y: 100
     //无边框的window flags
-    flags: Qt.WA_TranslucentBackground | Qt.WA_TransparentForMouseEvents| Qt.FramelessWindowHint
-                      | Qt.WindowSystemMenuHint
-                       | Qt.WindowStaysOnTopHint | Qt.X11BypassWindowManagerHint
-    //灰色0.9透明度
-//    color: Qt.rgba(0,0,0,0)
+    flags: Qt.WA_TranslucentBackground | Qt.WA_TransparentForMouseEvents
+           | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint
+           | Qt.WindowStaysOnTopHint | Qt.X11BypassWindowManagerHint
     color: 'transparent'
 
     Component.onCompleted: {
-        Util.bridge.changeAttribute(mainWindow, Qt.WA_TranslucentBackground, true)
-        Util.bridge.changeAttribute(mainWindow, Qt.WA_TransparentForMouseEvents, true)
+        App.appState.floatWindow = root
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            if (x < 0) x = 100
+            if (y < 0) y = 100
+            x = Math.min(x, Screen.desktopAvailableWidth - width)
+            y = Math.min(y, Screen.desktopAvailableHeight - height)
+        }
+    }
+
+    DataSaver {
+        $key: 'window.float'
+        property alias x: root.x
+        property alias y: root.y
+        property alias visible: root.visible
     }
 
     Rectangle {
-      anchors.fill: parent
-      color: Qt.rgba(0,0,0,0)
-      border.color: 'red'
-      border.width: 2
-    }
-    Rectangle {
-        id: rectangle
-        x: 0
-        y: 0
-        width: mainWindow.height
-        height: width
-        color: Qt.rgba(0.2, 1.0, 0.0, 0.7)
-        Component.onCompleted: {
+        id: contentContainer
+        width: 130
+        height: 35
+        border.color: 'gray'
+        // radius: 5
+        clip: true
+        anchors.centerIn: parent
 
-        }
-    }
-
-//    混合动画效果（这里混合x和y轴平移
-    ParallelAnimation {
-        id: moveAnimation
-        running: false
-        PropertyAnimation {
-            target: mainWindow
-            property: 'x'
-            easing.type: Easing.Linear
-            duration: 100
-        }
-        PropertyAnimation {
-            target: mainWindow
-            property: 'y'
-            easing.type: Easing.Linear
-            duration: 100
-        }
-    }
-
-    //鼠标可控制区域
-    MouseArea {
-        property point clickPos: "0,0"
-        id: dragRegion
-        anchors.fill: rectangle
-        drag.minimumX: 0
-        drag.maximumX: Screen.desktopAvailableWidth - mainWindow.width
-        drag.minimumY: 0
-        drag.maximumY: Screen.desktopAvailableHeight - mainWindow.heigh
-        onPressed: {
-            mainWindow.requestActivate()
-            clickPos = Qt.point(mouseX, mouseY)
-        }
-
-        onPositionChanged: {
-            moveAnimation.stop()
-            //鼠标偏移量
-            var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
-//            console.log(delta.x + "  " + delta.y)
-            mainWindow.x += delta.x
-            mainWindow.y += delta.y
-            moveAnimation.start()
-        }
-        //添加右键菜单
-        acceptedButtons: Qt.LeftButton | Qt.RightButton // 激活右键（别落下这个）
-        onClicked: {
-            if (mouse.button === Qt.RightButton) {
-                // 右键菜单
-                contentMenu.popup()
+        Rectangle {
+            id: logo
+            x: 1
+            height: parent.height - 2
+            anchors.verticalCenter: parent.verticalCenter
+            width: height * 1.1
+            color: '#38f'
+            IconFont {
+                type: 'baidu-cloud'
+                width: parent.height * 0.8
+                color: 'white'
+                anchors.centerIn: parent
             }
         }
-    }
-    //不是托盘的菜单类
-    Controls.Menu {
-        id: contentMenu
-        // 右键菜单
-        Controls.MenuItem {
-            id:hideItem
-            text: qsTr("隐藏")
-            onTriggered: {
-                if(trayIcon==null){
-                    console.log("系统托盘不存在");
-                    contentMenu.removeItem(hideItem);
-                    return;
-                }else{
-                    if(trayIcon.available){
-                        console.log("系统托盘存在");
-                    }else{
-                        console.log("系统托盘不存在");
-                        contentMenu.removeItem(hideItem)
+        Rectangle {
+            anchors.left: logo.right
+            anchors.verticalCenter: parent.verticalCenter
+            height: parent.height - 2
+            width: parent.width - 2 - logo.width
+            color: '#a2dcf4'
+            Text {
+                text: ''
+                color: '#34658a'
+                anchors.centerIn: parent
+                Timer {
+                    interval: 1000
+                    running: root.visible
+                    triggeredOnStart: true
+                    repeat: true
+                    onTriggered: {
+                        var data = {
+                            "speed": 0
+                        }
+                        App.appState.transferComp.sumSpeed(data)
+                        parent.text = Util.humanSize(data.speed) + '/s'
                     }
                 }
-                mainWindow.hide()
+            }
+        }
+        OpacityMask {
+            anchors.fill: logo
+            source: logo
+            maskSource: contentContainer
+            visible: true
+            antialiasing: true
+        }
+
+        MouseArea {
+            property point clickPos: "0,0"
+            anchors.fill: parent
+            onPressed: {
+                root.requestActivate()
+                clickPos = Qt.point(mouseX, mouseY)
+            }
+            onPositionChanged: {
+                var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
+                root.x += delta.x
+                root.y += delta.y
+            }
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: {
+                if (mouse.button === Qt.RightButton) {
+                    contentMenu.popup()
+                }
+            }
+        }
+    }
+
+    DropShadow {
+        anchors.fill: contentContainer
+        horizontalOffset: -5
+        verticalOffset: -5
+        radius: 12.0
+        samples: 25
+        color: "#20000000"
+        spread: 0.0
+        source: contentContainer
+    }
+    DropShadow {
+        anchors.fill: contentContainer
+        horizontalOffset: 5
+        verticalOffset: 5
+        radius: 12.0
+        samples: 25
+        color: "#20000000"
+        spread: 0.0
+        source: contentContainer
+    }
+
+    // 右键菜单
+    Controls.Menu {
+        id: contentMenu
+        Controls.MenuItem {
+            id: hideItem
+            text: '隐藏悬浮窗'
+            onTriggered: {
+                root.hide()
             }
         }
         Controls.MenuItem {
-            text: qsTr("退出")
+            text: '显示主界面'
+            visible: !G.root.visible
+            onTriggered: {
+                G.root.show()
+                G.root.raise()
+                G.root.requestActivate()
+            }
+        }
+        Controls.MenuItem {
+            text: '退出程序'
             onTriggered: Qt.quit()
         }
     }
 
-    //使用系统托盘的菜单组件
+    // 系统托盘菜单
     Menu {
         id: systemTrayMenu
-        // 右键菜单
         MenuItem {
-            text: qsTr("隐藏")
-            shortcut: "Ctrl+z"
-            onTriggered: mainWindow.hide()
+            visible: root.visible
+            text: '隐藏悬浮窗'
+            onTriggered: root.hide()
         }
         MenuItem {
-            text: qsTr("显示")
+            text: '显示悬浮窗'
+            visible: !root.visible
             onTriggered: {
-               mainWindow.show()
-               mainWindow.flags = Qt.WA_TranslucentBackground
-                   | Qt.WA_TransparentForMouseEvents| Qt.FramelessWindowHint
-                   | Qt.WindowSystemMenuHint
-                   | Qt.WindowStaysOnTopHint | Qt.X11BypassWindowManagerHint
+                root.show()
             }
         }
         MenuItem {
-            text: qsTr("退出")
+            text: '显示主界面'
+            onTriggered: {
+                G.root.show()
+                G.root.raise()
+                G.root.requestActivate()
+            }
+        }
+        MenuItem {
+            text: '退出程序'
             onTriggered: Qt.quit()
         }
     }
-    //系统托盘
+    // 系统托盘
     SystemTrayIcon {
-        id:trayIcon
+        id: trayIcon
         visible: true
         iconSource: "../assets/images/pan-light-1.png"
-        tooltip: "tiny-流量监控软件"
+        tooltip: "pan-light tray"
         onActivated: {
-            mainWindow.show()
-            mainWindow.raise()
-            mainWindow.requestActivate()
+            root.show()
+            root.raise()
+            root.requestActivate()
         }
         menu: systemTrayMenu
     }

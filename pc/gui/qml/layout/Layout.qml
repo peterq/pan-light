@@ -5,7 +5,8 @@ Item {
     property var tabsUrl: {'我的网盘': 'pan', '传输列表': 'transfer', '探索': 'explore'}
     property var tabs: ['我的网盘', '传输列表', '探索']
     property var colors: ['blue', 'red', 'green']
-    property string activeTab: '传输列表'
+    property string activeTab: '探索'
+    anchors.fill: parent
     Header {
         id: header
         tabs: mainLayout.tabs
@@ -15,6 +16,16 @@ Item {
             mainLayout.activeTab = tab
         }
     }
+    function notiActive() {
+        var idx = mainLayout.tabs.findIndex(function (tab) {
+            return tab === mainLayout.activeTab
+        })
+        tabRepeater.itemAt(idx).active()
+    }
+    onActiveTabChanged: {
+        notiActive()
+    }
+
     Rectangle {
         id: tabsViewport
         width: parent.width
@@ -113,11 +124,13 @@ Item {
             }
 
             Repeater {
+                id: tabRepeater
                 model: tabs
                 Rectangle {
                     id: tabWapper
                     width: tabsViewport.width
                     height: tabsViewport.height
+                    signal active
 
 //                    color: mainLayout.colors[index]
                     Rectangle {
@@ -135,7 +148,9 @@ Item {
                         focus: true
                         width: tabWapper.width
                         height: tabWapper.height
-                        source: '../' + tabsUrl[modelData] + '/' + tabsUrl[modelData] + '.qml'
+                        Component.onCompleted: {
+                            tabLoader.setSource('../' + tabsUrl[modelData] + '/' + tabsUrl[modelData] + '.qml', {tabWapper: tabWapper})
+                        }
                     }
                 }
             }
@@ -143,7 +158,9 @@ Item {
     }
 
     Component.onCompleted: {
+        notiActive()
         console.log(Util.callGoSync('time'))
+        Util.openDesktopWidget()
         Util.callGoAsync('wait', {time: 1})
             .then(function(data) {
                 console.log('reslove', data)

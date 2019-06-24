@@ -1,4 +1,5 @@
 .pragma library
+
 .import "./util.js" as Util
 
 // 响应式状态机
@@ -12,6 +13,14 @@ Util.event.once('init.api.ok', function (loginSession) {
     appState.loginSession = loginSession
     enterPath('/')
     console.log('app.js ', JSON.stringify(appState.loginSession))
+    Util.api("refresh-token").then(function (token) {
+        console.log('refresh token ok')
+    }).catch(function (err) {
+        console.log('refresh token error:', err.message)
+        Util.callGoAsync("api.login").then(function (token) {
+            console.log('登录 pan-light server 成功')
+        })
+    })
 })
 
 // 历史记录后退

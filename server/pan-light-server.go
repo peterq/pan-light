@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
+	"github.com/peterq/pan-light/server/artisan"
+	"github.com/peterq/pan-light/server/pc-api"
 	"github.com/peterq/pan-light/server/demo"
 	"log"
 	"os"
@@ -10,7 +12,7 @@ import (
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	app := iris.New()
+	app := artisan.NewApp()
 	app.Get("/", func(ctx context.Context) {})
 
 	cnf, ok := os.LookupEnv("pan_light_server_conf")
@@ -20,5 +22,7 @@ func main() {
 	configuration := iris.YAML(cnf)
 	demo.Init(app.Party("/demo"), configuration.Other["demo"].(map[interface{}]interface{}))
 
-	app.Run(iris.Addr(":8081"))
+	app.Use(artisan.ApiRecover)
+	pc_api.Init(app)
+	app.Run(iris.Addr("127.0.0.1:8081"))
 }

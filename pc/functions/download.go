@@ -13,11 +13,7 @@ func init() {
 
 var downloadSyncRoutes = map[string]syncHandler{
 	"download.new": func(p map[string]interface{}) interface{} {
-		useVip := false
-		if u, ok := p["useVip"]; ok {
-			useVip = u.(bool)
-		}
-		taskId, err := pan_download.DownloadFile(p["fid"].(string), p["savePath"].(string), useVip)
+		taskId, err := pan_download.DownloadFile(p["fid"].(string), p["savePath"].(string))
 		if err != nil {
 			return err
 		}

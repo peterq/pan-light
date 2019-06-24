@@ -1,39 +1,27 @@
 package dep
 
 import (
+	"math/rand"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 type tEnv struct {
 	Dev               bool   // 是否为开发环境
 	Platform          string // 运行平台, darwin, windows, linux
-	ApiHost           string
+	ApiBase           string // api调用前缀
 	InternalServerUrl string
 	VersionString     string
 	DataPath          string
 	Version           int
 	ClientUA          string
-	ElectronSecretUA  string
-	ListenPort        int
-}
-
-var Env = tEnv{
-	Dev:               true,
-	Platform:          "",
-	ApiHost:           "http://127.0.0.1:9050",
-	InternalServerUrl: "",
-	VersionString:     "v1.0.0",
-	DataPath:          "",
-	Version:           20181113001,
-	ClientUA:          "pan-light/v1.0.0;build 20181113001;",
-	ElectronSecretUA:  "secret",
-	ListenPort:        5678,
 }
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
 	Env.Platform = runtime.GOOS
 	switch Env.Platform {
 	case "linux", "darwin":

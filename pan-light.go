@@ -11,6 +11,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -124,7 +126,7 @@ func pcDev() {
 	_, err := os.Stat(pluginPath)
 	if os.IsNotExist(err) || rebuildPlugin {
 		log.Println("编译gui插件...")
-		runCmd("./pc", "go", "build", "-tags=plugin", "--buildmode=plugin", "-o", "gui/gui-plugin.so", "gui/gui-plugin.go")
+		runCmd("./pc", "go", "build", "-p", strconv.Itoa(runtime.NumCPU()-1), "-v", "-tags=plugin", "--buildmode=plugin", "-o", "gui/gui-plugin.so", "gui/gui-plugin.go")
 	}
 	log.Println("打包qml...")
 	cmd(qtBin("rcc"), "-binary", "pc/gui/qml/qml.qrc", "-o", "pc/gui/qml/qml.rcc").Run()

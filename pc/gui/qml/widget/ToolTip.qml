@@ -13,7 +13,8 @@ Item {
             tipIns.hide(showId)
             showDelay.stop()
         } else {
-            showDelay.restart()
+            if (text)
+                showDelay.restart()
         }
     }
 

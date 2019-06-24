@@ -51,8 +51,23 @@ ApplicationWindow {
         videoTitle = title
         videoRotation = 0
         mediaPlayer.stop()
-        mediaPlayer.source = source
-        mediaPlayer.play()
+        if (source.loadingLinkText) {
+            loadingLinkTip.text = source.loadingLinkText
+            loadingLinkTip.visible = true
+            source.then(function(link) {
+                mediaPlayer.stop()
+                mediaPlayer.source = link
+                mediaPlayer.play()
+            }).catch(function (err) {
+                mediaPlayer.showError("解析链接错误:" + err)
+            }).finally(function() {
+                loadingLinkTip.visible = false
+            })
+        } else {
+            mediaPlayer.stop()
+            mediaPlayer.source = source
+            mediaPlayer.play()
+        }
     }
 
     function rotateVideo() {
@@ -135,6 +150,15 @@ ApplicationWindow {
         onError: {
             console.log('-----------', error, errorString)
             // 同时2个弹窗有bug, 直接卡死, 改造成队列模式
+            showError(errorString)
+        }
+        onPaused: {
+            player.playing = false
+        }
+        onPlaying: {
+            player.playing = true
+        }
+        function showError(errorString) {
             errShowPromise = errShowPromise.finally(function () {
                 return Util.alert({
                                       "parent": player,
@@ -142,12 +166,6 @@ ApplicationWindow {
                                       "msg": errorString
                                   })
             })
-        }
-        onPaused: {
-            player.playing = false
-        }
-        onPlaying: {
-            player.playing = true
         }
     }
     VideoOutput {
@@ -181,5 +199,13 @@ ApplicationWindow {
         cursorShape: player.showControls ? Qt.ArrowCursor : Qt.BlankCursor
     }
     ControlArea {
+    }
+
+    Text {
+        id: loadingLinkTip
+        anchors.centerIn: parent
+        color: 'white'
+        font.pointSize: 20
+        visible: false
     }
 }

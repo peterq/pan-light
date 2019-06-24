@@ -4,6 +4,9 @@ import "../js/util.js" as Util
 
 Item {
     id: root
+
+    signal sumSpeed(var data)
+
     HeaderBar {
         id: headerBar
     }
@@ -53,18 +56,49 @@ Item {
         }).then(function (savePath) {
             savePath = savePath.toString()
             savePath = savePath.replace('file://', '')
+            var newFid = (useVip ? 'vip' : 'direct') + '.' + meta.fs_id
             var id = Util.callGoSync('download.new', {
-                                       "fid": meta.fs_id + '',
-                                       "savePath": savePath,
-                                       "useVip": !!useVip
-                                   })
+                                         "fid": newFid,
+                                         "savePath": savePath
+                                     })
             var obj = JSON.parse(JSON.stringify(meta))
             obj.downloadId = id
             var sep = Qt.platform.os == "windows" ? '\\' : '/'
             var t = String.prototype.split.call(savePath, sep)
+            obj.newFid = newFid
             obj.saveName = t.pop()
             obj.savePath = savePath
             obj.useVip = !!useVip
+            downloadingList.add(obj)
+        })
+    }
+
+    function addDownloadShare(md5, sliceMd5, fileSize, fileName) {
+        var fid = ['share', md5, sliceMd5, fileSize].join('.')
+        return Util.Promise.resolve().then(function () {
+            return Util.pickSavePath({
+                                         "fileName": fileName,
+                                         "defaultFolder": App.appState.settings.lastDownloadPath
+                                     })
+        }).then(function (savePath) {
+            savePath = savePath.toString()
+            savePath = savePath.replace('file://', '')
+            var id = Util.callGoSync('download.new', {
+                                         "fid": fid,
+                                         "savePath": savePath
+                                     })
+            var obj = {
+                "size": fileSize,
+                "downloadId": id,
+                "newFid": fid,
+                "savePath": savePath,
+                "useVip": true,
+                "fileName": fileName,
+                "isShare": true
+            }
+            var sep = Qt.platform.os == "windows" ? '\\' : '/'
+            var t = String.prototype.split.call(savePath, sep)
+            obj.saveName = t.pop()
             downloadingList.add(obj)
         })
     }

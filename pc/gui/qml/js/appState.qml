@@ -22,6 +22,8 @@ Item {
     property var downloadingList: []
     property var completedList: []
     property var transferComp: null
+    property var downloadingListComp: null
+    property var floatWindow: null
     property alias settings: settings
 
     DataSaver {
@@ -36,6 +38,14 @@ Item {
         $key: 'app-settings'
         property string defaultDownloadPath: ''
         property string lastDownloadPath: ''
+        property int maxParallelTaskNumber: 3
+        property int maxParallelCorutineNumber: 64
+
+        Component.onCompleted: {
+            Util.callGoSync('config', {
+                                "maxParallelCorutineNumber": maxParallelCorutineNumber
+                            })
+        }
     }
 
     onPathChanged: {

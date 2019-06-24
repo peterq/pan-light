@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"math/rand"
 	"strconv"
 	"time"
@@ -17,4 +19,10 @@ func First(args ...interface{}) interface{} {
 
 func Second(args ...interface{}) interface{} {
 	return args[1]
+}
+
+func Md5bin(bin []byte) string {
+	h := md5.New()
+	h.Write(bin)
+	return hex.EncodeToString(h.Sum(nil))
 }

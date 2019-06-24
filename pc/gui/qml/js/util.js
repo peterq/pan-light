@@ -72,7 +72,12 @@ var hideDesktopWidget
            ins = comp.createObject(null)
            return
        }
-       ins.visbal = true
+       ins.visible = true
+    }
+    hideDesktopWidget = function () {
+        if (ins) {
+            ins.visible = false
+        }
     }
 
 })()
@@ -304,46 +309,53 @@ var showMenu = (function () {
 })()
 
 function isVideo(f){
-    var ext = ['mp4', 'avi', 'rmvb', 'mkv', 'mov']
+    var ext = ['mp4', 'avi', 'rmvb', 'mkv', 'mov', 'wmv']
     var e = f.split('.').pop().toLowerCase()
     return ext.indexOf(e) >= 0
 }
 
 var videoAgentLink = (function(){
     var server
-    return function(meta) {
+    return function(fid) {
         if (!server) {
             server =  callGoSync('env.internal_server_url')
             console.log('internal url', JSON.stringify(server))
         }
-        return server + '/videoAgent?fid=' + meta.fs_id
+        return server + '/videoAgent?fid=' + fid
     }
 })()
 
 function getFileLink(meta) {
-    return callGoAsync('pan.link', {fid: meta.fs_id})
+    return callGoAsync('pan.link', {fid: 'direct.' + meta.fs_id})
 }
 
 function getFileLinkVip(meta) {
-    return callGoAsync('pan.link.vip', {fid: meta.fs_id})
+    return callGoAsync('pan.link', {fid: 'vip.' + meta.fs_id})
 }
 
+var playVideoByLink
 var playVideo = (function(){
     var comp = loadComponent(function(){},'../videoPlayer/MPlayer.qml')
     var ins
+    playVideoByLink = function(name, link) {
+        if (!ins || !ins.playVideo) {
+            ins = comp.createObject(G.root)
+        }
+        ins.playVideo(name, link)
+    }
     return function(meta, useVip){
         if (!ins || !ins.playVideo) {
             ins = comp.createObject(G.root)
         }
-        (useVip ?
-             getFileLinkVip(meta) :
-             getFileLink(meta))
+        var fid = (useVip ? 'vip.' : 'direct.') + meta.fs_id
+        var linkPromise = callGoAsync('pan.link', {fid: fid})
         .then(function(link){
-            var agentLink = videoAgentLink(meta, useVip)
+            var agentLink = videoAgentLink(fid)
             console.log('play link', agentLink, link)
-            ins.playVideo(meta.server_filename, agentLink)
+            return agentLink
         })
-
+        linkPromise.loadingLinkText = '正在解析播放链接'
+        ins.playVideo(meta.server_filename, linkPromise)
     }
 })()
 
@@ -405,3 +417,64 @@ function humanSize(size) {
     }
     return size.toFixed(2) + unit[i]
 }
+
+var openSetting = (function () {
+    var comp = loadComponent(function(){},'../pages/setting-window.qml')
+    var ins
+    return function(){
+        if (!ins || !ins.visible) {
+            ins = comp.createObject(G.root)
+        }
+        return ins
+    }
+})()
+
+var openAbout = (function () {
+    var comp = loadComponent(function(){},'../pages/about-window.qml')
+    var ins
+    return function(){
+        if (!ins || !ins.visible) {
+            ins = comp.createObject(G.root)
+        }
+        return ins
+    }
+})()
+
+var openFeedback = (function () {
+    var comp = loadComponent(function(){},'../pages/feedback-window.qml')
+    var ins
+    return function(){
+        if (!ins || !ins.visible) {
+            ins = comp.createObject(G.root)
+        }
+        return ins
+    }
+})()
+
+var openShare = (function () {
+    var comp = loadComponent(function(){},'../pages/share-window.qml')
+    var ins
+    return function(meta){
+        if (!ins || !ins.visible) {
+            ins = comp.createObject(G.root, {meta: meta})
+        }
+        return ins
+    }
+})()
+
+function api(name, param) {
+    param = param || {}
+    return callGoAsync('api.call', {name: name, param: param})
+}
+
+function digital(i) {
+  return i < 10 ? '0' + i: i
+}
+
+function unixTime(t) {
+    var d = new Date(t * 1000)
+    var date = [d.getFullYear(),d.getMonth()+1, d.getDate()].map(digital).join('-')
+    var time = [d.getHours(), d.getMinutes(), d.getSeconds()].map(digital).join(':')
+    return date + ' ' + time
+}
+
