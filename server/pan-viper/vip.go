@@ -259,7 +259,6 @@ func (v *Vip) SaveFileByMd5(md5, sliceMd5, path string, contentLength int64) (fi
 }
 
 func (v *Vip) LinkByFid(fid string) (link string, err error) {
-	log.Println(fid)
 	ss := v.loginSession()
 
 	data, err := v.request("GET", "https://pan.baidu.com/api/download", gson{
@@ -278,7 +277,6 @@ func (v *Vip) LinkByFid(fid string) (link string, err error) {
 		err = errors.Wrap(err, "")
 		return
 	}
-	log.Println(data)
 	link = data["dlink"].([]interface{})[0].(map[string]interface{})["dlink"].(string)
 	link = v.getRedirectedLink(link)
 	return

@@ -5,7 +5,7 @@ Item {
     property var tabsUrl: {'我的网盘': 'pan', '传输列表': 'transfer', '探索': 'explore'}
     property var tabs: ['我的网盘', '传输列表', '探索']
     property var colors: ['blue', 'red', 'green']
-    property string activeTab: '探索'
+    property string activeTab: '我的网盘'
     anchors.fill: parent
     Header {
         id: header

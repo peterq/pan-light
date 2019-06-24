@@ -1,0 +1,13 @@
+Other:
+  debug: true
+  app-secret: qwertyuiop
+  mongodb-uri: mongodb://super:super@127.0.0.1:27017/admin?maxPoolSize=100
+  database: pan-light
+  redis:
+    addr: 127.0.0.1:6379
+    pwd: ''
+    db: 2
+  demo:
+    hosts:
+    - name: asus-test
+      password: asus-test

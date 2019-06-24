@@ -4,11 +4,13 @@ import (
 	"github.com/peterq/pan-light/server/artisan/cache"
 	"github.com/peterq/pan-light/server/conf"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"math"
 	"time"
 )
 
 type FileShareModel struct {
+	Id       bson.ObjectId `bson:"_id,omitempty"`
 	Uk       string
 	Title    string
 	Md5      string
@@ -24,6 +26,9 @@ type fileShareDao struct{}
 
 func (*fileShareDao) collection(s *mgo.Session) *mgo.Collection {
 	return s.DB(conf.Conf.Database).C(conf.CollectionFileShare)
+}
+func (*fileShareDao) hitCollection(s *mgo.Session) *mgo.Collection {
+	return s.DB(conf.Conf.Database).C(conf.CollectionFileShareHit)
 }
 
 func (d *fileShareDao) Insert(data FileShareModel) (err error) {
@@ -150,6 +155,38 @@ func (d *fileShareDao) HotList() (data []gson, err error) {
 	} else {
 		cache.RedisSet(cacheKey, data, time.Minute)
 	}
+	return
+}
+
+func (d *fileShareDao) Hit(uk string, id string) (err error) {
+	s := conf.MongodbSession.Clone()
+	defer s.Refresh()
+	collection := d.collection(s)
+	var model FileShareModel
+	err = collection.FindId(bson.ObjectIdHex(id)).One(&model)
+	if err != nil {
+		return
+	}
+	hit := gson{
+		"uk":       uk,
+		"share_id": id,
+	}
+	err = d.hitCollection(s).Find(hit).One(&hit)
+	if err == nil {
+		return
+	}
+	hit["time"] = time.Now().Unix()
+	err = d.hitCollection(s).Insert(hit)
+	if err != nil {
+		return
+	}
+	collection.Update(bson.M{
+		"_id": model.Id,
+	}, gson{
+		"$set": gson{
+			"hot_index": model.HotIndex + 1,
+		},
+	})
 	return
 }
 
