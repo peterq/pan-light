@@ -1,5 +1,6 @@
 import QtQuick 2.9
 import QtQuick.Window 2.2
+import Qt.labs.platform 1.0
 import "js/util.js" as Util
 import "js/global.js" as G
 import "js/app.js" as App
@@ -27,6 +28,14 @@ Window {
         property alias y: mainWindow.y
         property alias width: mainWindow.width
         property alias height: mainWindow.height
+        property string firstStart: '1'
+        Component.onCompleted: {
+            if (firstStart === '1') {
+                firstStart = ''
+                mainWindow.x = (Screen.desktopAvailableWidth - mainWindow.width) / 2
+                mainWindow.y = (Screen.desktopAvailableHeight - mainWindow.height) / 2
+            }
+        }
     }
 
     Component {

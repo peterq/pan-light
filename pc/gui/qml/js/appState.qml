@@ -38,8 +38,8 @@ Item {
         $key: 'app-settings'
         property string defaultDownloadPath: ''
         property string lastDownloadPath: ''
-        property int maxParallelTaskNumber: 1
-        property int maxParallelCorutineNumber: 512
+        property int maxParallelTaskNumber: 3
+        property int maxParallelCorutineNumber: 64
 
         Component.onCompleted: {
             Util.callGoSync('config', {
