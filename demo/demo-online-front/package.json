@@ -9,10 +9,13 @@
   },
   "dependencies": {
     "core-js": "^2.6.5",
-    "element-ui": "^2.7.2",
+    "crc32": "^0.2.2",
+    "deflate-js": "^0.2.3",
+    "element-ui": "^2.10.0",
     "gzip-js": "^0.3.2",
     "moment": "^2.24.0",
-    "vue": "^2.6.6"
+    "vue": "^2.6.6",
+    "webpack-obfuscator": "^0.18.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.0",

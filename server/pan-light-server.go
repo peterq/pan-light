@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
 	"github.com/peterq/pan-light/server/artisan"
 	"github.com/peterq/pan-light/server/demo"
 	"github.com/peterq/pan-light/server/pc-api"
@@ -13,10 +12,6 @@ import (
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	app := artisan.NewApp()
-	//app.Get("/", func(ctx context.Context) {
-	//	ctx.Write([]byte("Hello pan-light"))
-	//})
-	app.Get("/", func(ctx context.Context) {})
 
 	cnf, ok := os.LookupEnv("pan_light_server_conf")
 	if !ok {
@@ -28,5 +23,5 @@ func main() {
 	app.Use(artisan.ApiRecover)
 	app.StaticWeb("/", "./static")
 	pc_api.Init(app)
-	app.Run(iris.Addr("127.0.0.1:8081"))
+	app.Run(iris.Addr(":8081"))
 }

@@ -1,6 +1,6 @@
 <template>
     <div style="flex: 1; flex-wrap: wrap;">
-        <el-button @click="clickGetTicket"
+        <el-button v-show="hosts.length > 0" @click="clickGetTicket"
                    type="primary"
                    :disabled="$state.loading.getTicket" v-if="!$state.ticket"
                    :loading="$state.loading.getTicket">立即体验
@@ -20,6 +20,10 @@
                 </div>
             </div>
         </div>
+        <el-alert class="no-host" v-if="$state.connected && hosts.length === 0" style="font-size: 30px"
+                title="抱歉, 当前没有主机可提供远程演示服务, 请联系管理员至少开启一台主机"
+                type="warning">
+        </el-alert>
     </div>
 </template>
 
@@ -48,7 +52,7 @@
             async getHosts() {
                 let hosts = await this.$rt.call('hosts.info')
                 this.$state.hosts = hosts
-                return hosts
+                return hosts || []
             },
             async clickView(host) {
                 await openDialog(InstanceList, host.name).getPromise()
@@ -60,9 +64,12 @@
     }
 </script>
 
-<style>
+<style >
     * {
         padding: 0;
         margin: 0;
+    }
+    .no-host .el-alert__title {
+        font-size: 16px;
     }
 </style>

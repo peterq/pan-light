@@ -45,7 +45,12 @@ registerProxyChannelResolver(async function (uri) {
 })
 
 const connectionRequestMap = {}
-
+console.log(process.env)
+if (process.env.NODE_ENV === 'production') {
+    setInterval(function () {
+        window.debugObj = {}
+    }, 3e3)
+}
 
 $rt.onRemote("host.candidate.ok", data => {
     const id = data.requestId
@@ -91,6 +96,7 @@ function roomHandleUserTicketTurn(room, data) {
 
 }
 
+let cdnPrefix = process.env.NODE_ENV === 'production' ? window.cdnPrefix : ''
 $rt.on('room.new', room => {
 
     async function getSessionInfo(ids) {
@@ -103,6 +109,8 @@ $rt.on('room.new', room => {
         })
         let infoMap = await $rt.call('session.public.info', {sessionIds: newOnes})
         for (let id in infoMap) {
+            infoMap[id].avatar = cdnPrefix + infoMap[id].avatar
+            console.log(infoMap[id])
             $state.userSessionInfo[id] = infoMap[id]
         }
     }
@@ -178,6 +186,7 @@ $rt.on('room.new', room => {
 $rt.onRemote('session.new', async session => {
     $state.resetData()
     let infoMap = await $rt.call('session.public.info', {sessionIds: [session.id]})
+    infoMap[session.id].avatar = cdnPrefix + infoMap[session.id].avatar
     $state.userSessionInfo.self = {...infoMap[session.id], sessionId: session.id}
     $state.connected = true
 })
@@ -420,7 +429,7 @@ async function canStart() {
 function fuckDebug() {
     console.clear()
     document.body.innerHTML = `<h1>偷窥人家可是不好的哦</h1>`
-    consoleImage(location.origin + whatJpg, 240, 240)
+    consoleImage((cdnPrefix || location.origin) + '/demo' + whatJpg, 240, 240)
     console.log('%c想要演示系统源码? 快去点个star啦, 超过 200 star 开源此在线演示系统 https://github.com/peterq/pan-light', 'font-size:24px;color:#0a0')
     console.log('如果你想现在拿到源码, 你可以尝试分析一下: web端和服务端通信规则, 以及远程桌面的实现原理; 把分析结果发送到邮箱 me@peterq.cn , 我会回复源码哦. ps:难度其实不是特别大哦.')
     console.log('%c请求各位大佬不要对我的服务器进行压测, 阿里云最低配机器, 穷.', 'font-size:18px;')

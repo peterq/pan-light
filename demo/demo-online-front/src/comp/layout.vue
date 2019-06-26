@@ -2,6 +2,7 @@
     <el-container style="height: 100vh;width: 100vw;">
         <el-header>
             pan-light 在线体验
+            <el-button style="margin-left: 10px;" @click="clickReturnHome">返回官网首页</el-button>
         </el-header>
         <el-container class="down-con">
             <el-main style="min-width: 800px">
@@ -45,6 +46,9 @@
             })
         },
         methods: {
+            clickReturnHome() {
+                location.href = location.origin
+            }
         },
         watch: {
 

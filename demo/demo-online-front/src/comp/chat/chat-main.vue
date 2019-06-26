@@ -6,6 +6,10 @@
             <img :src="$state.userSessionInfo.self.avatar" style="border-radius: 50%;" alt="avatar" width="50"
                  height="50"/>
             <p> {{$state.userSessionInfo.self.nickname}}</p>
+            <p style="margin: 20px" v-if="$state.ticket">
+                <i class="el-icon-time"></i>
+                体验门票号码: {{$state.ticket.order}}
+            </p>
         </div>
         <hr>
         <el-tabs v-model="activeRoom" style="padding: 5px; flex: 1;">
