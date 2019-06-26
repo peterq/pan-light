@@ -1,4 +1,4 @@
-// +build product
+// +build production
 
 package dep
 
@@ -7,8 +7,8 @@ var Env = tEnv{
 	Platform:          "",
 	ApiBase:           "https://pan-light.peterq.cn",
 	InternalServerUrl: "",
-	VersionString:     "v0.0.0-preview",
+	VersionString:     "v0.0.1-preview",
 	DataPath:          "",
-	Version:           20190620001,
-	ClientUA:          "pan-light/v0.0.0-preview;build 20190620;",
+	Version:           20190626001,
+	ClientUA:          "pan-light/v0.0.1-preview;build 20190626;",
 }

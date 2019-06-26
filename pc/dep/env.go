@@ -27,8 +27,10 @@ func init() {
 	case "linux", "darwin":
 		p, _ := filepath.Abs(os.Getenv("HOME") + "/pt-program/pan-light")
 		Env.DataPath = p
+	case "windows":
+		Env.DataPath = windowsHomeDir() + "/pt-program/pan-light"
 	default:
-
+		panic("unknown platform: " + Env.Platform)
 	}
 	Env.ClientUA += Env.Platform
 
@@ -53,4 +55,15 @@ func pathExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func windowsHomeDir() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	}
+	return os.Getenv("HOME")
 }
