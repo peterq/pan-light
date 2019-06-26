@@ -138,7 +138,12 @@ Item {
         }
     }
 
+    function hit() {
+        Util.api('share-hit', {id: meta._id})
+    }
+
     function clickDownload() {
+        hit()
         var fid = ['share', meta.md5, meta.slice_md5, meta.file_size].join('.')
         return Util.Promise.resolve().then(function () {
             return Util.callGoAsync('pan.link', {
@@ -156,6 +161,7 @@ Item {
     }
 
     function clickPlay() {
+        hit()
         var fid = ['share', meta.md5, meta.slice_md5, meta.file_size].join('.')
         return Util.Promise.resolve().then(function () {
             return Util.callGoAsync('pan.link', {
@@ -170,6 +176,7 @@ Item {
     }
 
     function clickSave() {
+        hit()
         return Util.Promise.resolve().then(function () {
             return Util.callGoAsync('pan.save.md5', {
                                         "md5": meta.md5,
