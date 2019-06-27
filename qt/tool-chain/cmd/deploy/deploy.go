@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"github.com/peterq/pan-light/qt/tool-chain/binding/parser"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -9,12 +10,11 @@ import (
 	"github.com/peterq/pan-light/qt/tool-chain/cmd"
 	"github.com/peterq/pan-light/qt/tool-chain/cmd/minimal"
 	"github.com/peterq/pan-light/qt/tool-chain/cmd/moc"
-	"github.com/peterq/pan-light/qt/tool-chain/cmd/rcc"
-
 	"github.com/peterq/pan-light/qt/tool-chain/utils"
 )
 
 func Deploy(mode, target, path string, docker bool, ldFlags, tags string, fast bool, device string, vagrant bool, vagrantsystem string, comply bool) {
+	parser.State.Target = target
 	utils.Log.WithField("mode", mode).WithField("target", target).WithField("path", path).WithField("docker", docker).WithField("ldFlags", ldFlags).WithField("fast", fast).WithField("comply", comply).Debug("running Deploy")
 	name := filepath.Base(path)
 	switch name {
@@ -69,7 +69,7 @@ func Deploy(mode, target, path string, docker bool, ldFlags, tags string, fast b
 			utils.RemoveAll(depPath + "_obj")
 		}
 
-		rcc.Rcc(path, target, tags, os.Getenv("QTRCC_OUTPUT_DIR"))
+		//rcc.Rcc(path, target, tags, os.Getenv("QTRCC_OUTPUT_DIR"))
 		if !fast {
 			moc.Moc(path, target, tags, false, false)
 		}

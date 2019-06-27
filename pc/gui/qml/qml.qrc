@@ -172,5 +172,6 @@
         <file>explore/ShareList.qml</file>
         <file>explore/ShareItem.qml</file>
         <file>explore/Tag.qml</file>
+        <file>widget/RightMenu.qml</file>
     </qresource>
 </RCC>

@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -62,6 +64,26 @@ func QT_DIR() string {
 		return path
 	}
 	return strings.Replace(path, QT_VERSION_MAJOR(), QT_VERSION(), -1)
+}
+
+func QT_STATIC() bool {
+	return os.Getenv("QT_STATIC") == "true"
+}
+
+var (
+	qtInstallPrefixCache      = make(map[string]string)
+	qtInstallPrefixCacheMutex = new(sync.Mutex)
+)
+
+func QT_INSTALL_PREFIX(target string) (r string) {
+	qtInstallPrefixCacheMutex.Lock()
+	if _, ok := qtInstallPrefixCache[target]; !ok {
+		log.Println("install prefix", ToolPath("qmake", target), target)
+		qtInstallPrefixCache[target] = strings.TrimSpace(RunCmd(exec.Command(ToolPath("qmake", target), "-query", "QT_INSTALL_PREFIX"), fmt.Sprintf("query install prefix path for %v on %v", target, runtime.GOOS)))
+	}
+	r = qtInstallPrefixCache[target]
+	qtInstallPrefixCacheMutex.Unlock()
+	return
 }
 
 func qT_DIR() string {
@@ -188,6 +210,7 @@ func ToolPath(tool, target string) string {
 			}
 			return path
 		}
+		log.Println("tool path", filepath.Join(QT_MXE_DIR(), "usr", QT_MXE_TRIPLET(), "qt5", "bin", tool), target)
 		return filepath.Join(QT_MXE_DIR(), "usr", QT_MXE_TRIPLET(), "qt5", "bin", tool)
 	case "linux", "ubports":
 		if QT_PKG_CONFIG() {

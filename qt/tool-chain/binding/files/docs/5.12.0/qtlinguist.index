@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QDOCINDEX>
+<INDEX url="http://doc.qt.io/qt-5" title="Qt Linguist Manual" version="" project="QtLinguist" indexTitle="Qt Linguist Manual">
+    <namespace threadsafety="unspecified" name="" status="active" access="public" documented="false" module="qtlinguist">
+        <page name="arrowpad" href="qtlinguist-arrowpad-example.html" status="active" location="arrowpad.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/examples/linguist/doc/src/arrowpad.qdoc" lineno="28" subtype="example" title="Arrow Pad Example" fulltitle="Arrow Pad Example" subtitle="" module="QtLinguist" groups="examples-linguist" brief="Understanding the Qt Linguist contexts concept and using two or more languages">
+            <contents name="line-by-line-walkthrough" title="Line by Line Walkthrough" level="1"/>
+            <contents name="translating-to-french-and-dutch" title="Translating to French and Dutch" level="1"/>
+            <contents name="exercises" title="Exercises" level="1"/>
+            <page name="arrowpad/arrowpad.cpp" href="qtlinguist-arrowpad-arrowpad-cpp.html" status="active" subtype="file" title="" fulltitle="arrowpad.cpp Example File" subtitle="arrowpad/arrowpad.cpp"/>
+            <page name="arrowpad/arrowpad.h" href="qtlinguist-arrowpad-arrowpad-h.html" status="active" subtype="file" title="" fulltitle="arrowpad.h Example File" subtitle="arrowpad/arrowpad.h"/>
+            <page name="arrowpad/arrowpad.pro" href="qtlinguist-arrowpad-arrowpad-pro.html" status="active" subtype="file" title="" fulltitle="arrowpad.pro Example File" subtitle="arrowpad/arrowpad.pro"/>
+            <page name="arrowpad/main.cpp" href="qtlinguist-arrowpad-main-cpp.html" status="active" subtype="file" title="" fulltitle="main.cpp Example File" subtitle="arrowpad/main.cpp"/>
+            <page name="arrowpad/mainwindow.cpp" href="qtlinguist-arrowpad-mainwindow-cpp.html" status="active" subtype="file" title="" fulltitle="mainwindow.cpp Example File" subtitle="arrowpad/mainwindow.cpp"/>
+            <page name="arrowpad/mainwindow.h" href="qtlinguist-arrowpad-mainwindow-h.html" status="active" subtype="file" title="" fulltitle="mainwindow.h Example File" subtitle="arrowpad/mainwindow.h"/>
+        </page>
+        <page name="hellotr" href="qtlinguist-hellotr-example.html" status="active" location="hellotr.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/examples/linguist/doc/src/hellotr.qdoc" lineno="28" subtype="example" title="Hello tr() Example" fulltitle="Hello tr() Example" subtitle="" module="QtLinguist" groups="examples-linguist" brief="Translating a small Hello World program to Latin">
+            <contents name="line-by-line-walkthrough" title="Line by Line Walkthrough" level="1"/>
+            <contents name="running-the-application-in-english" title="Running the Application in English" level="1"/>
+            <contents name="creating-a-latin-message-file" title="Creating a Latin Message File" level="1"/>
+            <contents name="translating-to-latin-with-qt-linguist" title="Translating to Latin with Qt Linguist" level="1"/>
+            <contents name="running-the-application-in-latin" title="Running the Application in Latin" level="1"/>
+            <page name="hellotr/hellotr.pro" href="qtlinguist-hellotr-hellotr-pro.html" status="active" subtype="file" title="" fulltitle="hellotr.pro Example File" subtitle="hellotr/hellotr.pro"/>
+            <page name="hellotr/main.cpp" href="qtlinguist-hellotr-main-cpp.html" status="active" subtype="file" title="" fulltitle="main.cpp Example File" subtitle="hellotr/main.cpp"/>
+        </page>
+        <page name="trollprint" href="qtlinguist-trollprint-example.html" status="active" location="trollprint.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/examples/linguist/doc/src/trollprint.qdoc" lineno="28" subtype="example" title="Troll Print Example" fulltitle="Troll Print Example" subtitle="" module="QtLinguist" groups="examples-linguist" brief="Updating translations for later releases">
+            <contents name="line-by-line-walkthrough" title="Line by Line Walkthrough" level="1"/>
+            <contents name="running-troll-print-1-0-in-english-and-in-portuguese" title="Running Troll Print 1.0 in English and in Portuguese" level="1"/>
+            <contents name="troll-print-1-1" title="Troll Print 1.1" level="1"/>
+            <page name="trollprint/main.cpp" href="qtlinguist-trollprint-main-cpp.html" status="active" subtype="file" title="" fulltitle="main.cpp Example File" subtitle="trollprint/main.cpp"/>
+            <page name="trollprint/mainwindow.cpp" href="qtlinguist-trollprint-mainwindow-cpp.html" status="active" subtype="file" title="" fulltitle="mainwindow.cpp Example File" subtitle="trollprint/mainwindow.cpp"/>
+            <page name="trollprint/mainwindow.h" href="qtlinguist-trollprint-mainwindow-h.html" status="active" subtype="file" title="" fulltitle="mainwindow.h Example File" subtitle="trollprint/mainwindow.h"/>
+            <page name="trollprint/printpanel.cpp" href="qtlinguist-trollprint-printpanel-cpp.html" status="active" subtype="file" title="" fulltitle="printpanel.cpp Example File" subtitle="trollprint/printpanel.cpp"/>
+            <page name="trollprint/printpanel.h" href="qtlinguist-trollprint-printpanel-h.html" status="active" subtype="file" title="" fulltitle="printpanel.h Example File" subtitle="trollprint/printpanel.h"/>
+            <page name="trollprint/trollprint.pro" href="qtlinguist-trollprint-trollprint-pro.html" status="active" subtype="file" title="" fulltitle="trollprint.pro Example File" subtitle="trollprint/trollprint.pro"/>
+        </page>
+        <page name="linguist-overview.html" href="linguist-overview.html" status="active" location="linguist-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/linguist/linguist/doc/src/linguist-manual.qdoc" lineno="75" subtype="page" title="Overview of the Translation Process" fulltitle="Overview of the Translation Process" subtitle="" module="QtLinguist" groups="internationalization"/>
+        <page name="qtlinguist-index.html" href="qtlinguist-index.html" status="active" location="linguist-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/linguist/linguist/doc/src/linguist-manual.qdoc" lineno="28" subtype="page" title="Qt Linguist Manual" fulltitle="Qt Linguist Manual" subtitle="" module="QtLinguist" groups="qttools,internationalization">
+            <keyword name="qt-linguist" title="Qt Linguist"/>
+            <contents name="table-of-contents" title="Table of Contents" level="1"/>
+        </page>
+        <page name="linguist-programmers.html" href="linguist-programmers.html" status="active" location="linguist-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/linguist/linguist/doc/src/linguist-manual.qdoc" lineno="822" subtype="page" title="Qt Linguist Manual: Developers" fulltitle="Qt Linguist Manual: Developers" subtitle="" module="QtLinguist" groups="internationalization">
+            <contents name="specifying-translation-sources-in-qt-project-files" title="Specifying Translation Sources in Qt Project Files" level="1"/>
+            <contents name="internationalizing-applications" title="Internationalizing Applications" level="1"/>
+            <contents name="deploying-translations" title="Deploying Translations" level="1"/>
+            <contents name="tutorials" title="Tutorials" level="1"/>
+        </page>
+        <page name="linguist-manager.html" href="linguist-manager.html" status="active" location="linguist-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/linguist/linguist/doc/src/linguist-manual.qdoc" lineno="144" subtype="page" title="Qt Linguist Manual: Release Manager" fulltitle="Qt Linguist Manual: Release Manager" subtitle="" module="QtLinguist" groups="internationalization">
+            <target name="lupdate"/>
+            <target name="lrelease"/>
+            <contents name="creating-translation-files" title="Creating Translation Files" level="1"/>
+            <contents name="using-lupdate" title="Using lupdate" level="1"/>
+            <contents name="using-lrelease" title="Using lrelease" level="1"/>
+            <contents name="missing-translations" title="Missing Translations" level="1"/>
+        </page>
+        <page name="linguist-ts-file-format.html" href="linguist-ts-file-format.html" status="active" location="linguist-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/linguist/linguist/doc/src/linguist-manual.qdoc" lineno="996" subtype="page" title="Qt Linguist Manual: TS File Format" fulltitle="Qt Linguist Manual: TS File Format" subtitle="" module="QtLinguist" groups="internationalization"/>
+        <page name="linguist-id-based-i18n.html" href="linguist-id-based-i18n.html" status="active" location="linguist-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/linguist/linguist/doc/src/linguist-manual.qdoc" lineno="1014" subtype="page" title="Qt Linguist Manual: Text ID Based Translations" fulltitle="Qt Linguist Manual: Text ID Based Translations" subtitle="" module="QtLinguist" groups="internationalization" brief="Text ID based internationalization provides support for large scale projects with many target locales and many texts to translate">
+            <contents name="internationalizing-with-text-ids" title="Internationalizing With Text IDs" level="1"/>
+            <contents name="localizing-with-text-ids" title="Localizing With Text IDs" level="1"/>
+            <contents name="advanced-usage" title="Advanced Usage" level="1"/>
+        </page>
+        <page name="linguist-translators.html" href="linguist-translators.html" status="active" location="linguist-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/linguist/linguist/doc/src/linguist-manual.qdoc" lineno="267" subtype="page" title="Qt Linguist Manual: Translators" fulltitle="Qt Linguist Manual: Translators" subtitle="" module="QtLinguist" groups="internationalization">
+            <target name="string-translation-states" title="String Translation States"/>
+            <target name="multiple-languages" title="multiple languages"/>
+            <contents name="translating-strings" title="Translating Strings" level="1"/>
+            <contents name="leaving-a-translation-for-later" title="Leaving a Translation for Later" level="2"/>
+            <contents name="phrases-that-require-multiple-translations-depending-on-context" title="Phrases That Require Multiple Translations Depending on Context" level="2"/>
+            <contents name="changing-keyboard-accelerators" title="Changing Keyboard Accelerators" level="2"/>
+            <contents name="alt-key-accelerators" title="Alt Key Accelerators" level="3"/>
+            <contents name="ctrl-key-accelerators" title="Ctrl Key Accelerators" level="3"/>
+            <contents name="handling-numbered-arguments-and-plurals" title="Handling Numbered Arguments and Plurals" level="2"/>
+            <contents name="changing-the-target-locale" title="Changing the Target Locale" level="2"/>
+            <contents name="selecting-context-to-translate" title="Selecting Context to Translate" level="1"/>
+            <contents name="selecting-string-to-translate" title="Selecting String to Translate" level="1"/>
+            <contents name="viewing-strings-in-context" title="Viewing Strings in Context" level="1"/>
+            <contents name="reusing-translations" title="Reusing Translations" level="1"/>
+            <contents name="batch-translation" title="Batch Translation" level="2"/>
+            <contents name="creating-and-editing-phrase-books" title="Creating and Editing Phrase Books" level="2"/>
+            <contents name="validating-translations" title="Validating Translations" level="1"/>
+            <contents name="translating-multiple-languages-simultaneously" title="Translating Multiple Languages Simultaneously" level="1"/>
+        </page>
+        <group name="all-examples" href="all-examples.html" status="internal" seen="false" title="" members="examples-linguist"/>
+        <group name="examples-linguist" href="examples-linguist.html" status="active" location="linguist-examples.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/linguist/linguist/doc/src/linguist-examples.qdoc" lineno="28" seen="true" title="Qt Linguist Examples" module="QtLinguist" groups="all-examples,internationalization" members="arrowpad,hellotr,trollprint" brief="Using Qt Linguist to internationalize your Qt application"/>
+        <group name="internationalization" href="internationalization.html" status="internal" seen="false" title="" members="examples-linguist,qtlinguist-index.html,linguist-overview.html,linguist-manager.html,linguist-translators.html,linguist-programmers.html,linguist-ts-file-format.html,linguist-id-based-i18n.html"/>
+        <group name="qttools" href="qttools.html" status="internal" seen="false" title="" members="qtlinguist-index.html"/>
+    </namespace>
+</INDEX>

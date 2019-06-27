@@ -15,6 +15,7 @@ Item {
     width: parent.width
     height: parent.height
 
+    RightMenu{}
     Resize {
         width: contentContainer.width + 2 * maWidth
         height: contentContainer.height + 2 * maWidth

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QDOCINDEX>
+<INDEX url="http://doc.qt.io/qt-5" title="Qt Assistant Manual" version="" project="QtAssistant" indexTitle="Qt Assistant Manual">
+    <namespace threadsafety="unspecified" name="" status="active" access="public" documented="false" module="qtassistant">
+        <page name="remotecontrol" href="qtassistant-remotecontrol-example.html" status="active" location="remotecontrol.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/examples/assistant/doc/src/remotecontrol.qdoc" lineno="28" subtype="example" title="Remote Control Example" fulltitle="Remote Control Example" subtitle="" module="QtAssistant" groups="examples-qtassistant" brief="Using and controlling Qt Assistant as a help viewer">
+            <page name="remotecontrol/enter.png" href="qtassistant-remotecontrol-enter-png.html" status="active" title="" fulltitle="enter.png Image File" subtitle="remotecontrol/enter.png"/>
+            <page name="remotecontrol/main.cpp" href="qtassistant-remotecontrol-main-cpp.html" status="active" subtype="file" title="" fulltitle="main.cpp Example File" subtitle="remotecontrol/main.cpp"/>
+            <page name="remotecontrol/remotecontrol.cpp" href="qtassistant-remotecontrol-remotecontrol-cpp.html" status="active" subtype="file" title="" fulltitle="remotecontrol.cpp Example File" subtitle="remotecontrol/remotecontrol.cpp"/>
+            <page name="remotecontrol/remotecontrol.h" href="qtassistant-remotecontrol-remotecontrol-h.html" status="active" subtype="file" title="" fulltitle="remotecontrol.h Example File" subtitle="remotecontrol/remotecontrol.h"/>
+            <page name="remotecontrol/remotecontrol.pro" href="qtassistant-remotecontrol-remotecontrol-pro.html" status="active" subtype="file" title="" fulltitle="remotecontrol.pro Example File" subtitle="remotecontrol/remotecontrol.pro"/>
+            <page name="remotecontrol/remotecontrol.qrc" href="qtassistant-remotecontrol-remotecontrol-qrc.html" status="active" subtype="file" title="" fulltitle="remotecontrol.qrc Example File" subtitle="remotecontrol/remotecontrol.qrc"/>
+            <page name="remotecontrol/remotecontrol.ui" href="qtassistant-remotecontrol-remotecontrol-ui.html" status="active" subtype="file" title="" fulltitle="remotecontrol.ui Example File" subtitle="remotecontrol/remotecontrol.ui"/>
+        </page>
+        <page name="simpletextviewer" href="qtassistant-simpletextviewer-example.html" status="active" location="simpletextviewer.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/examples/assistant/doc/src/simpletextviewer.qdoc" lineno="28" subtype="example" title="Simple Text Viewer Example" fulltitle="Simple Text Viewer Example" subtitle="" module="QtAssistant" groups="examples-qtassistant" brief="Using Qt Assistant as a customized help viewer for your application">
+            <contents name="creating-documentation-and-customizing-qt-assistant" title="Creating Documentation and Customizing Qt Assistant" level="1"/>
+            <contents name="organizing-documentation-for-qt-assistant" title="Organizing Documentation for Qt Assistant" level="2"/>
+            <contents name="customizing-qt-assistant" title="Customizing Qt Assistant" level="2"/>
+            <contents name="controlling-qt-assistant-via-the-assistant-class" title="Controlling Qt Assistant via the Assistant Class" level="1"/>
+            <contents name="mainwindow-class" title="MainWindow Class" level="1"/>
+            <contents name="findfiledialog-class" title="FindFileDialog Class" level="1"/>
+            <contents name="summary" title="Summary" level="1"/>
+            <page name="simpletextviewer/assistant.cpp" href="qtassistant-simpletextviewer-assistant-cpp.html" status="active" subtype="file" title="" fulltitle="assistant.cpp Example File" subtitle="simpletextviewer/assistant.cpp"/>
+            <page name="simpletextviewer/assistant.h" href="qtassistant-simpletextviewer-assistant-h.html" status="active" subtype="file" title="" fulltitle="assistant.h Example File" subtitle="simpletextviewer/assistant.h"/>
+            <page name="simpletextviewer/documentation/images/browse.png" href="qtassistant-simpletextviewer-documentation-images-browse-png.html" status="active" title="" fulltitle="browse.png Image File" subtitle="simpletextviewer/documentation/images/browse.png"/>
+            <page name="simpletextviewer/documentation/images/fadedfilemenu.png" href="qtassistant-simpletextviewer-documentation-images-fadedfilemenu-png.html" status="active" title="" fulltitle="fadedfilemenu.png Image File" subtitle="simpletextviewer/documentation/images/fadedfilemenu.png"/>
+            <page name="simpletextviewer/documentation/images/filedialog.png" href="qtassistant-simpletextviewer-documentation-images-filedialog-png.html" status="active" title="" fulltitle="filedialog.png Image File" subtitle="simpletextviewer/documentation/images/filedialog.png"/>
+            <page name="simpletextviewer/findfiledialog.cpp" href="qtassistant-simpletextviewer-findfiledialog-cpp.html" status="active" subtype="file" title="" fulltitle="findfiledialog.cpp Example File" subtitle="simpletextviewer/findfiledialog.cpp"/>
+            <page name="simpletextviewer/findfiledialog.h" href="qtassistant-simpletextviewer-findfiledialog-h.html" status="active" subtype="file" title="" fulltitle="findfiledialog.h Example File" subtitle="simpletextviewer/findfiledialog.h"/>
+            <page name="simpletextviewer/documentation/images/handbook.png" href="qtassistant-simpletextviewer-documentation-images-handbook-png.html" status="active" title="" fulltitle="handbook.png Image File" subtitle="simpletextviewer/documentation/images/handbook.png"/>
+            <page name="simpletextviewer/documentation/images/icon.png" href="qtassistant-simpletextviewer-documentation-images-icon-png.html" status="active" title="" fulltitle="icon.png Image File" subtitle="simpletextviewer/documentation/images/icon.png"/>
+            <page name="simpletextviewer/main.cpp" href="qtassistant-simpletextviewer-main-cpp.html" status="active" subtype="file" title="" fulltitle="main.cpp Example File" subtitle="simpletextviewer/main.cpp"/>
+            <page name="simpletextviewer/mainwindow.cpp" href="qtassistant-simpletextviewer-mainwindow-cpp.html" status="active" subtype="file" title="" fulltitle="mainwindow.cpp Example File" subtitle="simpletextviewer/mainwindow.cpp"/>
+            <page name="simpletextviewer/mainwindow.h" href="qtassistant-simpletextviewer-mainwindow-h.html" status="active" subtype="file" title="" fulltitle="mainwindow.h Example File" subtitle="simpletextviewer/mainwindow.h"/>
+            <page name="simpletextviewer/documentation/images/mainwindow.png" href="qtassistant-simpletextviewer-documentation-images-mainwindow-png.html" status="active" title="" fulltitle="mainwindow.png Image File" subtitle="simpletextviewer/documentation/images/mainwindow.png"/>
+            <page name="simpletextviewer/documentation/images/open.png" href="qtassistant-simpletextviewer-documentation-images-open-png.html" status="active" title="" fulltitle="open.png Image File" subtitle="simpletextviewer/documentation/images/open.png"/>
+            <page name="simpletextviewer/simpletextviewer.pro" href="qtassistant-simpletextviewer-simpletextviewer-pro.html" status="active" subtype="file" title="" fulltitle="simpletextviewer.pro Example File" subtitle="simpletextviewer/simpletextviewer.pro"/>
+            <page name="simpletextviewer/documentation/simpletextviewer.qhcp" href="qtassistant-simpletextviewer-documentation-simpletextviewer-qhcp.html" status="active" subtype="file" title="" fulltitle="simpletextviewer.qhcp Example File" subtitle="simpletextviewer/documentation/simpletextviewer.qhcp"/>
+            <page name="simpletextviewer/documentation/simpletextviewer.qhp" href="qtassistant-simpletextviewer-documentation-simpletextviewer-qhp.html" status="active" subtype="file" title="" fulltitle="simpletextviewer.qhp Example File" subtitle="simpletextviewer/documentation/simpletextviewer.qhp"/>
+            <page name="simpletextviewer/textedit.cpp" href="qtassistant-simpletextviewer-textedit-cpp.html" status="active" subtype="file" title="" fulltitle="textedit.cpp Example File" subtitle="simpletextviewer/textedit.cpp"/>
+            <page name="simpletextviewer/textedit.h" href="qtassistant-simpletextviewer-textedit-h.html" status="active" subtype="file" title="" fulltitle="textedit.h Example File" subtitle="simpletextviewer/textedit.h"/>
+            <page name="simpletextviewer/documentation/images/wildcard.png" href="qtassistant-simpletextviewer-documentation-images-wildcard-png.html" status="active" title="" fulltitle="wildcard.png Image File" subtitle="simpletextviewer/documentation/images/wildcard.png"/>
+        </page>
+        <page name="assistant-custom-help-viewer.html" href="assistant-custom-help-viewer.html" status="active" location="assistant-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/assistant/assistant/doc/src/assistant-manual.qdoc" lineno="61" subtype="page" title="Customizing Qt Assistant" fulltitle="Customizing Qt Assistant" subtitle="" module="QtAssistant">
+            <contents name="qt-help-collection-files" title="Qt Help Collection Files" level="1"/>
+            <contents name="displaying-custom-documentation" title="Displaying Custom Documentation" level="1"/>
+            <contents name="changing-the-appearance-of-qt-assistant" title="Changing the Appearance of Qt Assistant" level="1"/>
+            <contents name="creating-a-custom-help-collection-file" title="Creating a Custom Help Collection File" level="2"/>
+            <contents name="using-qt-assistant-remotely" title="Using Qt Assistant Remotely" level="1"/>
+        </page>
+        <page name="qtassistant-index.html" href="qtassistant-index.html" status="active" location="assistant-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/assistant/assistant/doc/src/assistant-manual.qdoc" lineno="28" subtype="page" title="Qt Assistant Manual" fulltitle="Qt Assistant Manual" subtitle="" module="QtAssistant" groups="qttools">
+            <keyword name="qt-assistant" title="Qt Assistant"/>
+            <contents name="table-of-contents" title="Table of Contents" level="1"/>
+        </page>
+        <page name="assistant-quick-guide.html" href="assistant-quick-guide.html" status="active" location="assistant-quick-guide.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/assistant/assistant/doc/src/assistant-quick-guide.qdoc" lineno="28" subtype="page" title="Qt Assistant Quick Guide" fulltitle="Qt Assistant Quick Guide" subtitle="" module="QtAssistant">
+            <contents name="managing-bookmarks" title="Managing Bookmarks" level="1"/>
+            <contents name="searching-for-keywords" title="Searching for Keywords" level="1"/>
+            <contents name="using-free-text-search" title="Using Free Text Search" level="1"/>
+        </page>
+        <page name="assistant-details.html" href="assistant-details.html" status="active" location="assistant-quick-guide.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/assistant/assistant/doc/src/assistant-quick-guide.qdoc" lineno="100" subtype="page" title="Using Qt Assistant" fulltitle="Using Qt Assistant" subtitle="" module="QtAssistant">
+            <contents name="searching-from-page-contents" title="Searching from Page Contents" level="1"/>
+            <contents name="full-text-searching" title="Full Text Searching" level="1"/>
+            <contents name="filtering-help-contents" title="Filtering Help Contents" level="1"/>
+            <contents name="adding-documentation" title="Adding Documentation" level="1"/>
+            <contents name="specifying-home-page" title="Specifying Home Page" level="1"/>
+            <contents name="using-command-line-options" title="Using Command Line Options" level="1"/>
+        </page>
+        <group name="all-examples" href="all-examples.html" status="internal" seen="false" title="" members="examples-qtassistant"/>
+        <group name="examples-qtassistant" href="examples-qtassistant.html" status="active" location="assistant-example.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/assistant/assistant/doc/src/assistant-example.qdoc" lineno="28" seen="true" title="Qt Assistant Examples" module="QtAssistant" groups="all-examples" members="remotecontrol,simpletextviewer" brief="Using Qt Assistant as a help viewer for Qt applications"/>
+        <group name="qttools" href="qttools.html" status="internal" seen="false" title="" members="qtassistant-index.html"/>
+    </namespace>
+</INDEX>

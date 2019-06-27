@@ -3,6 +3,7 @@ package deploy
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -83,7 +84,7 @@ func build(mode, target, path, ldFlagsCustom, tagsCustom, name, depPath string, 
 	cmd.Args = append(cmd.Args, fmt.Sprintf("-tags=\"%v\"", strings.Join(tags, "\" \"")))
 
 	if target != runtime.GOOS {
-		cmd.Args = append(cmd.Args, []string{"-pkgdir", filepath.Join(utils.MustGoPath(), "pkg", fmt.Sprintf("%v_%v_%v", strings.Replace(target, "-", "_", -1), env["GOOS"], env["GOARCH"]))}...)
+		//cmd.Args = append(cmd.Args, []string{"-pkgdir", filepath.Join(utils.MustGoPath(), "pkg", fmt.Sprintf("%v_%v_%v", strings.Replace(target, "-", "_", -1), env["GOOS"], env["GOARCH"]))}...)
 	}
 
 	switch target {
@@ -96,6 +97,7 @@ func build(mode, target, path, ldFlagsCustom, tagsCustom, name, depPath string, 
 	for key, value := range env {
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%v=%v", key, value))
 	}
+	log.Println(cmd.Args)
 
 	utils.RunCmd(cmd, fmt.Sprintf("build for %v on %v", target, runtime.GOOS))
 

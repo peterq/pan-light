@@ -9,6 +9,8 @@ function init(r) {
     root = r
 }
 
+var appState
+
 // DataSaver 使用过的key
 var dataSaverKeys = {}
 

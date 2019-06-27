@@ -20,6 +20,7 @@ import (
 )
 
 func Minimal(path, target, tags string) {
+	parser.State.Target = target
 	if utils.UseGOMOD(path) {
 		if !utils.ExistsDir(filepath.Join(path, "vendor")) {
 			cmd := exec.Command("go", "mod", "vendor")
@@ -235,7 +236,7 @@ func Minimal(path, target, tags string) {
 		go func(f string) {
 			for _, c := range parser.State.ClassMap {
 				if strings.Contains(f, c.Name) &&
-					strings.Contains(f, fmt.Sprintf("github.com/peterq/pan-light/qt/%v", strings.ToLower(strings.TrimPrefix(c.Module, "Qt")))) {
+					strings.Contains(f, fmt.Sprintf("github.com/peterq/pan-light/qt/bindings/%v", strings.ToLower(strings.TrimPrefix(c.Module, "Qt")))) {
 					exportClass(c, files)
 				}
 			}

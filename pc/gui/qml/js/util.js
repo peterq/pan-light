@@ -296,17 +296,9 @@ var pickSavePath
     }
 })()
 
-var showMenu = (function () {
-    var comp = loadComponent(function () {}, "../comps/rightClickMenu.qml")
-    return function(items, parent) {
-        var ins = comp.createObject(parent || G.root, {menus: items})
-        ins.popup()
-        ins.aboutToHide.connect(function(){
-            ins.destroy()
-        })
-        return ins
-    }
-})()
+var showMenu = function(items, parent ) {
+    G.appState.globalRightMenu.show(items)
+}
 
 function isVideo(f){
     var ext = ['mp4', 'avi', 'rmvb', 'mkv', 'mov', 'wmv']

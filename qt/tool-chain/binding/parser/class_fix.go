@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 
 	"github.com/peterq/pan-light/qt/tool-chain/utils"
 )
@@ -196,7 +197,10 @@ func (c *Class) fixLinkage() {
 	}
 }
 
-var pkgConfigIncludeDir string
+var (
+	pkgConfigIncludeDir      string
+	pkgConfigIncludeDirMutex = new(sync.Mutex)
+)
 
 func (c *Class) fixBases() {
 	if c.Module == MOC || c.Pkg != "" {
@@ -232,67 +236,42 @@ func (c *Class) fixBases() {
 	//}
 
 	var (
-		prefixPath string
+		prefixPath = utils.QT_INSTALL_PREFIX(State.Target)
 		infixPath  = "include"
 		suffixPath = string(filepath.Separator)
 	)
 
-	switch runtime.GOOS {
-	case "windows":
-		{
-			if utils.QT_MSYS2() {
-				prefixPath = utils.QT_MSYS2_DIR()
-				if utils.QT_MSYS2_STATIC() {
-					prefixPath = filepath.Join(prefixPath, "qt5-static")
-				}
-			} else {
-				prefixPath = filepath.Join(utils.QT_DIR(), utils.QT_VERSION_MAJOR(), "mingw73_64")
-				if !utils.ExistsDir(filepath.Join(utils.QT_DIR(), utils.QT_VERSION_MAJOR())) {
-					prefixPath = filepath.Join(utils.QT_DIR(), utils.QT_VERSION(), "mingw73_64")
-				}
-				if !utils.ExistsDir(prefixPath) {
-					prefixPath = strings.Replace(prefixPath, "mingw73_64", "mingw53_32", -1)
-				}
-				if !utils.ExistsDir(prefixPath) {
-					prefixPath = strings.Replace(prefixPath, "mingw53_32", "mingw49_32", -1)
-				}
-			}
-		}
-
+	switch State.Target {
 	case "darwin":
 		{
 			if utils.QT_NIX() {
-				infixPath = "include"
-				suffixPath = string(filepath.Separator)
 				for _, qmakepath := range strings.Split(os.Getenv("QMAKEPATH"), string(filepath.ListSeparator)) {
 					if utils.ExistsFile(filepath.Join(qmakepath, infixPath, c.DocModule+suffixPath+c.Name)) {
 						prefixPath = qmakepath
 						break
 					}
 				}
-			} else {
-				prefixPath = utils.QT_DARWIN_DIR()
+			} else if !utils.QT_STATIC() {
 				infixPath = "lib"
 				suffixPath = ".framework/Headers/"
 			}
 		}
 
-	case "linux":
+	default:
 		{
-			switch {
-			case utils.QT_PKG_CONFIG():
+			if utils.QT_SAILFISH() {
+				prefixPath = "/srv/mer/targets/SailfishOS-" + utils.QT_SAILFISH_VERSION() + "-i486/usr/include/qt5"
+				infixPath = ""
+			} else if utils.QT_PKG_CONFIG() {
+				pkgConfigIncludeDirMutex.Lock()
 				if pkgConfigIncludeDir == "" {
 					pkgConfigIncludeDir = strings.TrimSpace(utils.RunCmd(exec.Command("pkg-config", "--variable=includedir", "Qt5Core"), "parser.class_includedir"))
 				}
 				prefixPath = pkgConfigIncludeDir
-			case utils.QT_SAILFISH():
-				prefixPath = "/srv/mer/targets/SailfishOS-" + utils.QT_SAILFISH_VERSION() + "-i486/usr/include/qt5"
-				infixPath = ""
-			default:
-				prefixPath = filepath.Join(utils.QT_DIR(), utils.QT_VERSION_MAJOR(), "gcc_64")
-				if !utils.ExistsDir(filepath.Join(utils.QT_DIR(), utils.QT_VERSION_MAJOR())) {
-					prefixPath = filepath.Join(utils.QT_DIR(), utils.QT_VERSION(), "gcc_64")
-				}
+				pkgConfigIncludeDirMutex.Unlock()
+			} else if strings.HasPrefix(State.Target, "sailfish") && runtime.GOOS == "darwin" {
+				infixPath = "lib"
+				suffixPath = ".framework/Headers/"
 			}
 		}
 	}
@@ -325,7 +304,7 @@ func (c *Class) fixBases() {
 
 	case "QUiLoader", "QEGLNativeContext", "QWGLNativeContext", "QGLXNativeContext", "QEglFSFunctions", "QWindowsWindowFunctions", "QCocoaNativeContext", "QXcbWindowFunctions", "QCocoaWindowFunctions":
 		{
-			if utils.QT_PKG_CONFIG() {
+			if utils.QT_PKG_CONFIG() && runtime.GOOS != "darwin" {
 				c.Bases = getBasesFromHeader(utils.LoadOptional(filepath.Join(prefixPath, c.Module, strings.ToLower(c.Name)+".h")), c.Name, c.Module)
 			} else {
 				c.Bases = getBasesFromHeader(utils.Load(filepath.Join(prefixPath, "include", c.Module, strings.ToLower(c.Name)+".h")), c.Name, c.Module)
@@ -335,7 +314,7 @@ func (c *Class) fixBases() {
 
 	case "QPlatformSystemTrayIcon", "QPlatformGraphicsBuffer":
 		{
-			if utils.QT_PKG_CONFIG() {
+			if utils.QT_PKG_CONFIG() && runtime.GOOS != "darwin" {
 				c.Bases = getBasesFromHeader(utils.LoadOptional(filepath.Join(prefixPath, c.Module, utils.QT_VERSION(), c.Module, "qpa", strings.ToLower(c.Name)+".h")), c.Name, c.Module)
 			} else {
 				c.Bases = getBasesFromHeader(utils.Load(filepath.Join(prefixPath, infixPath, c.Module+suffixPath+utils.QT_VERSION(), "QtGui", "qpa", strings.ToLower(c.Name)+".h")), c.Name, c.Module)
@@ -347,7 +326,7 @@ func (c *Class) fixBases() {
 		{
 			for _, m := range append(LibDeps[strings.TrimPrefix(c.Module, "Qt")], strings.TrimPrefix(c.Module, "Qt")) {
 				m = fmt.Sprintf("Qt%v", m)
-				if utils.QT_PKG_CONFIG() {
+				if utils.QT_PKG_CONFIG() && runtime.GOOS != "darwin" {
 					if utils.ExistsFile(filepath.Join(prefixPath, m, strings.ToLower(c.Name)+".h")) {
 						c.Bases = getBasesFromHeader(utils.LoadOptional(filepath.Join(prefixPath, m, strings.ToLower(c.Name)+".h")), c.Name, c.Module)
 						return
@@ -373,7 +352,7 @@ func (c *Class) fixBases() {
 	var found bool
 	for _, m := range libs {
 		m = fmt.Sprintf("Qt%v", m)
-		if utils.QT_PKG_CONFIG() {
+		if utils.QT_PKG_CONFIG() && runtime.GOOS != "darwin" {
 			if utils.ExistsFile(filepath.Join(prefixPath, m, c.Name)) {
 
 				var f = utils.LoadOptional(filepath.Join(prefixPath, m, c.Name))

@@ -3,9 +3,11 @@ package utils
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -72,6 +74,8 @@ func Load(name string) string {
 	out, err := ioutil.ReadFile(name)
 	if err != nil {
 		Log.WithError(err).Errorf("failed to load %v", name)
+		debug.PrintStack()
+		os.Exit(0)
 	}
 	return string(out)
 }
@@ -110,6 +114,9 @@ func RunCmd(cmd *exec.Cmd, name string) string {
 	if err != nil {
 		Log.WithError(err).WithFields(fields).Error("failed to run command")
 		println(string(out))
+		if ee, ok := err.(*exec.ExitError); ok {
+			log.Println(string(ee.Stderr))
+		}
 		os.Exit(1)
 	}
 	return string(out)
