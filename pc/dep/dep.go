@@ -1,7 +1,10 @@
 package dep
 
 import (
+	"io/ioutil"
 	"log"
+	"os"
+	"runtime"
 	"runtime/debug"
 )
 
@@ -33,6 +36,14 @@ func DoClose() {
 		cb()
 	}
 	closeCb = nil
+}
+
+func Reboot() {
+	if runtime.GOOS == "windows" {
+		ioutil.WriteFile(DataPath("reboot"), []byte("true"), 0664)
+	}
+	DoClose()
+	os.Exit(2)
 }
 
 var NotifyQml = func(event string, data map[string]interface{}) {
