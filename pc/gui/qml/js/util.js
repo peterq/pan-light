@@ -470,3 +470,7 @@ function unixTime(t) {
     return date + ' ' + time
 }
 
+function exit() {
+    callGoSync('exit')
+}
+

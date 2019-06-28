@@ -34,7 +34,8 @@ Item {
             parent: G.root
             Window {
                 id: window
-                flags: Qt.Dialog | Qt.WindowModal | Qt.WindowCloseButtonHint
+                flags:  Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
+                        | Qt.WindowModal | Qt.Dialog
                 modality: Qt.ApplicationModal
                 title: root.title
                 minimumHeight: 100

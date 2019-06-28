@@ -18,6 +18,8 @@ Item {
         }
         onPositionChanged: {
             var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
+            delta.x = Math.max(delta.x,
+                               -mainWindow.width + mainWindow.minimumWidth)
             mainWindow.width += delta.x
         }
     }
@@ -38,11 +40,10 @@ Item {
                 return
             t = now
             var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
-            if (!(mainWindow.minimumWidth === mainWindow.width
-                  && delta.x > 0)) {
-                mainWindow.width -= delta.x
-                mainWindow.x += delta.x
-            }
+            delta.x = Math.min(delta.x,
+                               mainWindow.width - mainWindow.minimumWidth)
+            mainWindow.width -= delta.x
+            mainWindow.x += delta.x
         }
     }
     // 上
@@ -62,11 +63,10 @@ Item {
                 return
             t = now
             var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
-            if (!(mainWindow.minimumHeight === mainWindow.height
-                  && delta.y > 0)) {
-                mainWindow.height -= delta.y
-                mainWindow.y += delta.y
-            }
+            delta.y = Math.min(mainWindow.height - mainWindow.minimumHeight,
+                               delta.y)
+            mainWindow.height -= delta.y
+            mainWindow.y += delta.y
         }
     }
     // 下
@@ -87,6 +87,8 @@ Item {
                 return
             t = now
             var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
+            delta.y = Math.max(-mainWindow.height + mainWindow.minimumHeight,
+                               delta.y)
             mainWindow.height += delta.y
         }
     }
@@ -107,12 +109,14 @@ Item {
                 return
             t = now
             var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
+            delta.x = Math.max(delta.x,
+                               -mainWindow.width + mainWindow.minimumWidth)
+            delta.y = Math.min(mainWindow.height - mainWindow.minimumHeight,
+                               delta.y)
+
             mainWindow.width += delta.x
-            if (!(mainWindow.minimumHeight === mainWindow.height
-                  && delta.y > 0)) {
-                mainWindow.height -= delta.y
-                mainWindow.y += delta.y
-            }
+            mainWindow.height -= delta.y
+            mainWindow.y += delta.y
         }
     }
     // 左下
@@ -132,12 +136,14 @@ Item {
                 return
             t = now
             var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
+            delta.x = Math.min(delta.x,
+                               mainWindow.width - mainWindow.minimumWidth)
+            delta.y = Math.max(-mainWindow.height + mainWindow.minimumHeight,
+                               delta.y)
+
             mainWindow.height += delta.y
-            if (!(mainWindow.minimumWidth === mainWindow.width
-                  && delta.x > 0)) {
-                mainWindow.width -= delta.x
-                mainWindow.x += delta.x
-            }
+            mainWindow.width -= delta.x
+            mainWindow.x += delta.x
         }
     }
     // 左上
@@ -156,16 +162,16 @@ Item {
                 return
             t = now
             var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
-            if (!(mainWindow.minimumWidth === mainWindow.width
-                  && delta.x > 0)) {
-                mainWindow.width -= delta.x
-                mainWindow.x += delta.x
-            }
-            if (!(mainWindow.minimumHeight === mainWindow.height
-                  && delta.y > 0)) {
-                mainWindow.height -= delta.y
-                mainWindow.y += delta.y
-            }
+            delta.x = Math.min(delta.x,
+                               mainWindow.width - mainWindow.minimumWidth)
+            delta.y = Math.min(mainWindow.height - mainWindow.minimumHeight,
+                               delta.y)
+
+            mainWindow.width -= delta.x
+            mainWindow.x += delta.x
+
+            mainWindow.height -= delta.y
+            mainWindow.y += delta.y
         }
     }
     // 右下
@@ -186,6 +192,10 @@ Item {
                 return
             t = now
             var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
+            delta.x = Math.max(delta.x,
+                               -mainWindow.width + mainWindow.minimumWidth)
+            delta.y = Math.max(-mainWindow.height + mainWindow.minimumHeight,
+                               delta.y)
             mainWindow.width += delta.x
             mainWindow.height += delta.y
         }

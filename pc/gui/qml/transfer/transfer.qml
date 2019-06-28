@@ -55,7 +55,6 @@ Item {
                                      })
         }).then(function (savePath) {
             savePath = savePath.toString()
-            savePath = savePath.replace('file://', '')
             var newFid = (useVip ? 'vip' : 'direct') + '.' + meta.fs_id
             var id = Util.callGoSync('download.new', {
                                          "fid": newFid,
@@ -81,8 +80,6 @@ Item {
                                          "defaultFolder": App.appState.settings.lastDownloadPath
                                      })
         }).then(function (savePath) {
-            savePath = savePath.toString()
-            savePath = savePath.replace('file://', '')
             var id = Util.callGoSync('download.new', {
                                          "fid": fid,
                                          "savePath": savePath

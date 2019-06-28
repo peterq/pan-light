@@ -39,6 +39,12 @@ var baseSyncRoutes = map[string]syncHandler{
 		os.Exit(2)
 		return
 	},
+	// 退出
+	"exit": func(p map[string]interface{}) (result interface{}) {
+		dep.DoClose()
+		os.Exit(0)
+		return
+	},
 	// config
 	"config": func(p map[string]interface{}) (result interface{}) {
 		maxParallelCorutineNumber := int(p["maxParallelCorutineNumber"].(float64))

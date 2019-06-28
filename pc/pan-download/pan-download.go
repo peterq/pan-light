@@ -13,7 +13,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -123,7 +122,7 @@ func test() {
 }
 
 func DownloadFile(fid, savePath string) (taskId downloader.TaskId, err error) {
-	savePath, err = filepath.Abs(savePath)
+	//savePath, err = filepath.Abs(savePath)
 	if err != nil {
 		return
 	}

@@ -6,7 +6,8 @@ import "../js/app.js" as App
 import "../js/util.js" as Util
 Window {
     id: window
-    flags: Qt.Dialog | Qt.WindowModal | Qt.WindowCloseButtonHint
+    flags: Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
+           | Qt.WindowModal | Qt.Dialog
     modality: Qt.ApplicationModal
     title: '设置'
     minimumHeight: height

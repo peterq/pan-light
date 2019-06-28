@@ -3,14 +3,10 @@
 package gui
 
 import (
-	"bytes"
 	_ "github.com/peterq/pan-light/pc/functions"
 	_ "github.com/peterq/pan-light/pc/gui/bridge"
 	_ "github.com/peterq/pan-light/pc/gui/comp"
-	"io/ioutil"
-	"time"
-
-	//_ "github.com/peterq/pan-light/pc/gui/qml"
+	_ "github.com/peterq/pan-light/pc/gui/qml"
 	"github.com/peterq/pan-light/qt/bindings/core"
 	"github.com/peterq/pan-light/qt/bindings/gui"
 	"github.com/peterq/pan-light/qt/bindings/qml"
@@ -25,19 +21,22 @@ func StartGui() {
 
 	// 下面2句话居然能解决windows 异常退出的bug
 	core.QCoreApplication_SetOrganizationName("PeterQ") //needed to fix an QML Settings issue on windows
-	quick.QQuickWindow_SetSceneGraphBackend(quick.QSGRendererInterface__Software)
+	if os.Getenv("pan_light_render_exception_fix") == "true" {
+		quick.QQuickWindow_SetSceneGraphBackend(quick.QSGRendererInterface__Software)
+	}
 
-	rccFile := "E:\\pan-light\\qml.rcc"
-	bin, _ := ioutil.ReadFile(rccFile)
-	go func() {
-		for range time.Tick(2 * time.Second) {
-			n, _ := ioutil.ReadFile(rccFile)
-			if !bytes.Equal(bin, n) {
-				os.Exit(2)
-			}
-		}
-	}()
-	core.QResource_RegisterResource(rccFile, "/")
+	//rccFile := "E:\\pan-light\\qml.rcc"
+	//bin, _ := ioutil.ReadFile(rccFile)
+	//go func() {
+	//	for range time.Tick(2 * time.Second) {
+	//		n, _ := ioutil.ReadFile(rccFile)
+	//		if !bytes.Equal(bin, n) {
+	//			os.Exit(2)
+	//		}
+	//	}
+	//}()
+	//core.QResource_RegisterResource(rccFile, "/")
+
 	app := gui.NewQGuiApplication(len(os.Args), os.Args)
 
 	engine := qml.NewQQmlApplicationEngine(nil)

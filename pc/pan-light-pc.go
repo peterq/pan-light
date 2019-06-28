@@ -43,6 +43,11 @@ START_PAN:
 				code := status.ExitStatus()
 				if code == 2 {
 					goto START_PAN
+				} else if code == 3221225477 {
+					if os.Getenv("pan_light_render_exception_fix") != "true" {
+						os.Setenv("pan_light_render_exception_fix", "true")
+						goto START_PAN
+					}
 				}
 			}
 		}
