@@ -40,6 +40,8 @@
    
 ![截图3](https://qiniu-cdn.peterq.cn/pan-light/img/shot_3.png)
 
+![截图4](https://qiniu-cdn.peterq.cn/pan-light/img/shot_4.png)
+
 ## 其他
 
 - 本项目花费了作者大量的时间和精力, 如果你觉得本项目对你有帮助, 帮忙点个star.
