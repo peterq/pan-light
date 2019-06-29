@@ -140,7 +140,7 @@ func pcDev() {
 	log.Println("打包qml...")
 	cmd(qtBin("rcc"), "-binary", "pc/gui/qml/qml.qrc", "-o", "pc/gui/qml/qml.rcc").Run()
 	log.Println("启动客户端...")
-	//runCmd("./pc", "go", "run", "-tags=plugin", "pan-light-pc-dev.go")
+	runCmd("./pc", "go", "run", "-tags=plugin", "pan-light-pc-dev.go")
 }
 
 func pcBuild() {

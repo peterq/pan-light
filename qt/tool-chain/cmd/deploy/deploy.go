@@ -70,11 +70,11 @@ func Deploy(mode, target, path string, docker bool, ldFlags, tags string, fast b
 		}
 
 		//rcc.Rcc(path, target, tags, os.Getenv("QTRCC_OUTPUT_DIR"))
-		if !fast {
+		if false && !fast {
 			moc.Moc(path, target, tags, false, false)
 		}
 
-		if ((!fast || utils.QT_STUB()) || ((target == "js" || target == "wasm") && (utils.QT_DOCKER() || utils.QT_VAGRANT()))) && !utils.QT_FAT() {
+		if false && ((!fast || utils.QT_STUB()) || ((target == "js" || target == "wasm") && (utils.QT_DOCKER() || utils.QT_VAGRANT()))) && !utils.QT_FAT() {
 			minimal.Minimal(path, target, tags)
 		}
 
