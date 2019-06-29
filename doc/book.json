@@ -1,0 +1,49 @@
+{
+  "title": "pan-light doc",
+  "description": "pan-light 技术文档",
+  "author": "PeterQ<me@peterq.cn>",
+  "generator": "site",
+  "language": "zh-hans",
+  "gitbook": "3.2.3",
+  "styles": {
+    "website": "styles/website.css"
+  },
+  "links": {
+    "sidebar": {
+      "<i class='fa fa-fw fa-qq'></i> <strong> 开发者交流群 438604465</strong>": "https://jq.qq.com/?_wv=1027&k=52HpwTS"
+    }
+  },
+  "plugins": [
+    "-lunr",
+    "-search",
+    "-highlight",
+    "-fontsettings",
+    "prism",
+    "prism-themes",
+    "edit-link",
+    "anchors",
+    "github",
+    "search-plus",
+    "expand-active-chapter",
+    "expandable-chapters-interactive",
+    "theme-comscore",
+    "footer"
+  ],
+  "pluginsConfig": {
+    "edit-link": {
+      "base": "https://github.com/peterq/pan-light/edit/doc/",
+      "label": "编辑本页面"
+    },
+    "github": {
+      "url": "https://github.com/peterq/pan-light"
+    },
+    "prism": {
+      "css": [
+        "prism-themes/themes/prism-vs.css"
+      ]
+    },
+    "layout": {
+      "footerPath": "styles/footer.html"
+    }
+  }
+}
