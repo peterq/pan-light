@@ -7,12 +7,15 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"sync"
 )
 
 func Start() {
-	log.Println("hello pan light, real_time connecting")
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetPrefix(env("slave_name") + " ")
 	pwd := env("host_password")
 	os.Unsetenv("host_password")
+
 	rt = &realtime.RealTime{
 		WsAddr:       env("ws_addr"),
 		Role:         "slave",
@@ -21,14 +24,25 @@ func Start() {
 		SlaveName:    env("slave_name"),
 		OnConnected:  nil,
 	}
-	rt.Init()
 	order, _ := strconv.ParseInt(env("demo_order"), 10, 64)
 	exe = &executor{
 		hostName:      rt.HostName,
 		slaveName:     rt.SlaveName,
-		order:         order,
 		userSessionId: env("demo_user"),
+		order:         order,
+		rtOkCh:        make(chan bool, 1),
 	}
+
+	log.Println("hello pan light, real_time connecting")
+	once := sync.Once{}
+	rt.Init()
+	rt.RegisterEventListener(map[string]func(data interface{}, room string){
+		"session.new": func(data interface{}, room string) {
+			once.Do(func() {
+				exe.rtOkCh <- true
+			})
+		},
+	})
 	exe.startX()
 }
 

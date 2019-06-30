@@ -125,6 +125,7 @@ func (h *Holder) startIns() {
 	defer exec.Command("docker", "rm", "-v", "-f", h.containerName).Run()
 	exec.Command("docker", "rm", "-v", "-f", h.containerName).Run()
 	e, _ := filepath.Abs("./slave/ubuntu16.04/root.pan-light")
+	log.Println(e)
 	// 启动docker
 	dockerP := exec.Command("docker", "run",
 		"-m", "400m", "--memory-swap", "500m", // 400m 内存
@@ -134,7 +135,7 @@ func (h *Holder) startIns() {
 		"-e", "slave_name="+h.SlaveName, "-e", "ws_addr="+h.WsAddr, // ws 地址
 		"-e", "demo_order="+strconv.FormatInt(h.order, 10), // demo order
 		"-e", "demo_user="+h.sessionId, // 用户session
-		"-v"+e+":/root/pan-light",    // 开发时文件映射, 正式环境使用docker copy
+		//"-v"+e+":/root/pan-light",    // 开发时文件映射, 正式环境使用docker copy
 		"--name="+h.containerName+"", // 容器名
 		dockerImage)
 	defer exec.Command("docker", "kill", h.containerName)

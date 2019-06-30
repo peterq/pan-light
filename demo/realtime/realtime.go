@@ -37,7 +37,8 @@ type RealTime struct {
 	sessionSecret string
 
 	listenerMap map[string][]func(data interface{}, room string)
-	callMap     map[float64]chan<- *callResult
+	callMap     sync.Map
+	//callMap     map[float64]chan<- *callResult
 	callMapLock sync.Mutex
 	logWsMsg    bool
 }
@@ -49,7 +50,21 @@ func (rt *RealTime) Init() {
 	rt.inited = true
 	rt.connectOkCond = sync.NewCond(&rt.connectLock)
 	rt.listenerMap = map[string][]func(data interface{}, room string){}
-	rt.callMap = map[float64]chan<- *callResult{}
+	go func() {
+		for range time.Tick(10 * time.Second) {
+			rt.Call("ping", gson{})
+		}
+	}()
+	rt.RegisterEventListener(map[string]func(data interface{}, room string){
+		"session.new": func(data interface{}, room string) {
+			rt.sessionId = data.(gson)["id"].(string)
+			rt.sessionSecret = data.(gson)["id"].(string)
+			log.Println("rt 会话创建成功")
+		},
+		"session.resume": func(data interface{}, room string) {
+			log.Println("rt 会话恢复成功")
+		},
+	})
 	go rt.connect()
 }
 
@@ -67,27 +82,28 @@ func (rt *RealTime) connect() {
 	go func() {
 		for {
 			rt.connectLock.Lock()
-			for rt.connectOK != true {
+			for rt.connectOK != true { // 等待连接ok
 				rt.connectOkCond.Wait()
 			}
 			rt.connectLock.Unlock()
 			if rt.OnConnected != nil {
 				go rt.OnConnected()
 			}
+			log.Println("ws连接成功")
 			rt.readLoop()
 		}
 	}()
 	first := true
 	for {
-		func() {
+		func() { // 等待链接不ok, 进行连接
 			rt.connectLock.Lock()
+			for rt.connectOK != false {
+				rt.connectOkCond.Wait()
+			}
 			defer func() {
 				rt.connectLock.Unlock()
 				rt.connectOkCond.Broadcast()
 			}()
-			for rt.connectOK != false {
-				rt.connectOkCond.Wait()
-			}
 			if !first {
 				time.Sleep(5 * time.Second)
 			}
@@ -102,12 +118,14 @@ func (rt *RealTime) connect() {
 			rt.conn = conn
 			rt.connectOK = true
 			if rt.sessionId != "" {
+				log.Println("will resume session")
 				err = rt.write(gson{
 					"type":          "session.resume",
 					"sessionId":     rt.sessionId,
 					"sessionSecret": rt.sessionSecret,
 				})
 			} else {
+				log.Println("will new session")
 				err = rt.write(gson{
 					"type": "session.new",
 				})
@@ -119,7 +137,7 @@ func (rt *RealTime) connect() {
 				})
 			}
 			if err != nil {
-				log.Println("write error")
+				log.Println("write error", err)
 				rt.connectOK = false
 				return
 			}
@@ -158,7 +176,7 @@ func (rt *RealTime) handleMsg(data gson) {
 			return
 		}
 		for _, cb := range cbs {
-			go func() {
+			go func(cb func(data interface{}, room string)) {
 				defer func() {
 					if e := recover(); e != nil {
 						log.Println(e)
@@ -166,13 +184,13 @@ func (rt *RealTime) handleMsg(data gson) {
 					}
 				}()
 				cb(data["payload"], room.(string))
-			}()
+			}(cb)
 		}
 		return
 	}
 	if t == "call.result" {
 		id := data["id"].(float64)
-		ch, ok := rt.callMap[id]
+		ch, ok := rt.callMap.Load(id)
 		if !ok {
 			return
 		}
@@ -186,7 +204,7 @@ func (rt *RealTime) handleMsg(data gson) {
 			ret.err = errors.New(data["error"].(string))
 			ret.ret = nil
 		}
-		ch <- ret
+		ch.(chan *callResult) <- ret
 		return
 	}
 
@@ -214,7 +232,7 @@ func (rt *RealTime) Call(method string, param gson) (result interface{}, err err
 	ch := make(chan *callResult)
 
 	rt.callMapLock.Lock()
-	rt.callMap[id] = ch
+	rt.callMap.Store(id, ch)
 	rt.callMapLock.Unlock()
 
 	rt.write(gson{
@@ -229,7 +247,7 @@ func (rt *RealTime) Call(method string, param gson) (result interface{}, err err
 	close(ch)
 
 	rt.callMapLock.Lock()
-	delete(rt.callMap, id)
+	rt.callMap.Delete(id)
 	rt.callMapLock.Unlock()
 
 	return
@@ -248,6 +266,11 @@ func (rt *RealTime) read() (data gson, err error) {
 }
 
 func (rt *RealTime) write(data gson) (err error) {
+
+	if !rt.connectOK {
+		return errors.New("connect not ok")
+	}
+
 	if rt.logWsMsg {
 		log.Println("ws ->", data)
 	}

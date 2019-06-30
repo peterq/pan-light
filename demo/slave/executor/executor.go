@@ -16,6 +16,7 @@ type executor struct {
 	slaveName     string
 	userSessionId string
 	order         int64
+	rtOkCh        chan bool
 }
 
 func (e *executor) startX() {
@@ -24,6 +25,7 @@ func (e *executor) startX() {
 	})
 	log.Println("set password")
 	vnc_password.SetPassword(env("vnc_operate_pwd"), env("vnc_view_pwd"))
+	<-e.rtOkCh
 	e.notifyHost("start.ok", gson{})
 	startTime := time.Now()
 	endTime := startTime.Add(5 * time.Minute)

@@ -91,7 +91,8 @@ func demoAvatar() {
 }
 
 func buildDockerSlave() {
-	runCmd("demo", "docker", "build", "-t", "pan-light-slave", "./slave/ubuntu16.04")
+	runCmd("demo", "go", "build", "-o", "./slave/ubuntu16.04/root.pan-light/demo_instance_manager", "slave.go")
+	//runCmd("demo", "docker", "build", "-t", "pan-light-slave", "./slave/ubuntu16.04")
 }
 
 func demoHost() {

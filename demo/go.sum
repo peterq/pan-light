@@ -26,6 +26,7 @@ github.com/onsi/ginkgo v1.7.0 h1:WSHQ+IS43OoUrWtD1/bbclrwK8TTH5hzp+umCiuxHgs=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/gomega v1.4.3 h1:RE1xgDvH7imwFD45h+u2SgIfERHlS2yNG4DObb5BSKU=
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
+github.com/peterq/pan-light v0.0.0-20190630114539-5740b2e61fc8 h1:l9G3+foZSQM1wexOK1inl7TGWJxzlEWCzgfLN/vNwEE=
 github.com/pion/datachannel v1.3.0 h1:gxt/xGufDn8Yylk0uJB231xbGQVlFjVps+KdUAUl5Ls=
 github.com/pion/datachannel v1.3.0/go.mod h1:lxFbZLIT+EBPmy5AiCv8M0CXkcuTL53A4cyagZiRrDo=
 github.com/pion/dtls v1.3.0 h1:5jcC5bBzRcLfxmUH60zp/slIe/tjCLmz6AUZagPYmhA=
