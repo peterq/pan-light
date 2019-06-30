@@ -1,0 +1,5 @@
+*
+!.gitignore
+!go.mod
+!go.sum
+!mod.go
