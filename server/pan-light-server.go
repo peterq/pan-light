@@ -16,5 +16,8 @@ func main() {
 	app.Use(artisan.ApiRecover)
 	app.StaticWeb("/", "./static")
 	pc_api.Init(app)
-	app.Run(iris.Addr("127.0.0.1:8081"))
+	app.Run(iris.Addr(":8081"), iris.WithConfiguration(iris.Configuration{
+		DisablePathCorrectionRedirection: true,
+		DisablePathCorrection:            true,
+	}))
 }
