@@ -15,14 +15,12 @@ Item {
     width: parent.width
     height: parent.height
 
-    Resize {
-        width: contentContainer.width + 2 * maWidth
-        height: contentContainer.height + 2 * maWidth
-        anchors.centerIn: parent
-    }
+    RightMenu{}
+
     Rectangle {
         id: contentContainer
         border.color: 'gray'
+        clip: true
         property int subInt: 2 * shadeWidth * 1.1
         width: parent.width - subInt
         height: parent.height - subInt
@@ -125,7 +123,7 @@ Item {
                         }
                         MenuItem {
                             text: '退出程序'
-                            onTriggered: Qt.quit()
+                            onTriggered: Util.exit()
                         }
                     }
                 }
@@ -162,13 +160,19 @@ Item {
                 width: 20
                 onClicked: {
                     if (!App.appState.transferComp) {
-                        Qt.quit()
+                        Util.exit()
                     } else {
                         G.root.visible = false
                     }
                 }
             }
         }
+    }
+
+    Resize {
+        width: contentContainer.width + maWidth
+        height: contentContainer.height + maWidth
+        anchors.centerIn: parent
     }
 
     DropShadow {

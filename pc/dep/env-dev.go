@@ -1,4 +1,4 @@
-// +build !product
+// +build !production
 
 package dep
 

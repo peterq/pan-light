@@ -1,5 +1,7 @@
 package main
 
+// 这个是为了方便开发写的脚本, 代码写的很糙, 见笑
+
 import (
 	"encoding/json"
 	"flag"
@@ -137,6 +139,11 @@ func pcDev() {
 
 func pcBuild() {
 	runCmd("./pc", "go", "run", "../qt/cmd/qtdeploy/main.go", "-fast", "build", "desktop")
+	// 正式包编译步骤
+	// cd pc
+	// go run ../qt/cmd/qtrcc/main.go desktop gui/qml
+	// go build -p 8 -v -ldflags=all="-s" -o deploy/linux/pc -tags="production"
+
 }
 
 func qtBin(name string) string {

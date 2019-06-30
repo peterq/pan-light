@@ -9,6 +9,7 @@ import (
 	goparser "go/parser"
 	"go/token"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -51,6 +52,7 @@ var (
 )
 
 func Moc(path, target, tags string, fast, slow bool) {
+	parser.State.Target = target
 	if utils.UseGOMOD(path) {
 		if !utils.ExistsDir(filepath.Join(path, "vendor")) {
 			cmd := exec.Command("go", "mod", "vendor")
@@ -372,6 +374,7 @@ func moc(path, target, tags string, fast, slow, root bool, l int, dirty bool) {
 			for i := 0; i < 5; i++ {
 				fix, err = imports.Process("moc.go", fixR, nil)
 				if err != nil {
+					log.Println("here")
 					utils.Log.WithError(err).Error("failed to fix go imports")
 					fix = fixR
 				}

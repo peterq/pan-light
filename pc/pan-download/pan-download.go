@@ -2,6 +2,7 @@ package pan_download
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"github.com/peterq/pan-light/pc/dep"
 	"github.com/peterq/pan-light/pc/downloader"
@@ -13,7 +14,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -90,10 +90,20 @@ func LinkResolver(fileId string) (link string, err error) {
 	case "share":
 		fileSize, _ := strconv.ParseInt(args[3], 10, 64)
 		return VipLinkByMd5(args[1], args[2], fileSize)
+	case "link":
+		return decodeHyperLink(args[1])
 	default:
 		err = errors.New("unknown download method: " + args[0])
 	}
 	return
+}
+func decodeHyperLink(s string) (string, error) {
+	bin, err := base64.StdEncoding.DecodeString(s)
+	return string(bin), err
+}
+
+func encodeHyperLink(s string) string {
+	return base64.StdEncoding.EncodeToString([]byte(s))
 }
 
 func vipLink(fileId string) (link string, err error) {
@@ -123,7 +133,7 @@ func test() {
 }
 
 func DownloadFile(fid, savePath string) (taskId downloader.TaskId, err error) {
-	savePath, err = filepath.Abs(savePath)
+	//savePath, err = filepath.Abs(savePath)
 	if err != nil {
 		return
 	}

@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QDOCINDEX>
+<INDEX url="http://doc.qt.io/qt-5" title="QMake Manual" version="" project="QMake" indexTitle="qmake Manual">
+    <namespace threadsafety="unspecified" name="" status="active" access="public" documented="false" module="qmake">
+        <page name="qmake-advanced-usage.html" href="qmake-advanced-usage.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="4342" subtype="page" title="Advanced Usage" fulltitle="Advanced Usage" subtitle="" module="QMake">
+            <target name="libdepend" title="LibDepend"/>
+            <contents name="adding-new-configuration-features" title="Adding New Configuration Features" level="1"/>
+            <contents name="installing-files" title="Installing Files" level="1"/>
+            <contents name="adding-custom-targets" title="Adding Custom Targets" level="1"/>
+            <contents name="adding-compilers" title="Adding Compilers" level="1"/>
+            <contents name="library-dependencies" title="Library Dependencies" level="1"/>
+        </page>
+        <page name="qmake-common-projects.html" href="qmake-common-projects.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="5070" subtype="page" title="Building Common Project Types" fulltitle="Building Common Project Types" subtitle="" module="QMake">
+            <target name="application" title="Application"/>
+            <target name="library" title="Library"/>
+            <target name="plugin" title="Plugin"/>
+            <contents name="building-an-application" title="Building an Application" level="1"/>
+            <contents name="building-a-testcase" title="Building a Testcase" level="1"/>
+            <contents name="building-a-library" title="Building a Library" level="1"/>
+            <contents name="building-a-plugin" title="Building a Plugin" level="1"/>
+            <contents name="building-a-qt-designer-plugin" title="Building a Qt Designer Plugin" level="2"/>
+            <contents name="building-and-installing-in-debug-and-release-modes" title="Building and Installing in Debug and Release Modes" level="1"/>
+            <contents name="building-in-both-modes" title="Building in Both Modes" level="2"/>
+            <contents name="installing-in-both-modes" title="Installing in Both Modes" level="2"/>
+        </page>
+        <page name="qmake-environment-reference.html" href="qmake-environment-reference.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="3878" subtype="page" title="Configuring qmake" fulltitle="Configuring qmake" subtitle="" module="QMake">
+            <target name="qmakespec" title="QMAKESPEC"/>
+            <target name="cache"/>
+            <target name="extensions" title="Extensions"/>
+            <contents name="properties" title="Properties" level="1"/>
+            <contents name="qmakespec" title="QMAKESPEC" level="1"/>
+            <contents name="cache-file" title="Cache File" level="1"/>
+            <contents name="file-extensions" title="File Extensions" level="1"/>
+        </page>
+        <page name="qmake-project-files.html" href="qmake-project-files.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="158" subtype="page" title="Creating Project Files" fulltitle="Creating Project Files" subtitle="" module="QMake">
+            <target name="projectfileelementsvariables" title="ProjectFileElementsVariables"/>
+            <target name="generalconfiguration" title="GeneralConfiguration"/>
+            <contents name="project-file-elements" title="Project File Elements" level="1"/>
+            <contents name="variables" title="Variables" level="2"/>
+            <contents name="whitespace" title="Whitespace" level="3"/>
+            <contents name="comments" title="Comments" level="2"/>
+            <contents name="built-in-functions-and-control-flow" title="Built-in Functions and Control Flow" level="2"/>
+            <contents name="project-templates" title="Project Templates" level="1"/>
+            <contents name="general-configuration" title="General Configuration" level="1"/>
+            <contents name="declaring-qt-libraries" title="Declaring Qt Libraries" level="1"/>
+            <contents name="configuration-features" title="Configuration Features" level="1"/>
+            <contents name="declaring-other-libraries" title="Declaring Other Libraries" level="1"/>
+        </page>
+        <page name="qmake-tutorial.html" href="qmake-tutorial.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="4900" subtype="page" title="Getting Started" fulltitle="Getting Started" subtitle="" module="QMake">
+            <keyword name="qmake-getting-started"/>
+            <contents name="starting-off-simple" title="Starting Off Simple" level="1"/>
+            <contents name="making-an-application-debuggable" title="Making an Application Debuggable" level="1"/>
+            <contents name="adding-platform-specific-source-files" title="Adding Platform-Specific Source Files" level="1"/>
+            <contents name="stopping-qmake-if-a-file-does-not-exist" title="Stopping qmake If a File Does Not Exist" level="1"/>
+            <contents name="checking-for-more-than-one-condition" title="Checking for More than One Condition" level="1"/>
+        </page>
+        <page name="qmake-overview.html" href="qmake-overview.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="84" subtype="page" title="Overview" fulltitle="Overview" subtitle="" module="QMake">
+            <contents name="describing-a-project" title="Describing a Project" level="1"/>
+            <contents name="building-a-project" title="Building a Project" level="1"/>
+            <contents name="using-third-party-libraries" title="Using Third Party Libraries" level="1"/>
+            <contents name="precompiling-headers" title="Precompiling Headers" level="1"/>
+        </page>
+        <page name="qmake-platform-notes.html" href="qmake-platform-notes.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="647" subtype="page" title="Platform Notes" fulltitle="Platform Notes" subtitle="" module="QMake">
+            <contents name="macos-ios-tvos-and-watchos" title="macOS, iOS, tvOS, and watchOS" level="1"/>
+            <contents name="source-and-binary-packages" title="Source and Binary Packages" level="2"/>
+            <contents name="using-frameworks" title="Using Frameworks" level="2"/>
+            <contents name="creating-frameworks" title="Creating Frameworks" level="2"/>
+            <contents name="creating-and-moving-xcode-projects" title="Creating and Moving Xcode Projects" level="2"/>
+            <contents name="supporting-two-build-targets-simultaneously" title="Supporting Two Build Targets Simultaneously" level="2"/>
+            <contents name="windows" title="Windows" level="1"/>
+            <contents name="adding-windows-resource-files" title="Adding Windows Resource Files" level="2"/>
+            <contents name="creating-visual-studio-project-files" title="Creating Visual Studio Project Files" level="2"/>
+            <contents name="visual-studio-manifest-files" title="Visual Studio Manifest Files" level="2"/>
+        </page>
+        <page name="qmake-reference.html" href="qmake-reference.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="863" subtype="page" title="Reference" fulltitle="Reference" subtitle="" module="QMake">
+            <contents name="variable-reference" title="Variable Reference" level="1"/>
+            <contents name="function-reference" title="Function Reference" level="1"/>
+        </page>
+        <page name="qmake-function-reference.html" href="qmake-function-reference.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="2996" subtype="page" title="Replace Functions" fulltitle="Replace Functions" subtitle="" module="QMake">
+            <target name="qmake-cat"/>
+            <target name="findfunction"/>
+            <target name="fn-first" title="fn_first"/>
+            <target name="format-number" title="format_number()"/>
+            <target name="fn-last" title="fn_last"/>
+            <target name="member" title="member()"/>
+            <target name="num-add" title="num_add()"/>
+            <target name="fn-size" title="fn_size"/>
+            <target name="str-member" title="str_member()"/>
+            <target name="str-size" title="str_size()"/>
+            <target name="system-replace" title="system_replace"/>
+            <target name="take-first" title="take_first()"/>
+            <target name="take-last" title="take_last()"/>
+            <target name="unique"/>
+            <keyword name="qmake-function-reference-replace-functions" title="qmake Function Reference - Replace Functions"/>
+            <contents name="built-in-replace-functions" title="Built-in Replace Functions" level="1"/>
+            <contents name="absolute-path-path-base" title="absolute_path(path[, base])" level="2"/>
+            <contents name="basename-variablename" title="basename(variablename)" level="2"/>
+            <contents name="cat-filename-mode" title="cat(filename[, mode])" level="2"/>
+            <contents name="clean-path-path" title="clean_path(path)" level="2"/>
+            <contents name="dirname-file" title="dirname(file)" level="2"/>
+            <contents name="enumerate-vars" title="enumerate_vars" level="2"/>
+            <contents name="escape-expand-arg1-arg2-argn" title="escape_expand(arg1 [, arg2 ..., argn])" level="2"/>
+            <contents name="find-variablename-substr" title="find(variablename, substr)" level="2"/>
+            <contents name="files-pattern-recursive-false" title="files(pattern[, recursive=false])" level="2"/>
+            <contents name="first-variablename" title="first(variablename)" level="2"/>
+            <contents name="format-number-number-options" title="format_number(number[, options...])" level="2"/>
+            <contents name="fromfile-filename-variablename" title="fromfile(filename, variablename)" level="2"/>
+            <contents name="getenv-variablename" title="getenv(variablename)" level="2"/>
+            <contents name="join-variablename-glue-before-after" title="join(variablename, glue, before, after)" level="2"/>
+            <contents name="last-variablename" title="last(variablename)" level="2"/>
+            <contents name="list-arg1-arg2-argn" title="list(arg1 [, arg2 ..., argn])" level="2"/>
+            <contents name="lower-arg1-arg2-argn" title="lower(arg1 [, arg2 ..., argn])" level="2"/>
+            <contents name="member-variablename-start-end" title="member(variablename [, start [, end]])" level="2"/>
+            <contents name="num-add-arg1-arg2-argn" title="num_add(arg1 [, arg2 ..., argn])" level="2"/>
+            <contents name="prompt-question-decorate" title="prompt(question [, decorate])" level="2"/>
+            <contents name="quote-string" title="quote(string)" level="2"/>
+            <contents name="re-escape-string" title="re_escape(string)" level="2"/>
+            <contents name="relative-path-filepath-base" title="relative_path(filePath[, base])" level="2"/>
+            <contents name="replace-string-old-string-new-string" title="replace(string, old_string, new_string)" level="2"/>
+            <contents name="resolve-depends-variablename-prefix" title="resolve_depends(variablename, prefix)" level="2"/>
+            <contents name="reverse-variablename" title="reverse(variablename)" level="2"/>
+            <contents name="section-variablename-separator-begin-end" title="section(variablename, separator, begin, end)" level="2"/>
+            <contents name="shadowed-path" title="shadowed(path)" level="2"/>
+            <contents name="shell-path-path" title="shell_path(path)" level="2"/>
+            <contents name="shell-quote-arg" title="shell_quote(arg)" level="2"/>
+            <contents name="size-variablename" title="size(variablename)" level="2"/>
+            <contents name="sort-depends-variablename-prefix" title="sort_depends(variablename, prefix)" level="2"/>
+            <contents name="sorted-variablename" title="sorted(variablename)" level="2"/>
+            <contents name="split-variablename-separator" title="split(variablename, separator)" level="2"/>
+            <contents name="sprintf-string-arguments" title="sprintf(string, arguments...)" level="2"/>
+            <contents name="str-member-arg-start-end" title="str_member(arg [, start [, end]])" level="2"/>
+            <contents name="str-size-arg" title="str_size(arg)" level="2"/>
+            <contents name="system-command-mode-stsvar" title="system(command[, mode[, stsvar]])" level="2"/>
+            <contents name="system-path-path" title="system_path(path)" level="2"/>
+            <contents name="system-quote-arg" title="system_quote(arg)" level="2"/>
+            <contents name="take-first-variablename" title="take_first(variablename)" level="2"/>
+            <contents name="take-last-variablename" title="take_last(variablename)" level="2"/>
+            <contents name="unique-variablename" title="unique(variablename)" level="2"/>
+            <contents name="upper-arg1-arg2-argn" title="upper(arg1 [, arg2 ..., argn])" level="2"/>
+            <contents name="val-escape-variablename" title="val_escape(variablename)" level="2"/>
+        </page>
+        <page name="qmake-running.html" href="qmake-running.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="477" subtype="page" title="Running qmake" fulltitle="Running qmake" subtitle="" module="QMake">
+            <target name="makefilemode" title="MakefileMode"/>
+            <target name="projectmode" title="ProjectMode"/>
+            <contents name="command-syntax" title="Command Syntax" level="1"/>
+            <contents name="operating-modes" title="Operating Modes" level="1"/>
+            <contents name="files" title="Files" level="1"/>
+            <contents name="general-options" title="General Options" level="1"/>
+            <contents name="makefile-mode-options" title="Makefile Mode Options" level="1"/>
+            <contents name="project-mode-options" title="Project Mode Options" level="1"/>
+        </page>
+        <page name="qmake-test-function-reference.html" href="qmake-test-function-reference.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="3475" subtype="page" title="Test Functions" fulltitle="Test Functions" subtitle="" module="QMake">
+            <target name="countfunction"/>
+            <target name="forfunction"/>
+            <target name="touchfunction"/>
+            <keyword name="qmake-function-reference-test-functions" title="qmake Function Reference - Test Functions"/>
+            <contents name="built-in-test-functions" title="Built-in Test Functions" level="1"/>
+            <contents name="cache-variablename-set-add-sub-transient-super-stash-source-variablename" title="cache(variablename, [set|add|sub] [transient] [super|stash], [source variablename])" level="2"/>
+            <contents name="config-config" title="CONFIG(config)" level="2"/>
+            <contents name="contains-variablename-value" title="contains(variablename, value)" level="2"/>
+            <contents name="count-variablename-number" title="count(variablename, number)" level="2"/>
+            <contents name="debug-level-message" title="debug(level, message)" level="2"/>
+            <contents name="defined-name-type" title="defined(name[, type])" level="2"/>
+            <contents name="equals-variablename-value" title="equals(variablename, value)" level="2"/>
+            <contents name="error-string" title="error(string)" level="2"/>
+            <contents name="eval-string" title="eval(string)" level="2"/>
+            <contents name="exists-filename" title="exists(filename)" level="2"/>
+            <contents name="export-variablename" title="export(variablename)" level="2"/>
+            <contents name="for-iterate-list" title="for(iterate, list)" level="2"/>
+            <contents name="greaterthan-variablename-value" title="greaterThan(variablename, value)" level="2"/>
+            <contents name="if-condition" title="if(condition)" level="2"/>
+            <contents name="include-filename" title="include(filename)" level="2"/>
+            <contents name="infile-filename-var-val" title="infile(filename, var, val)" level="2"/>
+            <contents name="isactiveconfig" title="isActiveConfig" level="2"/>
+            <contents name="isempty-variablename" title="isEmpty(variablename)" level="2"/>
+            <contents name="isequal" title="isEqual" level="2"/>
+            <contents name="lessthan-variablename-value" title="lessThan(variablename, value)" level="2"/>
+            <contents name="load-feature" title="load(feature)" level="2"/>
+            <contents name="log-message" title="log(message)" level="2"/>
+            <contents name="message-string" title="message(string)" level="2"/>
+            <contents name="mkpath-dirpath" title="mkpath(dirPath)" level="2"/>
+            <contents name="requires-condition" title="requires(condition)" level="2"/>
+            <contents name="system-command" title="system(command)" level="2"/>
+            <contents name="touch-filename-reference-filename" title="touch(filename, reference_filename)" level="2"/>
+            <contents name="unset-variablename" title="unset(variablename)" level="2"/>
+            <contents name="versionatleast-variablename-versionnumber" title="versionAtLeast(variablename, versionNumber)" level="2"/>
+            <contents name="versionatmost-variablename-versionnumber" title="versionAtMost(variablename, versionNumber)" level="2"/>
+            <contents name="warning-string" title="warning(string)" level="2"/>
+            <contents name="write-file-filename-variablename-mode" title="write_file(filename, [variablename, [mode]])" level="2"/>
+            <contents name="test-function-library" title="Test Function Library" level="1"/>
+            <contents name="packagesexist-packages" title="packagesExist(packages)" level="2"/>
+            <contents name="preparerecursivetarget-target" title="prepareRecursiveTarget(target)" level="2"/>
+            <contents name="qtcompiletest-test" title="qtCompileTest(test)" level="2"/>
+            <contents name="qthavemodule-name" title="qtHaveModule(name)" level="2"/>
+        </page>
+        <page name="qmake-precompiledheaders.html" href="qmake-precompiledheaders.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="4683" subtype="page" title="Using Precompiled Headers" fulltitle="Using Precompiled Headers" subtitle="" module="QMake">
+            <target name="introduction" title="Introduction"/>
+            <target name="add-pch" title="ADD_PCH"/>
+            <target name="project-options" title="PROJECT_OPTIONS"/>
+            <target name="example-project" title="EXAMPLE_PROJECT"/>
+            <contents name="adding-precompiled-headers-to-your-project" title="Adding Precompiled Headers to Your Project" level="1"/>
+            <contents name="project-options" title="Project Options" level="2"/>
+            <contents name="notes-on-possible-issues" title="Notes on Possible Issues" level="1"/>
+            <contents name="example-project" title="Example Project" level="1"/>
+            <contents name="mydialog-op-op-ui" title="mydialog&lt;@op&gt;.&lt;/@op&gt;ui" level="2"/>
+            <contents name="stable-op-op-h" title="stable&lt;@op&gt;.&lt;/@op&gt;h" level="2"/>
+            <contents name="myobject-op-op-h" title="myobject&lt;@op&gt;.&lt;/@op&gt;h" level="2"/>
+            <contents name="myobject-op-op-cpp" title="myobject&lt;@op&gt;.&lt;/@op&gt;cpp" level="2"/>
+            <contents name="util-op-op-cpp" title="util&lt;@op&gt;.&lt;/@op&gt;cpp" level="2"/>
+            <contents name="main-op-op-cpp" title="main&lt;@op&gt;.&lt;/@op&gt;cpp" level="2"/>
+            <contents name="precompile-op-op-pro" title="precompile&lt;@op&gt;.&lt;/@op&gt;pro" level="2"/>
+        </page>
+        <page name="qmake-variable-reference.html" href="qmake-variable-reference.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="894" subtype="page" title="Variables" fulltitle="Variables" subtitle="" module="QMake">
+            <target name="config" title="CONFIG"/>
+            <target name="defines" title="DEFINES"/>
+            <target name="def-file" title="DEF_FILE"/>
+            <target name="dependpath" title="DEPENDPATH"/>
+            <target name="destdir" title="DESTDIR"/>
+            <target name="distfiles" title="DISTFILES"/>
+            <target name="dlldestdir" title="DLLDESTDIR"/>
+            <target name="extra-translations" title="EXTRA_TRANSLATIONS"/>
+            <target name="forms" title="FORMS"/>
+            <target name="guid" title="GUID"/>
+            <target name="headers" title="HEADERS"/>
+            <target name="icon" title="ICON"/>
+            <target name="idlsources" title="IDLSOURCES"/>
+            <target name="includepath" title="INCLUDEPATH"/>
+            <target name="installs" title="INSTALLS"/>
+            <target name="leximpls" title="LEXIMPLS"/>
+            <target name="lexobjects" title="LEXOBJECTS"/>
+            <target name="lexsources" title="LEXSOURCES"/>
+            <target name="libs" title="LIBS"/>
+            <target name="libs-private" title="LIBS_PRIVATE"/>
+            <target name="literal-hash" title="LITERAL_HASH"/>
+            <target name="makefile" title="MAKEFILE"/>
+            <target name="makefile-generator" title="MAKEFILE_GENERATOR"/>
+            <target name="msvcproj" title="MSVCPROJ_*"/>
+            <target name="moc-dir" title="MOC_DIR"/>
+            <target name="objective-headers" title="OBJECTIVE_HEADERS"/>
+            <target name="objective-sources" title="OBJECTIVE_SOURCES"/>
+            <target name="objects" title="OBJECTS"/>
+            <target name="objects-dir" title="OBJECTS_DIR"/>
+            <target name="post-targetdeps" title="POST_TARGETDEPS"/>
+            <target name="pre-targetdeps" title="PRE_TARGETDEPS"/>
+            <target name="precompiled-header" title="PRECOMPILED_HEADER"/>
+            <target name="pwd" title="PWD"/>
+            <target name="out-pwd" title="OUT_PWD"/>
+            <target name="qm-files-resource-prefix" title="QM_FILES_RESOURCE_PREFIX"/>
+            <target name="qm-files-install-path" title="QM_FILES_INSTALL_PATH"/>
+            <target name="qmake-systemvariable" title="QMAKE_systemvariable"/>
+            <target name="qmakespec-systemvariable" title="QMAKESPEC_systemvariable"/>
+            <target name="qmake-ar-cmd" title="QMAKE_AR_CMD"/>
+            <target name="qmake-bundle-data" title="QMAKE_BUNDLE_DATA"/>
+            <target name="qmake-cflags-debug" title="QMAKE_CFLAGS_DEBUG"/>
+            <target name="qmake-cflags-release" title="QMAKE_CFLAGS_RELEASE"/>
+            <target name="qmake-cflags-shlib" title="QMAKE_CFLAGS_SHLIB"/>
+            <target name="qmake-cflags-thread" title="QMAKE_CFLAGS_THREAD"/>
+            <target name="qmake-cflags-warn-off" title="QMAKE_CFLAGS_WARN_OFF"/>
+            <target name="qmake-cflags-warn-on" title="QMAKE_CFLAGS_WARN_ON"/>
+            <target name="qmake-clean" title="QMAKE_CLEAN"/>
+            <target name="qmake-cxxflags-debug" title="QMAKE_CXXFLAGS_DEBUG"/>
+            <target name="qmake-cxxflags-release" title="QMAKE_CXXFLAGS_RELEASE"/>
+            <target name="qmake-cxxflags-shlib" title="QMAKE_CXXFLAGS_SHLIB"/>
+            <target name="qmake-cxxflags-thread" title="QMAKE_CXXFLAGS_THREAD"/>
+            <target name="qmake-cxxflags-warn-off" title="QMAKE_CXXFLAGS_WARN_OFF"/>
+            <target name="qmake-cxxflags-warn-on" title="QMAKE_CXXFLAGS_WARN_ON"/>
+            <target name="qmake-development-team" title="QMAKE_DEVELOPMENT_TEAM"/>
+            <target name="qmake-distclean" title="QMAKE_DISTCLEAN"/>
+            <target name="qmake-extension-shlib" title="QMAKE_EXTENSION_SHLIB"/>
+            <target name="qmake-extension-staticlib" title="QMAKE_EXTENSION_STATICLIB"/>
+            <target name="qmake-failed-requirements" title="QMAKE_FAILED_REQUIREMENTS"/>
+            <target name="qmake-framework-version" title="QMAKE_FRAMEWORK_VERSION"/>
+            <target name="qmake-host" title="QMAKE_HOST"/>
+            <target name="qmake-incdir" title="QMAKE_INCDIR"/>
+            <target name="qmake-incdir-egl" title="QMAKE_INCDIR_EGL"/>
+            <target name="qmake-incdir-opengl" title="QMAKE_INCDIR_OPENGL"/>
+            <target name="qmake-incdir-openvg" title="QMAKE_INCDIR_OPENVG"/>
+            <target name="qmake-incdir-x11" title="QMAKE_INCDIR_X11"/>
+            <target name="qmake-info-plist" title="QMAKE_INFO_PLIST"/>
+            <target name="qmake-lflags-console" title="QMAKE_LFLAGS_CONSOLE"/>
+            <target name="qmake-lrelease-flags" title="QMAKE_LRELEASE_FLAGS"/>
+            <target name="qmake-provisioning-profile" title="QMAKE_PROVISIONING_PROFILE"/>
+            <target name="qmake-target-company" title="QMAKE_TARGET_COMPANY"/>
+            <target name="qmake-target-description" title="QMAKE_TARGET_DESCRIPTION"/>
+            <target name="qmake-target-copyright" title="QMAKE_TARGET_COPYRIGHT"/>
+            <target name="qmake-target-product" title="QMAKE_TARGET_PRODUCT"/>
+            <target name="qt-version-variable" title="QT_VERSION_variable"/>
+            <target name="qt-major-version" title="QT_MAJOR_VERSION"/>
+            <target name="qt-minor-version" title="QT_MINOR_VERSION"/>
+            <target name="qt-patch-version" title="QT_PATCH_VERSION"/>
+            <target name="rc-codepage" title="RC_CODEPAGE"/>
+            <target name="rc-defines" title="RC_DEFINES"/>
+            <target name="rc-icons" title="RC_ICONS"/>
+            <target name="rc-lang" title="RC_LANG"/>
+            <target name="rcc-dir" title="RCC_DIR"/>
+            <target name="requires" title="REQUIRES"/>
+            <target name="resources" title="RESOURCES"/>
+            <target name="sources" title="SOURCES"/>
+            <target name="subdirs" title="SUBDIRS"/>
+            <target name="target" title="TARGET"/>
+            <target name="template" title="TEMPLATE"/>
+            <target name="translations" title="TRANSLATIONS"/>
+            <target name="ui-dir" title="UI_DIR"/>
+            <target name="version" title="VERSION"/>
+            <target name="winrt-manifest" title="WINRT_MANIFEST"/>
+            <target name="yaccsources" title="YACCSOURCES"/>
+            <keyword name="qmake-variable-reference" title="qmake Variable Reference"/>
+            <contents name="config" title="CONFIG" level="1"/>
+            <contents name="defines" title="DEFINES" level="1"/>
+            <contents name="def-file" title="DEF_FILE" level="1"/>
+            <contents name="dependpath" title="DEPENDPATH" level="1"/>
+            <contents name="destdir" title="DESTDIR" level="1"/>
+            <contents name="distfiles" title="DISTFILES" level="1"/>
+            <contents name="dlldestdir" title="DLLDESTDIR" level="1"/>
+            <contents name="extra-translations" title="EXTRA_TRANSLATIONS" level="1"/>
+            <contents name="forms" title="FORMS" level="1"/>
+            <contents name="guid" title="GUID" level="1"/>
+            <contents name="headers" title="HEADERS" level="1"/>
+            <contents name="icon" title="ICON" level="1"/>
+            <contents name="idlsources" title="IDLSOURCES" level="1"/>
+            <contents name="includepath" title="INCLUDEPATH" level="1"/>
+            <contents name="installs" title="INSTALLS" level="1"/>
+            <contents name="leximpls" title="LEXIMPLS" level="1"/>
+            <contents name="lexobjects" title="LEXOBJECTS" level="1"/>
+            <contents name="lexsources" title="LEXSOURCES" level="1"/>
+            <contents name="libs" title="LIBS" level="1"/>
+            <contents name="libs-private" title="LIBS_PRIVATE" level="1"/>
+            <contents name="literal-hash" title="LITERAL_HASH" level="1"/>
+            <contents name="makefile" title="MAKEFILE" level="1"/>
+            <contents name="makefile-generator" title="MAKEFILE_GENERATOR" level="1"/>
+            <contents name="msvcproj" title="MSVCPROJ_*" level="1"/>
+            <contents name="moc-dir" title="MOC_DIR" level="1"/>
+            <contents name="objective-headers" title="OBJECTIVE_HEADERS" level="1"/>
+            <contents name="objective-sources" title="OBJECTIVE_SOURCES" level="1"/>
+            <contents name="objects" title="OBJECTS" level="1"/>
+            <contents name="objects-dir" title="OBJECTS_DIR" level="1"/>
+            <contents name="post-targetdeps" title="POST_TARGETDEPS" level="1"/>
+            <contents name="pre-targetdeps" title="PRE_TARGETDEPS" level="1"/>
+            <contents name="precompiled-header" title="PRECOMPILED_HEADER" level="1"/>
+            <contents name="pwd" title="PWD" level="1"/>
+            <contents name="out-pwd" title="OUT_PWD" level="1"/>
+            <contents name="qm-files-resource-prefix" title="QM_FILES_RESOURCE_PREFIX" level="1"/>
+            <contents name="qm-files-install-path" title="QM_FILES_INSTALL_PATH" level="1"/>
+            <contents name="qmake" title="QMAKE" level="1"/>
+            <contents name="qmakespec" title="QMAKESPEC" level="1"/>
+            <contents name="qmake-ar-cmd" title="QMAKE_AR_CMD" level="1"/>
+            <contents name="qmake-bundle-data" title="QMAKE_BUNDLE_DATA" level="1"/>
+            <contents name="qmake-bundle-extension" title="QMAKE_BUNDLE_EXTENSION" level="1"/>
+            <contents name="qmake-cc" title="QMAKE_CC" level="1"/>
+            <contents name="qmake-cflags" title="QMAKE_CFLAGS" level="1"/>
+            <contents name="qmake-cflags-debug" title="QMAKE_CFLAGS_DEBUG" level="1"/>
+            <contents name="qmake-cflags-release" title="QMAKE_CFLAGS_RELEASE" level="1"/>
+            <contents name="qmake-cflags-shlib" title="QMAKE_CFLAGS_SHLIB" level="1"/>
+            <contents name="qmake-cflags-thread" title="QMAKE_CFLAGS_THREAD" level="1"/>
+            <contents name="qmake-cflags-warn-off" title="QMAKE_CFLAGS_WARN_OFF" level="1"/>
+            <contents name="qmake-cflags-warn-on" title="QMAKE_CFLAGS_WARN_ON" level="1"/>
+            <contents name="qmake-clean" title="QMAKE_CLEAN" level="1"/>
+            <contents name="qmake-cxx" title="QMAKE_CXX" level="1"/>
+            <contents name="qmake-cxxflags" title="QMAKE_CXXFLAGS" level="1"/>
+            <contents name="qmake-cxxflags-debug" title="QMAKE_CXXFLAGS_DEBUG" level="1"/>
+            <contents name="qmake-cxxflags-release" title="QMAKE_CXXFLAGS_RELEASE" level="1"/>
+            <contents name="qmake-cxxflags-shlib" title="QMAKE_CXXFLAGS_SHLIB" level="1"/>
+            <contents name="qmake-cxxflags-thread" title="QMAKE_CXXFLAGS_THREAD" level="1"/>
+            <contents name="qmake-cxxflags-warn-off" title="QMAKE_CXXFLAGS_WARN_OFF" level="1"/>
+            <contents name="qmake-cxxflags-warn-on" title="QMAKE_CXXFLAGS_WARN_ON" level="1"/>
+            <contents name="qmake-development-team" title="QMAKE_DEVELOPMENT_TEAM" level="1"/>
+            <contents name="qmake-distclean" title="QMAKE_DISTCLEAN" level="1"/>
+            <contents name="qmake-extension-shlib" title="QMAKE_EXTENSION_SHLIB" level="1"/>
+            <contents name="qmake-extension-staticlib" title="QMAKE_EXTENSION_STATICLIB" level="1"/>
+            <contents name="qmake-ext-moc" title="QMAKE_EXT_MOC" level="1"/>
+            <contents name="qmake-ext-ui" title="QMAKE_EXT_UI" level="1"/>
+            <contents name="qmake-ext-prl" title="QMAKE_EXT_PRL" level="1"/>
+            <contents name="qmake-ext-lex" title="QMAKE_EXT_LEX" level="1"/>
+            <contents name="qmake-ext-yacc" title="QMAKE_EXT_YACC" level="1"/>
+            <contents name="qmake-ext-obj" title="QMAKE_EXT_OBJ" level="1"/>
+            <contents name="qmake-ext-cpp" title="QMAKE_EXT_CPP" level="1"/>
+            <contents name="qmake-ext-h" title="QMAKE_EXT_H" level="1"/>
+            <contents name="qmake-extra-compilers" title="QMAKE_EXTRA_COMPILERS" level="1"/>
+            <contents name="qmake-extra-targets" title="QMAKE_EXTRA_TARGETS" level="1"/>
+            <contents name="qmake-failed-requirements" title="QMAKE_FAILED_REQUIREMENTS" level="1"/>
+            <contents name="qmake-framework-bundle-name" title="QMAKE_FRAMEWORK_BUNDLE_NAME" level="1"/>
+            <contents name="qmake-framework-version" title="QMAKE_FRAMEWORK_VERSION" level="1"/>
+            <contents name="qmake-host" title="QMAKE_HOST" level="1"/>
+            <contents name="qmake-incdir" title="QMAKE_INCDIR" level="1"/>
+            <contents name="qmake-incdir-egl" title="QMAKE_INCDIR_EGL" level="1"/>
+            <contents name="qmake-incdir-opengl" title="QMAKE_INCDIR_OPENGL" level="1"/>
+            <contents name="qmake-incdir-opengl-es2" title="QMAKE_INCDIR_OPENGL_ES2" level="1"/>
+            <contents name="qmake-incdir-openvg" title="QMAKE_INCDIR_OPENVG" level="1"/>
+            <contents name="qmake-incdir-x11" title="QMAKE_INCDIR_X11" level="1"/>
+            <contents name="qmake-info-plist" title="QMAKE_INFO_PLIST" level="1"/>
+            <contents name="qmake-ios-deployment-target" title="QMAKE_IOS_DEPLOYMENT_TARGET" level="1"/>
+            <contents name="qmake-lflags" title="QMAKE_LFLAGS" level="1"/>
+            <contents name="qmake-lflags-console" title="QMAKE_LFLAGS_CONSOLE" level="1"/>
+            <contents name="qmake-lflags-debug" title="QMAKE_LFLAGS_DEBUG" level="1"/>
+            <contents name="qmake-lflags-plugin" title="QMAKE_LFLAGS_PLUGIN" level="1"/>
+            <contents name="qmake-lflags-rpath" title="QMAKE_LFLAGS_RPATH" level="1"/>
+            <contents name="qmake-lflags-rel-rpath" title="QMAKE_LFLAGS_REL_RPATH" level="1"/>
+            <contents name="qmake-rel-rpath-base" title="QMAKE_REL_RPATH_BASE" level="1"/>
+            <contents name="qmake-lflags-rpathlink" title="QMAKE_LFLAGS_RPATHLINK" level="1"/>
+            <contents name="qmake-lflags-release" title="QMAKE_LFLAGS_RELEASE" level="1"/>
+            <contents name="qmake-lflags-app" title="QMAKE_LFLAGS_APP" level="1"/>
+            <contents name="qmake-lflags-shlib" title="QMAKE_LFLAGS_SHLIB" level="1"/>
+            <contents name="qmake-lflags-soname" title="QMAKE_LFLAGS_SONAME" level="1"/>
+            <contents name="qmake-lflags-thread" title="QMAKE_LFLAGS_THREAD" level="1"/>
+            <contents name="qmake-lflags-windows" title="QMAKE_LFLAGS_WINDOWS" level="1"/>
+            <contents name="qmake-libdir" title="QMAKE_LIBDIR" level="1"/>
+            <contents name="qmake-libdir-post" title="QMAKE_LIBDIR_POST" level="1"/>
+            <contents name="qmake-libdir-flags" title="QMAKE_LIBDIR_FLAGS" level="1"/>
+            <contents name="qmake-libdir-egl" title="QMAKE_LIBDIR_EGL" level="1"/>
+            <contents name="qmake-libdir-opengl" title="QMAKE_LIBDIR_OPENGL" level="1"/>
+            <contents name="qmake-libdir-openvg" title="QMAKE_LIBDIR_OPENVG" level="1"/>
+            <contents name="qmake-libdir-x11" title="QMAKE_LIBDIR_X11" level="1"/>
+            <contents name="qmake-libs" title="QMAKE_LIBS" level="1"/>
+            <contents name="qmake-libs-private" title="QMAKE_LIBS_PRIVATE" level="1"/>
+            <contents name="qmake-libs-egl" title="QMAKE_LIBS_EGL" level="1"/>
+            <contents name="qmake-libs-opengl" title="QMAKE_LIBS_OPENGL" level="1"/>
+            <contents name="qmake-libs-opengl-es1-qmake-libs-opengl-es2" title="QMAKE_LIBS_OPENGL_ES1, QMAKE_LIBS_OPENGL_ES2" level="1"/>
+            <contents name="qmake-libs-openvg" title="QMAKE_LIBS_OPENVG" level="1"/>
+            <contents name="qmake-libs-thread" title="QMAKE_LIBS_THREAD" level="1"/>
+            <contents name="qmake-libs-x11" title="QMAKE_LIBS_X11" level="1"/>
+            <contents name="qmake-lib-flag" title="QMAKE_LIB_FLAG" level="1"/>
+            <contents name="qmake-link" title="QMAKE_LINK" level="1"/>
+            <contents name="qmake-link-shlib-cmd" title="QMAKE_LINK_SHLIB_CMD" level="1"/>
+            <contents name="qmake-ln-shlib" title="QMAKE_LN_SHLIB" level="1"/>
+            <contents name="qmake-lrelease-flags" title="QMAKE_LRELEASE_FLAGS" level="1"/>
+            <contents name="qmake-objective-cflags" title="QMAKE_OBJECTIVE_CFLAGS" level="1"/>
+            <contents name="qmake-post-link" title="QMAKE_POST_LINK" level="1"/>
+            <contents name="qmake-pre-link" title="QMAKE_PRE_LINK" level="1"/>
+            <contents name="qmake-project-name" title="QMAKE_PROJECT_NAME" level="1"/>
+            <contents name="qmake-provisioning-profile" title="QMAKE_PROVISIONING_PROFILE" level="1"/>
+            <contents name="qmake-mac-sdk" title="QMAKE_MAC_SDK" level="1"/>
+            <contents name="qmake-macosx-deployment-target" title="QMAKE_MACOSX_DEPLOYMENT_TARGET" level="1"/>
+            <contents name="qmake-makefile" title="QMAKE_MAKEFILE" level="1"/>
+            <contents name="qmake-qmake" title="QMAKE_QMAKE" level="1"/>
+            <contents name="qmake-resource-flags" title="QMAKE_RESOURCE_FLAGS" level="1"/>
+            <contents name="qmake-rpathdir" title="QMAKE_RPATHDIR" level="1"/>
+            <contents name="qmake-rpathlinkdir" title="QMAKE_RPATHLINKDIR" level="1"/>
+            <contents name="qmake-run-cc" title="QMAKE_RUN_CC" level="1"/>
+            <contents name="qmake-run-cc-imp" title="QMAKE_RUN_CC_IMP" level="1"/>
+            <contents name="qmake-run-cxx" title="QMAKE_RUN_CXX" level="1"/>
+            <contents name="qmake-run-cxx-imp" title="QMAKE_RUN_CXX_IMP" level="1"/>
+            <contents name="qmake-soname-prefix" title="QMAKE_SONAME_PREFIX" level="1"/>
+            <contents name="qmake-target" title="QMAKE_TARGET" level="1"/>
+            <contents name="qmake-target-company" title="QMAKE_TARGET_COMPANY" level="1"/>
+            <contents name="qmake-target-description" title="QMAKE_TARGET_DESCRIPTION" level="1"/>
+            <contents name="qmake-target-copyright" title="QMAKE_TARGET_COPYRIGHT" level="1"/>
+            <contents name="qmake-target-product" title="QMAKE_TARGET_PRODUCT" level="1"/>
+            <contents name="qmake-tvos-deployment-target" title="QMAKE_TVOS_DEPLOYMENT_TARGET" level="1"/>
+            <contents name="qmake-uic-flags" title="QMAKE_UIC_FLAGS" level="1"/>
+            <contents name="qmake-watchos-deployment-target" title="QMAKE_WATCHOS_DEPLOYMENT_TARGET" level="1"/>
+            <contents name="qt" title="QT" level="1"/>
+            <contents name="qtplugin" title="QTPLUGIN" level="1"/>
+            <contents name="qt-version" title="QT_VERSION" level="1"/>
+            <contents name="qt-major-version" title="QT_MAJOR_VERSION" level="1"/>
+            <contents name="qt-minor-version" title="QT_MINOR_VERSION" level="1"/>
+            <contents name="qt-patch-version" title="QT_PATCH_VERSION" level="1"/>
+            <contents name="rc-file" title="RC_FILE" level="1"/>
+            <contents name="rc-codepage" title="RC_CODEPAGE" level="1"/>
+            <contents name="rc-defines" title="RC_DEFINES" level="1"/>
+            <contents name="rc-icons" title="RC_ICONS" level="1"/>
+            <contents name="rc-lang" title="RC_LANG" level="1"/>
+            <contents name="rc-includepath" title="RC_INCLUDEPATH" level="1"/>
+            <contents name="rcc-dir" title="RCC_DIR" level="1"/>
+            <contents name="requires" title="REQUIRES" level="1"/>
+            <contents name="resources" title="RESOURCES" level="1"/>
+            <contents name="res-file" title="RES_FILE" level="1"/>
+            <contents name="sources" title="SOURCES" level="1"/>
+            <contents name="subdirs" title="SUBDIRS" level="1"/>
+            <contents name="target" title="TARGET" level="1"/>
+            <contents name="target-ext" title="TARGET_EXT" level="1"/>
+            <contents name="target-x" title="TARGET_x" level="1"/>
+            <contents name="target-x-y-z" title="TARGET_x.y.z" level="1"/>
+            <contents name="template" title="TEMPLATE" level="1"/>
+            <contents name="translations" title="TRANSLATIONS" level="1"/>
+            <contents name="ui-dir" title="UI_DIR" level="1"/>
+            <contents name="version" title="VERSION" level="1"/>
+            <contents name="version-pe-header" title="VERSION_PE_HEADER" level="1"/>
+            <contents name="ver-maj" title="VER_MAJ" level="1"/>
+            <contents name="ver-min" title="VER_MIN" level="1"/>
+            <contents name="ver-pat" title="VER_PAT" level="1"/>
+            <contents name="vpath" title="VPATH" level="1"/>
+            <contents name="winrt-manifest" title="WINRT_MANIFEST" level="1"/>
+            <contents name="yaccsources" title="YACCSOURCES" level="1"/>
+            <contents name="pro-file" title="_PRO_FILE_" level="1"/>
+            <contents name="pro-file-pwd" title="_PRO_FILE_PWD_" level="1"/>
+        </page>
+        <page name="qmake-language.html" href="qmake-language.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="4029" subtype="page" title="qmake Language" fulltitle="qmake Language" subtitle="" module="QMake">
+            <target name="scopes" title="Scopes"/>
+            <target name="usingvariables" title="UsingVariables"/>
+            <target name="usingreplacefunctions" title="UsingReplaceFunctions"/>
+            <target name="usingtestfunctions" title="UsingTestFunctions"/>
+            <contents name="operators" title="Operators" level="1"/>
+            <contents name="assigning-values" title="Assigning Values" level="2"/>
+            <contents name="appending-values" title="Appending Values" level="2"/>
+            <contents name="removing-values" title="Removing Values" level="2"/>
+            <contents name="adding-unique-values" title="Adding Unique Values" level="2"/>
+            <contents name="replacing-values" title="Replacing Values" level="2"/>
+            <contents name="variable-expansion" title="Variable Expansion" level="2"/>
+            <contents name="accessing-qmake-properties" title="Accessing qmake Properties" level="2"/>
+            <contents name="scopes" title="Scopes" level="1"/>
+            <contents name="scope-syntax" title="Scope Syntax" level="2"/>
+            <contents name="scopes-and-conditions" title="Scopes and Conditions" level="2"/>
+            <contents name="configuration-and-scopes" title="Configuration and Scopes" level="2"/>
+            <contents name="platform-scope-values" title="Platform Scope Values" level="2"/>
+            <contents name="variables" title="Variables" level="1"/>
+            <contents name="replace-functions" title="Replace Functions" level="1"/>
+            <contents name="test-functions" title="Test Functions" level="1"/>
+        </page>
+        <page name="qmake-manual.html" href="qmake-manual.html" status="active" location="qmake-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qtbase/qmake/doc/src/qmake-manual.qdoc" lineno="28" subtype="page" title="qmake Manual" fulltitle="qmake Manual" subtitle="" module="QMake" groups="qttools">
+            <keyword name="qmake"/>
+            <contents name="table-of-contents" title="Table of Contents" level="1"/>
+        </page>
+        <group name="qttools" href="qttools.html" status="internal" seen="false" title="" members="qmake-manual.html"/>
+    </namespace>
+</INDEX>

@@ -160,7 +160,7 @@ Window {
         }
         Controls.MenuItem {
             text: '退出程序'
-            onTriggered: Qt.quit()
+            onTriggered: Util.exit()
         }
     }
 
@@ -189,7 +189,7 @@ Window {
         }
         MenuItem {
             text: '退出程序'
-            onTriggered: Qt.quit()
+            onTriggered: Util.exit()
         }
     }
     // 系统托盘

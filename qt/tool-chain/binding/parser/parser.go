@@ -50,7 +50,12 @@ func LoadModules() {
 	}
 }
 
+var mu sync.Mutex
+
 func LoadModule(m string) *Module {
+	//defer os.Exit(0)
+	//mu.Lock()
+	//defer mu.Unlock()
 	var (
 		logName   = "parser.LoadModule"
 		logFields = logrus.Fields{"module": m}
@@ -72,7 +77,7 @@ func LoadModule(m string) *Module {
 		err = xml.Unmarshal([]byte(utils.LoadOptional(filepath.Join(strings.TrimSpace(utils.RunCmdOptional(utils.GoList("{{.Dir}}", "github.com/peterq/pan-light/qt/tool-chain/binding/files/docs/5.8.0"), "get doc dir")), fmt.Sprintf("qt%v.index", strings.ToLower(m))))), &module)
 
 	case utils.QT_MXE():
-		err = xml.Unmarshal([]byte(utils.LoadOptional(filepath.Join(strings.TrimSpace(utils.RunCmdOptional(utils.GoList("{{.Dir}}", "github.com/peterq/pan-light/qt/tool-chain/binding/files/docs/"+utils.QT_API("5.12.0")), "get doc dir")), fmt.Sprintf("qt%v.index", strings.ToLower(m))))), &module)
+		err = xml.Unmarshal([]byte(utils.LoadOptional(filepath.Join("../qt/tool-chain/binding/files/docs/5.12.0", fmt.Sprintf("qt%v.index", strings.ToLower(m))))), &module)
 
 	case utils.QT_HOMEBREW():
 		err = xml.Unmarshal([]byte(utils.LoadOptional(filepath.Join(strings.TrimSpace(utils.RunCmdOptional(utils.GoList("{{.Dir}}", "github.com/peterq/pan-light/qt/tool-chain/binding/files/docs/"+utils.QT_API("5.12.0")), "get doc dir")), fmt.Sprintf("qt%v.index", strings.ToLower(m))))), &module)

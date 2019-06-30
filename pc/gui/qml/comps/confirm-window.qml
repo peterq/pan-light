@@ -22,7 +22,8 @@ Window {
     }
     height: msg.implicitHeight + 24 + 150
 
-    flags: Qt.Dialog | Qt.WindowModal | Qt.WindowCloseButtonHint
+    flags: Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
+            | Qt.WindowModal | Qt.Dialog
     modality: Qt.WindowModal
 
     Dialog {

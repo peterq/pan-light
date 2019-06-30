@@ -19,6 +19,24 @@ func StartGui() {
 	core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
 	quick.QQuickWindow_SetDefaultAlphaBuffer(true) // 悬浮窗需要此设置
 
+	// 下面2句话居然能解决windows 异常退出的bug
+	core.QCoreApplication_SetOrganizationName("PeterQ") //needed to fix an QML Settings issue on windows
+	if os.Getenv("pan_light_render_exception_fix") == "true" {
+		quick.QQuickWindow_SetSceneGraphBackend(quick.QSGRendererInterface__Software)
+	}
+
+	//rccFile := "E:\\pan-light\\qml.rcc"
+	//bin, _ := ioutil.ReadFile(rccFile)
+	//go func() {
+	//	for range time.Tick(2 * time.Second) {
+	//		n, _ := ioutil.ReadFile(rccFile)
+	//		if !bytes.Equal(bin, n) {
+	//			os.Exit(2)
+	//		}
+	//	}
+	//}()
+	//core.QResource_RegisterResource(rccFile, "/")
+
 	app := gui.NewQGuiApplication(len(os.Args), os.Args)
 
 	engine := qml.NewQQmlApplicationEngine(nil)

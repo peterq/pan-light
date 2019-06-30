@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QDOCINDEX>
+<INDEX url="http://doc.qt.io/qt-5" title="Qt Distance Field Generator Manual" version="" project="QtDistanceFieldGenerator" indexTitle="Qt Distance Field Generator Manual">
+    <namespace threadsafety="unspecified" name="" status="active" access="public" documented="false" module="qtdistancefieldgenerator">
+        <page name="qtdistancefieldgenerator-index.html" href="qtdistancefieldgenerator-index.html" status="active" location="distancefieldgenerator-manual.qdoc" filepath="/home/qt/work/qt/tqtc-qt5/qttools/src/distancefieldgenerator/doc/src/distancefieldgenerator-manual.qdoc" lineno="28" subtype="page" title="Qt Distance Field Generator Manual" fulltitle="Qt Distance Field Generator Manual" subtitle="" module="QtDistanceFieldGenerator" groups="qttools">
+            <contents name="general-usage" title="General Usage" level="1"/>
+            <contents name="selecting-glyphs" title="Selecting Glyphs" level="1"/>
+            <contents name="using-the-file" title="Using the File" level="1"/>
+            <contents name="measuring-performance" title="Measuring performance" level="1"/>
+        </page>
+        <group name="qttools" href="qttools.html" status="internal" seen="false" title="" members="qtdistancefieldgenerator-index.html"/>
+    </namespace>
+</INDEX>

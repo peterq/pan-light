@@ -18,7 +18,14 @@ FileDialog {
         console.log(v)
     }
     onAccepted: {
-        resolve(file)
+        console.log(file.toString())
+        var savePath = file.toString().replace('file://'
+                                               + (Qt.platform.os == "windows" ? '/' : '')
+                                               , '')
+        if (Qt.platform.os == "windows") {
+            savePath = savePath.split('/').join('\\')
+        }
+        resolve(savePath)
     }
     onRejected: {
         reject('用户取消选择保存路径')

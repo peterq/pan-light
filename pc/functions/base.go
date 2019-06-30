@@ -35,8 +35,13 @@ var baseSyncRoutes = map[string]syncHandler{
 	},
 	// 重启
 	"reboot": func(p map[string]interface{}) (result interface{}) {
+		dep.Reboot()
+		return
+	},
+	// 退出
+	"exit": func(p map[string]interface{}) (result interface{}) {
 		dep.DoClose()
-		os.Exit(2)
+		os.Exit(0)
 		return
 	},
 	// config
@@ -51,8 +56,7 @@ var baseSyncRoutes = map[string]syncHandler{
 			storage.UserState.Logout = true
 		}
 		storage.Global.CurrentUser = "default"
-		dep.DoClose()
-		os.Exit(2)
+		dep.Reboot()
 		return
 	},
 	// 账号列表
@@ -69,8 +73,7 @@ var baseSyncRoutes = map[string]syncHandler{
 	// 切换账号
 	"account.change": func(p map[string]interface{}) (result interface{}) {
 		storage.Global.CurrentUser = p["username"].(string)
-		dep.DoClose()
-		os.Exit(2)
+		dep.Reboot()
 		return
 	},
 }

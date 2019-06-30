@@ -7,7 +7,8 @@ Window {
     maximumHeight: height
     minimumWidth: width
     maximumWidth: width
-    flags: Qt.Dialog | Qt.WindowModal |Qt.WindowCloseButtonHint
+    flags: Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
+           | Qt.WindowModal | Qt.Dialog
     visible: false
     modality: Qt.WindowModal
 }

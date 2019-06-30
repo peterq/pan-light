@@ -1,0 +1,89 @@
+{
+  "title": "pan-light doc",
+  "description": "pan-light 技术文档",
+  "author": "PeterQ<me@peterq.cn>",
+  "generator": "site",
+  "language": "zh-hans",
+  "gitbook": "3.2.3",
+  "styles": {
+    "website": "styles/website.css"
+  },
+  "links": {
+    "sidebar": {
+      "<i class='fa fa-fw fa-qq'></i> <strong> 开发者交流群 438604465</strong>": "https://jq.qq.com/?_wv=1027&k=52HpwTS"
+    }
+  },
+  "plugins": [
+    "-lunr",
+    "-search",
+    "-highlight",
+    "-fontsettings",
+    "-sharing",
+    "sharing-plus",
+    "prism",
+    "prism-themes",
+    "edit-link",
+    "anchors",
+    "anchor-navigation-ex",
+    "github",
+    "search-plus",
+    "expand-active-chapter",
+    "expandable-chapters-interactive",
+    "theme-comscore",
+    "footer",
+    "github-buttons"
+  ],
+  "pluginsConfig": {
+    "sharing": {
+      "douban": false,
+      "facebook": false,
+      "google": false,
+      "hatenaBookmark": false,
+      "instapaper": false,
+      "line": false,
+      "linkedin": false,
+      "messenger": false,
+      "pocket": false,
+      "qq": false,
+      "qzone": false,
+      "stumbleupon": false,
+      "twitter": false,
+      "viber": false,
+      "vk": false,
+      "weibo": false,
+      "whatsapp": false,
+      "all": [
+        "google", "facebook", "weibo", "twitter",
+        "qq", "qzone", "linkedin", "pocket"
+      ]
+    },
+    "edit-link": {
+      "base": "https://github.com/peterq/pan-light/edit/master/doc/",
+      "label": "编辑本页面"
+    },
+    "github": {
+      "url": "https://github.com/peterq/pan-light"
+    },
+    "github-buttons": {
+      "buttons": [{
+        "user": "peterq",
+        "repo": "pan-light",
+        "type": "star",
+        "size": "small",
+        "count": true
+      }
+      ]
+    },
+    "prism": {
+      "css": [
+        "prism-themes/themes/prism-vs.css"
+      ]
+    },
+    "layout": {
+      "footerPath": "styles/footer.html"
+    },
+    "anchor-navigation-ex": {
+      "showLevel": false
+    }
+  }
+}

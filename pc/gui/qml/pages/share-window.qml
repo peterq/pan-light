@@ -8,7 +8,8 @@ import "../widget"
 
 Window {
     id: window
-    flags: Qt.Dialog | Qt.WindowModal | Qt.WindowCloseButtonHint
+    flags: Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
+           | Qt.WindowModal | Qt.Dialog
     modality: Qt.ApplicationModal
     title: '分享到资源广场'
     minimumHeight: height

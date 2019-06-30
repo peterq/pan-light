@@ -24,6 +24,7 @@ Item {
     property var transferComp: null
     property var downloadingListComp: null
     property var floatWindow: null
+    property var globalRightMenu: null
     property alias settings: settings
 
     DataSaver {

@@ -1,12 +1,15 @@
 .pragma library
 
 .import "./util.js" as Util
+.import "./global.js" as G
 
 // 响应式状态机
 var appState = (function () {
     var comp = Qt.createComponent('./appState.qml')
     return comp.createObject()
 })()
+
+G.appState = appState
 
 // 加载首页
 Util.event.once('init.api.ok', function (loginSession) {

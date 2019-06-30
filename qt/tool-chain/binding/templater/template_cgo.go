@@ -83,7 +83,7 @@ func cgoSailfish(module, mocPath string, mode int, pkg string, libs []string) {
 	fmt.Fprint(bb, "#cgo CFLAGS: -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -m32 -msse -msse2 -march=i686 -mfpmath=sse -mtune=generic -fno-omit-frame-pointer -fasynchronous-unwind-tables -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -W -D_REENTRANT -fPIC\n")
 	fmt.Fprint(bb, "#cgo CXXFLAGS: -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -m32 -msse -msse2 -march=i686 -mfpmath=sse -mtune=generic -fno-omit-frame-pointer -fasynchronous-unwind-tables -std=gnu++0x -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -W -D_REENTRANT -fPIC\n")
 
-	fmt.Fprint(bb, "#cgo CXXFLAGS: -DQT_NO_DEBUG")
+	//fmt.Fprint(bb, "#cgo CXXFLAGS: -DQT_NO_DEBUG")
 	for _, m := range libs {
 		fmt.Fprintf(bb, " -DQT_%v_LIB", strings.ToUpper(m))
 	}
@@ -192,7 +192,7 @@ func cgoAsteroid(module, mocPath string, mode int, pkg string) {
 	fmt.Fprint(bb, "#cgo CFLAGS: -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types -fexceptions -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -fmessage-length=0 -march=armv7ve -mfloat-abi=softfp -mfpu=neon -mthumb -Wno-psabi -fPIC -fvisibility=hidden -Wall -W -D_REENTRANT -fPIE\n")
 	fmt.Fprint(bb, "#cgo CXXFLAGS: -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types -fexceptions -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -fmessage-length=0 -march=armv7ve -mfloat-abi=softfp -mfpu=neon -mthumb -Wno-psabi -fPIC -fvisibility=hidden -Wall -W -D_REENTRANT -fPIE\n")
 
-	fmt.Fprint(bb, "#cgo CXXFLAGS: -DQT_NO_DEBUG")
+	//fmt.Fprint(bb, "#cgo CXXFLAGS: -DQT_NO_DEBUG")
 	for _, m := range libs {
 		fmt.Fprintf(bb, " -DQT_%v_LIB", strings.ToUpper(m))
 	}
