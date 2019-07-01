@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/peterq/pan-light/qt/tool-chain/binding/parser"
 	"os"
 	"runtime"
 	"strings"
@@ -92,6 +93,8 @@ func main() {
 	if target == "js" || target == "wasm" { //TODO: remove for module support + resolve dependencies
 		os.Setenv("GOCACHE", "off")
 	}
+
+	parser.State.Target = target
 
 	switch mode {
 	case "prep":
