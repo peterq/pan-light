@@ -60,36 +60,9 @@ setWsFactory(function (uri, protocols) {
         // return proxyWs(host.wsAgentUrl + '?slave=' + slave, protocols)
         return new ProxyWebSocket(host.wsAgentUrl + '?slave=' + slave, protocols)
     }
-    new RtcWebSocket
+    return new RtcWebSocket(uri, protocols)
 })
 
-function proxyWs(u, p) {
-    let ws = new WebSocket(u, p)
-    let fake = {
-        connected: false,
-        onmessage: null,
-    }
-    ws.onmessage = function (evt) {
-        console.log(evt.data)
-        ws.onmessage = fake.onmessage
-    }
-    return new Proxy(ws, {
-        get: function (target, key, receiver) {
-            return Reflect.get(target, key, receiver)
-        },
-        set: function (target, key, value, receiver) {
-            if (key === 'onmessage') {
-                if (fake.connected) {
-                    return Reflect.set(target, key, value, receiver)
-                } else {
-                    fake.onmessage = value
-                    return true
-                }
-            }
-            return Reflect.set(target, key, value, receiver)
-        }
-    })
-}
 
 const connectionRequestMap = {}
 console.log(process.env)
