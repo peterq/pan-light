@@ -14,10 +14,12 @@ import (
 )
 
 var host = &struct {
-	name       string
-	password   string
-	wsAddr     string
-	slaveCount int
+	name        string
+	password    string
+	wsAddr      string
+	slaveCount  int
+	wsAgentPort string
+	wsAgentAddr string
 
 	slaves []string
 
@@ -36,6 +38,8 @@ func Start() {
 	host.name = env("host_name")
 	host.password = env("host_password")
 	host.wsAddr = env("ws_addr")
+	host.wsAgentPort = env("ws_agent_port")
+	host.wsAgentAddr = env("ws_agent_addr")
 	var err error
 	host.slaveCount, err = strconv.Atoi(env("slave_count"))
 	if err != nil {
@@ -50,6 +54,10 @@ func Start() {
 	}
 	rt.Init()
 	rt.RegisterEventListener(eventHandlers)
+
+	if host.wsAgentPort != "" {
+		startWsAgentServer()
+	}
 	select {}
 }
 
@@ -75,7 +83,8 @@ func startServe() {
 		host.slaves[i] = host.name + ".slave." + strconv.Itoa(i)
 	}
 	_, err := rt.Call("slave.register", gson{
-		"slaves": host.slaves,
+		"slaves":       host.slaves,
+		"ws_agent_url": host.wsAgentAddr,
 	})
 	if err != nil {
 		log.Println("注册slave失败", err)

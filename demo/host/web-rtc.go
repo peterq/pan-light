@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 )
@@ -47,10 +48,22 @@ func handleNewUser(cand, sessionId, requestId string) {
 	if err != nil {
 		log.Println("cand 解码错误", err)
 	}
+	t := strings.Split(remoteSd.SDP, "\n")
+	var t2 []string
+	for _, s := range t {
+		if strings.Contains(s, "a=candidate:") &&
+			strings.Contains(s, "local") {
+			continue
+		}
+		t2 = append(t2, s)
+	}
+	remoteSd.SDP = strings.Join(t2, "\n")
+	//log.Println(remoteSd)
+	log.Println("rtc new", sessionId)
 	ctx, cancel := context.WithCancel(context.Background())
 	peerConnection, err := webRtcApi.NewPeerConnection(webRtcConfig)
 	if err != nil {
-		log.Println(err)
+		log.Println("rtc connection error", err)
 		return
 	}
 
@@ -98,6 +111,7 @@ func handleNewUser(cand, sessionId, requestId string) {
 		"requestId": requestId,
 		"sessionId": sessionId,
 	})
+	log.Println("rtc send answer", sessionId)
 
 	go func() {
 		time.Sleep(10 * time.Second)

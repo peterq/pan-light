@@ -2,8 +2,10 @@ package instance
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/peterq/pan-light/demo/realtime"
 	"github.com/pkg/errors"
+	"golang.org/x/net/websocket"
 	"io"
 	"log"
 	"net"
@@ -221,6 +223,72 @@ func (h *Holder) VncProxy(rw io.ReadWriteCloser, proxyCb func(err error)) {
 	go WriteLoop(rw)
 	<-ctx.Done()
 	log.Println("proxy gone rw", rw)
+}
+
+func (h *Holder) WsProxy(userConn *websocket.Conn) {
+	defer userConn.Close()
+	var addr string
+	func() {
+		h.vncAddrLock.Lock()
+		defer h.vncAddrLock.Unlock()
+		for h.vncAddr == "" {
+			log.Println("ws proxy 等待docker ip")
+			h.vncAddrCond.Wait()
+		}
+		addr = h.vncAddr
+	}()
+
+	tcpAddr, _ := net.ResolveTCPAddr("tcp4", addr)
+	vncConn, err := net.DialTCP("tcp", nil, tcpAddr)
+	if err != nil {
+		log.Printf("connection failed: %v\n", err)
+		bin, _ := json.Marshal(gson{
+			"proxyOk": false,
+			"message": "连接docker内部vnc出错",
+		})
+		userConn.Write(bin)
+		return
+	}
+	defer vncConn.Close()
+
+	bin, _ := json.Marshal(gson{
+		"proxyOk": true,
+		"message": "连接成功",
+	})
+	userConn.Write(bin)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	var ReadLoop = func() {
+		for {
+			var msg []byte
+			err := websocket.Message.Receive(userConn, &msg)
+			if err != nil {
+				log.Println("ws agent read from user err:", err)
+				cancel()
+				return
+			}
+			vncConn.Write(msg)
+		}
+	}
+
+	var WriteLoop = func() {
+		for {
+			msg := make([]byte, 1024)
+			l, err := vncConn.Read(msg)
+			if err != nil {
+				log.Println("ws agent read from vnc err:", err)
+				cancel()
+				return
+			}
+			websocket.Message.Send(userConn, msg[:l])
+		}
+	}
+
+	log.Println("ws proxy start", h.SlaveName)
+	go ReadLoop()
+	go WriteLoop()
+	<-ctx.Done()
+	log.Println("ws proxy gone", h.SlaveName)
 }
 
 // 处理 slave 发来的消息

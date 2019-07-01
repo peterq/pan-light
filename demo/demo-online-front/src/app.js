@@ -4,6 +4,9 @@ import Vue from "vue"
 import State, {dataTemplate} from "./util/state"
 import {registerProxyChannelResolver} from "./lib/vnc/core/RtcWebSocket"
 import whatJpg from './assets/what.jpeg'
+import {setWsFactory} from "./lib/vnc/core/websock"
+import RtcWebSocket from "./lib/vnc/core/RtcWebSocket"
+import ProxyWebSocket from "./lib/vnc/core/ProxyWebSocket"
 
 // const $rt = new RealTime('ws://localhost:8001/demo/ws')
 
@@ -43,6 +46,50 @@ registerProxyChannelResolver(async function (uri) {
     console.log(host)
     return await host.vncProxyChanel(slave, method === 'view')
 })
+
+setWsFactory(function (uri, protocols) {
+    uri = uri.replace('ws://', '').replace('wss://', '')
+    let [hostName, slave] = uri.split('/')
+    let host = $state.hosts.find(function (host) {
+        return host.name === hostName
+    })
+    if (!host)
+        throw new Error('host not found in host list: ' + hostName)
+    if (host.wsAgentUrl) {
+        // return new WebSocket('ws://172.17.0.2:5901', protocols)
+        // return proxyWs(host.wsAgentUrl + '?slave=' + slave, protocols)
+        return new ProxyWebSocket(host.wsAgentUrl + '?slave=' + slave, protocols)
+    }
+    new RtcWebSocket
+})
+
+function proxyWs(u, p) {
+    let ws = new WebSocket(u, p)
+    let fake = {
+        connected: false,
+        onmessage: null,
+    }
+    ws.onmessage = function (evt) {
+        console.log(evt.data)
+        ws.onmessage = fake.onmessage
+    }
+    return new Proxy(ws, {
+        get: function (target, key, receiver) {
+            return Reflect.get(target, key, receiver)
+        },
+        set: function (target, key, value, receiver) {
+            if (key === 'onmessage') {
+                if (fake.connected) {
+                    return Reflect.set(target, key, value, receiver)
+                } else {
+                    fake.onmessage = value
+                    return true
+                }
+            }
+            return Reflect.set(target, key, value, receiver)
+        }
+    })
+}
 
 const connectionRequestMap = {}
 console.log(process.env)

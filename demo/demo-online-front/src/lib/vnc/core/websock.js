@@ -21,6 +21,14 @@ import RtcWebSocket from "./RtcWebSocket"
 const ENABLE_COPYWITHIN = false;
 const MAX_RQ_GROW_SIZE = 40 * 1024 * 1024;  // 40 MiB
 
+let wsFactory = function (uri, protocols) {
+    return new WebSocket(uri, protocols)
+}
+
+export function setWsFactory(f) {
+    wsFactory = f
+}
+
 export default class Websock {
     constructor() {
         this._websocket = null;  // WebSocket object
@@ -182,7 +190,7 @@ export default class Websock {
     open(uri, protocols) {
         this.init();
 
-        this._websocket = new RtcWebSocket(uri, protocols);
+        this._websocket = wsFactory(uri, protocols);
         this._websocket.binaryType = 'arraybuffer';
 
         this._websocket.onmessage = this._recv_message.bind(this);

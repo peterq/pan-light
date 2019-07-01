@@ -71,6 +71,7 @@ var hostRpcMap = map[string]realtime.RpcHandler{
 			host.slaves[name.(string)] = slave
 			manager.slaveMap[name.(string)] = slave
 		}
+		host.wsAgentUrl = p["ws_agent_url"].(string)
 		return
 	}),
 	"host.hello": realtime.RpcHandleFunc(func(ss *realtime.Session, p gson) (result interface{}, err error) {

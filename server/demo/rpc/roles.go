@@ -12,9 +12,10 @@ type roleType interface {
 }
 
 type roleHost struct {
-	name    string
-	session *realtime.Session
-	slaves  map[string]*roleSlave
+	name       string
+	session    *realtime.Session
+	wsAgentUrl string
+	slaves     map[string]*roleSlave
 }
 
 func (*roleHost) publicInfo() gson {

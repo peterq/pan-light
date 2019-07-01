@@ -84,16 +84,8 @@ export default class RtcWebSocket {
         } else {
             data = new Uint8Array(data)
         }
-        // this._send_queue.set(data, this.bufferedAmount);
-        // this.bufferedAmount += data.length;
         this.proxyChannel.send(data)
     }
-
-    // _get_sent_data() {
-    //     const res = new Uint8Array(this._send_queue.buffer, 0, this.bufferedAmount);
-    //     this.bufferedAmount = 0;
-    //     return res;
-    // }
 
     _open() {
         this.readyState = RtcWebSocket.OPEN

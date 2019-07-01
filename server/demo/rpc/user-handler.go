@@ -19,8 +19,9 @@ var userRpcMap = map[string]realtime.RpcHandler{
 				})
 			}
 			arr = append(arr, gson{
-				"name":   host.name,
-				"slaves": slaves,
+				"name":       host.name,
+				"wsAgentUrl": host.wsAgentUrl,
+				"slaves":     slaves,
 			})
 		}
 		return arr, nil
