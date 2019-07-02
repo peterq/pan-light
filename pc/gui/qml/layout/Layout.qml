@@ -1,8 +1,11 @@
 import QtQuick 2.4
+import "../pan"
+import "../transfer"
+import "../explore"
 import "../js/util.js" as Util
 Item {
     id: mainLayout
-    property var tabsUrl: {'我的网盘': 'pan', '传输列表': 'transfer', '探索': 'explore'}
+    property var tabsMap: {'我的网盘': pan, '传输列表': transfer, '探索': explore}
     property var tabs: ['我的网盘', '传输列表', '探索']
     property var colors: ['blue', 'red', 'green']
     property string activeTab: '我的网盘'
@@ -17,10 +20,7 @@ Item {
         }
     }
     function notiActive() {
-        var idx = mainLayout.tabs.findIndex(function (tab) {
-            return tab === mainLayout.activeTab
-        })
-        tabRepeater.itemAt(idx).active()
+        tabsMap[mainLayout.activeTab].active()
     }
     onActiveTabChanged: {
         notiActive()
@@ -112,48 +112,34 @@ Item {
                 }
             }
 
-
             transform: Scale {
                 id: tabsConScale
                 property real scale: 1
                 xScale: scale
                 yScale: scale
                 origin.x: -tabsCon.x + tabsViewport.width / 2
-//                origin.x: tabsCon.width / 2
                 origin.y: parent.height /2
             }
 
-            Repeater {
-                id: tabRepeater
-                model: tabs
-                Rectangle {
-                    id: tabWapper
-                    width: tabsViewport.width
-                    height: tabsViewport.height
-                    signal active
-
-//                    color: mainLayout.colors[index]
-                    Rectangle {
-                       visible: false
-                       property real borderWidth: 10
-                       width: parent.width + 2 * borderWidth
-                       height: parent.height + 2 * borderWidth
-                       x: -borderWidth
-                       y: -borderWidth
-                       border.color: 'red'
-                       border.width: borderWidth
-                    }
-                    Loader {
-                        id: tabLoader
-                        focus: true
-                        width: tabWapper.width
-                        height: tabWapper.height
-                        Component.onCompleted: {
-                            tabLoader.setSource('../' + tabsUrl[modelData] + '/' + tabsUrl[modelData] + '.qml', {tabWapper: tabWapper})
-                        }
-                    }
-                }
+            Pan {
+                id: pan
+                width: tabsViewport.width
+                height: tabsViewport.height
             }
+
+            Transfer {
+                id: transfer
+                width: tabsViewport.width
+                height: tabsViewport.height
+            }
+
+            Explore {
+                id: explore
+                width: tabsViewport.width
+                height: tabsViewport.height
+            }
+
+
         }
     }
 

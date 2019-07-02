@@ -18,8 +18,7 @@ Window {
     minimumWidth: 900
     title: "pan-light"
     signal customerEvent(string event, var data)
-    flags: Qt.WA_TranslucentBackground | Qt.WA_TransparentForMouseEvents
-           | Qt.FramelessWindowHint | Qt.MSWindowsFixedSizeDialogHint
+    flags: Qt.FramelessWindowHint
     color: 'transparent'
     visibility: Window.Windowed
 

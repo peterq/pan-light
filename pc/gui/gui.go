@@ -3,6 +3,7 @@
 package gui
 
 import (
+	"github.com/peterq/pan-light/pc/dep"
 	_ "github.com/peterq/pan-light/pc/functions"
 	_ "github.com/peterq/pan-light/pc/gui/bridge"
 	_ "github.com/peterq/pan-light/pc/gui/comp"
@@ -11,6 +12,7 @@ import (
 	"github.com/peterq/pan-light/qt/bindings/gui"
 	"github.com/peterq/pan-light/qt/bindings/qml"
 	"github.com/peterq/pan-light/qt/bindings/quick"
+	"log"
 	"os"
 )
 
@@ -41,5 +43,9 @@ func StartGui() {
 
 	engine := qml.NewQQmlApplicationEngine(nil)
 	engine.Load(core.NewQUrl3("qrc:/main.qml", 0))
+	dep.OnClose(func() {
+		log.Println("will exit ui")
+		app.Exit(dep.ExitCode)
+	})
 	app.Exec()
 }

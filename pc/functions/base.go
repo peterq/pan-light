@@ -7,7 +7,6 @@ import (
 	"github.com/peterq/pan-light/pc/server-api"
 	"github.com/peterq/pan-light/pc/storage"
 	"log"
-	"os"
 )
 
 func init() {
@@ -41,7 +40,7 @@ var baseSyncRoutes = map[string]syncHandler{
 	// 退出
 	"exit": func(p map[string]interface{}) (result interface{}) {
 		dep.DoClose()
-		os.Exit(0)
+		//os.Exit(0)
 		return
 	},
 	// config

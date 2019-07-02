@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"syscall"
 )
 
 var Fatal = func(str string) {
@@ -14,6 +15,7 @@ var Fatal = func(str string) {
 }
 
 var initCb []func()
+var ExitCode = 0
 
 func OnInit(cb func()) {
 	initCb = append(initCb, cb)
@@ -32,18 +34,25 @@ func OnClose(cb func()) {
 }
 
 func DoClose() {
+	if closeCb == nil {
+		return
+	}
 	for _, cb := range closeCb {
 		cb()
 	}
-	closeCb = nil
+	if runtime.GOOS == "darwin" {
+		syscall.Kill(os.Getpid(), syscall.SIGKILL)
+	}
+	os.Exit(ExitCode)
 }
 
 func Reboot() {
-	if runtime.GOOS == "windows" {
+	ExitCode = 2
+	if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
 		ioutil.WriteFile(DataPath("reboot"), []byte("true"), 0664)
 	}
 	DoClose()
-	os.Exit(2)
+	//os.Exit(2)
 }
 
 var NotifyQml = func(event string, data map[string]interface{}) {

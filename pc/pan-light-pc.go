@@ -32,7 +32,7 @@ const startCmd = "pan_light_start"
 
 func master() {
 
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS != "linux" {
 		windosMaster()
 		return
 	}
@@ -55,7 +55,8 @@ START_PAN:
 			}
 		}
 	}
-	log.Fatal(err)
+	log.Println(err)
+	os.Exit(0)
 }
 
 func windosMaster() {
@@ -85,5 +86,6 @@ START_PAN:
 	if string(bin) == "true" {
 		goto START_PAN
 	}
-	log.Fatal(err)
+	log.Println(err)
+	os.Exit(0)
 }

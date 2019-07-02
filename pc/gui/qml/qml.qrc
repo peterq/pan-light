@@ -12,9 +12,9 @@
         <file>comps/desktop-widget_copy.qml</file>
         <file>comps/bridge.qml</file>
         <file>assets/images/pan-light-1.png</file>
-        <file>pan/pan.qml</file>
-        <file>explore/explore.qml</file>
-        <file>transfer/transfer.qml</file>
+        <file>pan/Pan.qml</file>
+        <file>explore/Explore.qml</file>
+        <file>transfer/Transfer.qml</file>
         <file>login/Login.qml</file>
         <file>comps/IconFont.qml</file>
         <file>assets/images/icons/wx.svg</file>
