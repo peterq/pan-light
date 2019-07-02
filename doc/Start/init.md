@@ -38,7 +38,7 @@ go run ../qt/cmd/qtmoc/main.go desktop gui/comp
 ## 打包qml资源文件
 
 ```bash
-go run ../qt/cmd/qtmoc/main.go desktop gui/qml
+go run ../qt/cmd/qtrcc/main.go desktop gui/qml
 ```
 
 > 这一步会把qml资源文件打包成c++代码, 从而嵌入到程序里边

@@ -6,6 +6,8 @@
     - [protobuf](DevEnv/protobuf.md)
 
 - 开始
+    - [设计思路-客户端部分](Start/design-pc.md)   
+    - [设计思路-在线演示系统](Start/design-demo.md)   
     - [目录结构](Start/directory.md)   
     - [项目初始化](Start/init.md)
     
