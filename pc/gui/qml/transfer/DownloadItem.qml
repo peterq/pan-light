@@ -17,7 +17,7 @@ Item {
     property string resumeData: ''
     property bool isNewAdd: true
     property string downloadState: ''
-    property int progress: 0
+    property real progress: 0
     property string errString: ''
     property bool isQueued: false
 
@@ -118,7 +118,7 @@ Item {
 
     onTaskEvent: {
         // 更新下载速度
-        if (event === 'task.speed') {
+        if (event === 'task.speed') {            
             speed = Util.humanSize(data.speed) + '/s'
             speedInt = data.speed
             speedClearTimer.restart()
