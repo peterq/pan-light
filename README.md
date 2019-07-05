@@ -46,8 +46,6 @@
 
 - 本项目花费了作者大量的时间和精力, 如果你觉得本项目对你有帮助, 帮忙点个star.
 
-- 在线体验系统的源码暂未push到github. 如果需要, 你可以打开在线体验页面, 按f12, 按控制台描述方式获取
-
 - 作者QQ
 
 ![](https://qiniu-cdn.peterq.cn/pan-light/img/author_qq.jpg)
