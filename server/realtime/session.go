@@ -4,16 +4,16 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"github.com/pkg/errors"
 	"golang.org/x/net/websocket"
 	"io/ioutil"
 	"math/rand"
-	"strconv"
 	"sync"
 	"time"
 )
 
-type SessionId int64
+type SessionId string
 
 type Session struct {
 	Data interface{} // 业务数据存放
@@ -29,8 +29,8 @@ type Session struct {
 	rooms            []*Room
 }
 
-func (s *Session) Rooms() []*Room {
-	return s.rooms
+func (ss *Session) Rooms() []*Room {
+	return ss.rooms
 }
 
 func randomStr(lenght int) string {
@@ -44,17 +44,13 @@ func randomStr(lenght int) string {
 
 func newSession(conn *websocket.Conn, missMessageSize int, server *Server) *Session {
 	s := &Session{
-		id:          SessionId(time.Now().UnixNano()),
+		id:          SessionId(fmt.Sprint(time.Now().UnixNano())),
 		secret:      randomStr(16),
 		server:      server,
 		conn:        conn,
 		online:      true,
 		missMessage: make([]gson, missMessageSize),
 	}
-	s.Emit("session.new", gson{
-		"id":     strconv.FormatInt(int64(s.id), 10),
-		"secret": s.secret,
-	})
 	return s
 }
 
@@ -62,12 +58,16 @@ func (ss *Session) Id() SessionId {
 	return ss.id
 }
 
-func (ss *Session) Emit(event string, data interface{}) {
-	ss.write(gson{
+func (ss *Session) Emit(event string, data interface{}, room ...string) {
+	d := gson{
 		"type":    "event",
 		"event":   event,
 		"payload": data,
-	})
+	}
+	if len(room) > 0 {
+		d["room"] = room[0]
+	}
+	ss.write(d)
 }
 
 func (ss *Session) write(data gson) (err error) {
@@ -112,7 +112,7 @@ func (ss *Session) InRoom(name string) bool {
 	return false
 }
 
-const enc = false
+const enc = true
 const key = "pan-light"
 
 func xorBin(bin []byte) []byte {
@@ -128,23 +128,45 @@ func encBin(bin []byte) []byte {
 	if !enc {
 		return bin
 	}
-	buf := bytes.NewBuffer(make([]byte, 0, len(bin)))
-	w := gzip.NewWriter(buf)
-	w.Write(bin)
-	w.Flush()
-	return xorBin(buf.Bytes())
+	zipped, _ := gzipEncode(bin)
+	return xorBin(zipped)
 }
 func dencBin(bin []byte) (dest []byte, err error) {
 	if !enc {
 		return bin, nil
 	}
-	buf := bytes.NewReader(xorBin(bin))
-	r, err := gzip.NewReader(buf)
+	return gzipDecode(xorBin(bin))
+}
+
+func gzipEncode(in []byte) ([]byte, error) {
+	var (
+		buffer bytes.Buffer
+		out    []byte
+		err    error
+	)
+	writer := gzip.NewWriter(&buffer)
+	_, err = writer.Write(in)
 	if err != nil {
-		return
+		writer.Close()
+		return out, err
 	}
-	dest, err = ioutil.ReadAll(r)
-	return
+	err = writer.Close()
+	if err != nil {
+		return out, err
+	}
+
+	return buffer.Bytes(), nil
+}
+
+func gzipDecode(in []byte) ([]byte, error) {
+	reader, err := gzip.NewReader(bytes.NewReader(in))
+	if err != nil {
+		var out []byte
+		return out, err
+	}
+	defer reader.Close()
+
+	return ioutil.ReadAll(reader)
 }
 
 // 接受完整帧

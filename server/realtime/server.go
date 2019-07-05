@@ -1,7 +1,6 @@
 package realtime
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/peterq/pan-light/server/timewheel"
 	"github.com/pkg/errors"
@@ -10,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"runtime/debug"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -39,6 +37,7 @@ type Server struct {
 	SessionKeepTime         time.Duration // 断线, 回话维持时间
 	KeepMessageCount        int           // 断线保留的消息数量
 	BeforeAcceptSession     func(ss *Session) (err error)
+	AfterAcceptSession      func(ss *Session) (err error)
 	BeforeDispatchUserEvent func(ss *Session, event string) (err error)
 	BeforeDispatchUserRpc   func(ss *Session, method string) (err error)
 	OnSessionLost           func(ss *Session)
@@ -143,13 +142,18 @@ func (s *Server) RemoveSession(id SessionId) {
 		return
 	}
 	delete(s.sessionMap, id)
-	for _, room := range ss.rooms {
-		room.Remove(id)
+	go func() {
+		for _, room := range ss.rooms {
+			room.Remove(id)
+		}
+		if ss.online {
+			ss.conn.Close()
+		}
+	}()
+	if s.OnSessionLost != nil {
+		go s.OnSessionLost(ss)
 	}
-	if ss.online {
-		ss.conn.Close()
-	}
-	go s.OnSessionLost(ss)
+
 }
 
 func (s *Server) SessionById(id SessionId) (ss *Session, ok bool) {
@@ -174,6 +178,13 @@ func (s *Server) RoomByName(name string) *Room {
 	return room
 }
 
+func (s *Server) RoomExist(name string) bool {
+	s.roomMapLock.Lock()
+	defer s.roomMapLock.Unlock()
+	_, ok := s.roomMap[name]
+	return ok
+}
+
 func (s *Server) handleWsConn(conn *websocket.Conn) {
 	log.Println("new ws conn", conn.RemoteAddr())
 	var err error
@@ -190,12 +201,9 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 		}
 	}()
 	// 新session或者恢复之前的session
-	bin, err := receiveFullFrame(conn)
-	if err != nil {
-		return
-	}
-	var d gson
-	err = json.Unmarshal(bin, &d)
+	d, err := (&Session{
+		conn: conn,
+	}).Read()
 	if err != nil {
 		return
 	}
@@ -209,11 +217,8 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 			s.sessionMapLock.RLock()
 			defer s.sessionMapLock.RUnlock()
 			var ok bool
-			var id int64
-			id, err = strconv.ParseInt(d["sessionId"].(string), 10, 64)
-			if err != nil {
-				return
-			}
+			var id string
+			id = d["sessionId"].(string)
 			session, ok = s.sessionMap[SessionId(id)]
 			if !ok || session.secret != d["sessionSecret"] {
 				isNewSession = true
@@ -238,6 +243,15 @@ func (s *Server) handleWsConn(conn *websocket.Conn) {
 		s.sessionMapLock.Lock()
 		s.sessionMap[session.id] = session
 		s.sessionMapLock.Unlock()
+		session.Emit("session.new", gson{
+			"id":     session.id,
+			"secret": session.secret,
+		})
+		if s.AfterAcceptSession != nil {
+			if err = s.AfterAcceptSession(session); err != nil {
+				log.Println(err)
+			}
+		}
 	} else {
 		session.Emit("session.resume", "ok")
 	}
@@ -308,7 +322,7 @@ func (s *Server) handleMessage(data gson, ss *Session) {
 		resp := gson{
 			"type":    "call.result",
 			"success": err == nil,
-			"data":    result,
+			"result":  result,
 			"id":      data["id"],
 		}
 		if err != nil {

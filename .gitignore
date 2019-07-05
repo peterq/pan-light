@@ -7,6 +7,5 @@ pc/gui/qml/rcc*
 qml.rcc
 gui-plugin.so
 .env
-/demo
 *.pb.go
 pc/deploy
