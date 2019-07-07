@@ -46,8 +46,5 @@
 
 - 本项目花费了作者大量的时间和精力, 如果你觉得本项目对你有帮助, 帮忙点个star.
 
-- 作者QQ
-
-![](https://qiniu-cdn.peterq.cn/pan-light/img/author_qq.jpg)
   
     
