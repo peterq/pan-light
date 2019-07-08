@@ -13,6 +13,8 @@
 ```
 # pan-light
 
+* 现在有严重bug，请勿使用。[#10](https://github.com/peterq/pan-light/issues/10) *
+
 >　pan-light 是一款不限速的百度网盘客户端, 基于 golang + Qt5 开发.
 本项意义在于探究 golang 在图形界面客户端; web 服务端; 事件调度, websocket, p2p 长连接 等方面的应用和实践.
 欢迎广大 golang 开发者参与本项目. 
