@@ -35,9 +35,5 @@
 - 本文档所描述的操作都是基于linux的, 作者使用Ubuntu进行开发. 你也可以用windows开发不过需要你自己折腾. 折腾之后欢迎补充本文档
 
 - 本项目花费了作者大量的时间和精力, 如果你觉得本项目对你有帮助, 帮忙点个star.
-
-- 作者QQ
-
-![](https://qiniu-cdn.peterq.cn/pan-light/img/author_qq.jpg)
   
     

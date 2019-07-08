@@ -31,7 +31,8 @@
     "expandable-chapters-interactive",
     "theme-comscore",
     "footer",
-    "github-buttons"
+    "github-buttons",
+    "changyan"
   ],
   "pluginsConfig": {
     "sharing": {
@@ -53,8 +54,14 @@
       "weibo": false,
       "whatsapp": false,
       "all": [
-        "google", "facebook", "weibo", "twitter",
-        "qq", "qzone", "linkedin", "pocket"
+        "google",
+        "facebook",
+        "weibo",
+        "twitter",
+        "qq",
+        "qzone",
+        "linkedin",
+        "pocket"
       ]
     },
     "edit-link": {
@@ -65,13 +72,14 @@
       "url": "https://github.com/peterq/pan-light"
     },
     "github-buttons": {
-      "buttons": [{
-        "user": "peterq",
-        "repo": "pan-light",
-        "type": "star",
-        "size": "small",
-        "count": true
-      }
+      "buttons": [
+        {
+          "user": "peterq",
+          "repo": "pan-light",
+          "type": "star",
+          "size": "small",
+          "count": true
+        }
       ]
     },
     "prism": {
@@ -84,6 +92,13 @@
     },
     "anchor-navigation-ex": {
       "showLevel": false
+    },
+    "changyan": {
+      "appid": "cyuk3W80B",
+      "conf": {
+        "appid": "cyuk3W80B",
+        "conf": "prod_a9b47b9dc7f77f7881f336217d139495"
+      }
     }
   }
 }
