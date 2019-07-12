@@ -17,7 +17,7 @@
 本项意义在于探究 golang 在图形界面客户端; web 服务端; 事件调度, websocket, p2p 长连接 等方面的应用和实践.
 欢迎广大 golang 开发者参与本项目. 
 
-[软件官网](https://pan-light.peterq.cn) | [在线体验](https://pan-light.peterq.cn/demo) | [技术文档](https://pan-light.peterq.cn/doc) | [交流群: 438604465](https://jq.qq.com/?_wv=1027&k=52HpwTS)
+[软件官网](https://pan-light.peterq.cn) | [在线体验](https://pan-light.peterq.cn/demo) | [技术文档](https://pan-light.peterq.cn/doc) | [技术交流群: 438604465](https://jq.qq.com/?_wv=1027&k=52HpwTS) | 用户交流群: 222718962
 
 ## 特性
 
