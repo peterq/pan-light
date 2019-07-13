@@ -89,6 +89,7 @@ var hostEventMap = map[string]realtime.EventHandler{
 		slave := host.slaves[slaveName]
 
 		unexpected := slave.state == slaveStateRunning
+		slave.state = slaveStateWait
 		room := server.RoomByName("room.slave.all.user." + slaveName)
 		room.Broadcast("slave.exit", gson{
 			"unexpected": unexpected,
