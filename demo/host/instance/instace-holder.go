@@ -173,6 +173,16 @@ func (h *Holder) startIns() {
 		h.vncAddr = addr
 		h.vncAddrCond.Broadcast() // 通知等待链接的代理
 	}()
+	// 超过6分强制结束进程
+	exited := make(chan bool)
+	defer close(exited)
+	go func() {
+		select {
+		case <-time.After(6 * time.Minute):
+			dockerP.Process.Kill()
+		case <-exited:
+		}
+	}()
 	dockerP.Wait()
 }
 
