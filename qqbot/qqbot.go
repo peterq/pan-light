@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -173,6 +174,23 @@ func (s *State) handleGroupMsg(fromQQ int64, msg string) {
 	}
 }
 
+type MemberSlice []*Member
+
+func (s MemberSlice) Len() int {
+	return len(s)
+}
+
+func (s MemberSlice) Less(i, j int) bool {
+	if s[i].TimeLeft != s[i].TimeLeft {
+		return s[i].TimeLeft > s[j].TimeLeft
+	}
+	return s[i].Info.LastChat.Unix() < s[j].Info.LastChat.Unix()
+}
+
+func (s MemberSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
 func (s *State) cmdOut(cmd []string) {
 	if len(cmd) != 2 {
 		cqp.SendGroupMsg(s.QGroup, "踢人参数不正确. eg: [踢人 3] 剔除 3 个回答错误的群员")
@@ -184,12 +202,23 @@ func (s *State) cmdOut(cmd []string) {
 		return
 	}
 	msg := "以下群员将被剔除:"
-	var members []*Member
+
+	var sorted = make(MemberSlice, len(state.Members))
+	i := 0
 	for _, m := range state.Members {
+		sorted[i] = m
+		i++
+	}
+	sort.Sort(sorted)
+	var members []*Member
+	for _, m := range sorted {
 		if len(members) >= n {
 			break
 		}
 		if m.Info.Auth > 1 || m.Correct || m.BeenOut {
+			continue
+		}
+		if m.Info.QQ == 295851641 {
 			continue
 		}
 		members = append(members, m)
