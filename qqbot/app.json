@@ -1,0 +1,83 @@
+{
+  "ret": 1,
+  "apiver": 9,
+  "appid": "qqbot.pan-light.peterq.cn",
+  "name": "pan-light-qqbot",
+  "version": "1.0.0",
+  "version_id": 1,
+  "author": "peterq",
+  "description": "Q 群管理",
+  "event": [
+    {
+      "name": "插件启用",
+      "function": "EVENT_ON_ENABLE",
+      "type": 1003,
+      "priority": 20000,
+      "id": 1003
+    },
+    {
+      "name": "插件停用",
+      "function": "EVENT_ON_DISABLE",
+      "type": 1004,
+      "priority": 20000,
+      "id": 1004
+    },
+    {
+      "name": "群消息",
+      "function": "EVENT_ON_GROUP_MSG",
+      "type": 2,
+      "priority": 20000,
+      "id": 2
+    },
+    {
+      "name": "私聊消息",
+      "function": "EVENT_ON_PRIVATE_MSG",
+      "type": 21,
+      "priority": 20000,
+      "id": 1
+    },
+    {
+      "id": 6,
+      "type": 102,
+      "name": "群成员减少",
+      "function": "EVENT_ON_GROUP_MEMBER_DECREASE",
+      "priority": 20000
+    }
+  ],
+  "auth": [
+    20,
+    // getCookies / getCsrfToken
+    // 30, // getRecord
+    101,
+    // sendGroupMsg
+    103,
+    // sendDiscussMsg
+    106,
+    // sendPrivateMsg
+    // 110, // sendLikeV2 / sendLike
+     120, // setGroupKick
+    // 121, // setGroupBan
+    // 122, // setGroupAdmin
+    // 123, // setGroupWholeBan
+    // 124, // setGroupAnonymousBan
+    // 125, // setGroupAnonymous
+    // 126, // setGroupCard
+    // 127, // setGroupLeave
+    // 128, // setGroupSpecialTitle
+    130,
+    // getGroupMemberInfoV2 / getGroupMemberInfo
+    131,
+    // getStrangerInfo
+    // 140, // setDiscussLeave
+    // 150, // setFriendAddRequest
+    // 151, // setGroupAddRequest
+    160,
+    // getGroupMemberList
+    161,
+    // getGroupList
+    180
+    // deleteMsg
+  ],
+  "menu": [],
+  "status": []
+}

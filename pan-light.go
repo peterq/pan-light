@@ -54,9 +54,41 @@ func main() {
 		demoCmd()
 	case "server":
 		serverCmd()
+	case "bot":
+		botCmd()
 	default:
 		flag.Usage()
 	}
+}
+
+func botCmd() {
+	cmd := flag.Arg(1)
+	switch cmd {
+	case "build":
+		buildBot()
+	default:
+		flag.Usage()
+	}
+}
+
+func buildBot() {
+	cmd := exec.Command("go", "build", "-ldflags", "-s -w", "-buildmode", "c-shared", "-o", "app.dll")
+	cmd.Dir, _ = filepath.Abs("./qqbot")
+	env := map[string]string{
+		"CGO_LDFLAGS": "-Wl,--kill-at",
+		"CGO_ENABLED": "1",
+		"GOOS":        "windows",
+		"GOARCH":      "386",
+		//"CXX": "/usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-g++",
+		//"CC": "/usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-gcc",
+	}
+	cmd.Env = os.Environ()
+	for key, value := range env {
+		cmd.Env = append(cmd.Env, key+"="+value)
+	}
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
 }
 
 func serverCmd() {
