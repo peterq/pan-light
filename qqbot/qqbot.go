@@ -117,15 +117,23 @@ func (s *State) init() {
 		}
 	}()
 	s.Members = map[int64]*Member{}
+	s.getMembers()
+	old := map[int64]*Member{}
 	bytes, e := ioutil.ReadFile(s.File)
 	if e != nil {
 		s.OnError("读取state失败")
-		s.getMembers()
 	} else {
-		e = json.Unmarshal(bytes, &s.Members)
+		e = json.Unmarshal(bytes, &old)
 		if e != nil {
 			s.OnError("恢复state失败")
-			s.getMembers()
+		}
+	}
+	if old != nil {
+		for qq, om := range old {
+			if m, ok := s.Members[qq]; ok {
+				om.Info = m.Info
+				s.Members[qq] = om
+			}
 		}
 	}
 }
@@ -257,6 +265,7 @@ func (s *State) cmdConfirm(cmd []string) {
 			if cqp.SetGroupKick(s.QGroup, m.Info.QQ, false) == 0 {
 				i++
 			}
+			time.Sleep(2 * time.Second)
 		}
 		cqp.SendGroupMsg(s.QGroup, fmt.Sprintf("已剔除%d名成员", i))
 	}()
