@@ -223,6 +223,8 @@ func (v *Vip) DeleteFile(serverPath string) (err error) {
 }
 
 func (v *Vip) SaveFileByMd5(md5, sliceMd5, path string, contentLength int64) (fid string, fileSize int64, err error) {
+	err = errors.New("vip通道已关闭, 请联系管理员")
+	return
 	ss := v.loginSession()
 	data, err := v.request("POST", "https://pan.baidu.com/api/rapidupload", gson{
 		"rtype":      1,

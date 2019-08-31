@@ -14,7 +14,7 @@ import (
 
 type gson = map[string]interface{}
 
-const baiduUa = "netdisk;4.6.2.0;PC;PC-Windows;10.0.10240;WindowsBaiduYunGuanJia"
+const baiduUa = "netdisk;2.2.3;pc;pc-mac;10.14.5;macbaiduyunguanjia"
 
 func makeHttpClient(cookieStr string) (http.Client, string) {
 	jar, _ := cookiejar.New(nil)

@@ -72,7 +72,7 @@ func VideoProxy(writer http.ResponseWriter, request *http.Request, targetLink st
 	io.Copy(writer, resp.Body)
 }
 
-var BaiduUA = "netdisk;4.6.2.0;PC;PC-Windows;10.0.10240;WindowsBaiduYunGuanJia"
+var BaiduUA = "netdisk;2.2.3;pc;pc-mac;10.14.5;macbaiduyunguanjia"
 
 type tBin []byte
 type tJson map[string]interface{}
