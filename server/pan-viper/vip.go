@@ -269,11 +269,11 @@ func (v *Vip) LinkByFid(fid string) (link string, err error) {
 		"fidlist":    "[" + fid + "]",
 		"type":       "dlink",
 		"channel":    "chunlei",
-		"web":        1,
+		"web":        5,
 		"app_id":     "250528",
 		"bdstoken":   ss.Bdstoken,
 		"logid":      time.Now().UnixNano(),
-		"clienttype": 0,
+		"clienttype": 5,
 	}, nil)
 	if err != nil {
 		err = errors.Wrap(err, "")

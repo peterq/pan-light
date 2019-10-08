@@ -182,11 +182,11 @@ func LinkDirect(fid string) (link string, err error) {
 		"fidlist":    "[" + fid + "]",
 		"type":       "dlink",
 		"channel":    "chunlei",
-		"web":        1,
+		"web":        5,
 		"app_id":     "250528",
 		"bdstoken":   LoginSession.Bdstoken,
 		"logid":      time.Now().UnixNano(),
-		"clienttype": 0,
+		"clienttype": 5,
 	}
 	q := req.URL.Query()
 	for k, v := range params {
