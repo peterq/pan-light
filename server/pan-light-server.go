@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/kataras/iris"
+	"github.com/kataras/iris/v12"
 	"github.com/peterq/pan-light/server/artisan"
 	"github.com/peterq/pan-light/server/demo"
 	"github.com/peterq/pan-light/server/pc-api"
@@ -21,7 +21,7 @@ func main() {
 	demo.Init(app.Party("/demo"), configuration.Other["demo"].(map[interface{}]interface{}))
 
 	app.Use(artisan.ApiRecover)
-	app.StaticWeb("/", "./static")
+	app.HandleDir("/", "./static")
 	pc_api.Init(app)
 	app.Run(iris.Addr(":8081"), iris.WithConfiguration(iris.Configuration{
 		DisablePathCorrectionRedirection: true,
