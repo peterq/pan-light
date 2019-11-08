@@ -1,14 +1,13 @@
 package demo
 
 import (
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
+	"github.com/kataras/iris/v12"
 	"github.com/peterq/pan-light/server/demo/rpc"
 )
 
 func Init(router iris.Party, conf map[interface{}]interface{}) {
 	// 静态页
-	router.Get("/", func(context context.Context) {
+	router.Get("/", func(context iris.Context) {
 		context.Redirect("/demo/init.html")
 	})
 	hosts := map[string]string{}

@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"fmt"
-	"github.com/kataras/iris"
+	"github.com/kataras/iris/v12"
 	"github.com/peterq/pan-light/server/demo/nickname"
 	"github.com/peterq/pan-light/server/realtime"
 	"github.com/pkg/errors"

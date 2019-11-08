@@ -2,14 +2,14 @@ package middleware
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
-	jwtmiddleware "github.com/iris-contrib/middleware/jwt"
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
-	"github.com/peterq/pan-light/server/conf"
-	"github.com/peterq/pan-light/server/dao"
 	"runtime/debug"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	jwtmiddleware "github.com/iris-contrib/middleware/jwt"
+	"github.com/kataras/iris/v12"
+	"github.com/peterq/pan-light/server/conf"
+	"github.com/peterq/pan-light/server/dao"
 )
 
 type PcLoginInfo struct {
@@ -34,11 +34,11 @@ var PcJwtHandler = jwtmiddleware.New(jwtmiddleware.Config{
 	},
 
 	SigningMethod: jwt.SigningMethodHS256,
-	ErrorHandler: func(ctx context.Context, err string) {
+	ErrorHandler: func(ctx iris.Context, err error) {
 		ctx.StatusCode(iris.StatusUnauthorized)
 		ctx.JSON(map[string]interface{}{
 			"success": false,
-			"message": "jwt token check error: " + err,
+			"message": "jwt token check error: " + err.Error(),
 			"code":    iris.StatusUnauthorized,
 		})
 		debug.PrintStack()
@@ -46,7 +46,7 @@ var PcJwtHandler = jwtmiddleware.New(jwtmiddleware.Config{
 })
 
 // 校验pc端jwt
-func PcJwtAuth(ctx context.Context) {
+func PcJwtAuth(ctx iris.Context) {
 	if err := PcJwtHandler.CheckJWT(ctx); err != nil {
 		ctx.StopExecution()
 		return
@@ -100,6 +100,6 @@ func ParseToken(token string) (claim jwt.MapClaims, err error) {
 	return
 }
 
-func ContextLoginInfo(ctx context.Context) *PcLoginInfo {
+func ContextLoginInfo(ctx iris.Context) *PcLoginInfo {
 	return ctx.Values().Get(conf.CtxPcLogin).(*PcLoginInfo)
 }

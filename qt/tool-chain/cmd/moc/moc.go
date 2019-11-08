@@ -227,7 +227,7 @@ func moc(path, target, tags string, fast, slow, root bool, l int, dirty bool) {
 
 	//copy properties + signals + slots
 	utils.Log.Debug("start copy properties + signals + slots")
-	for _ = range append(m.Namespace.Classes, otherclasses...) {
+	for range append(m.Namespace.Classes, otherclasses...) {
 		for _, c := range append(m.Namespace.Classes, otherclasses...) {
 			bc, ok := parser.State.ClassMap[c.Bases]
 			if !ok || bc.Pkg == "" {
