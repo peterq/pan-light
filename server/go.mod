@@ -11,6 +11,6 @@ require (
 	github.com/iris-contrib/middleware/jwt v0.0.0-20191028172159-41f72a73786a
 	github.com/kataras/iris/v12 v12.0.1
 	github.com/pkg/errors v0.8.1
-	golang.org/x/net v0.0.0-20191105084925-a882066a44e0
+	golang.org/x/net v0.7.0
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )
